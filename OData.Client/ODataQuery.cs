@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Mime;
 using System.Threading;
+using System.Threading.Tasks;
 using OData.Client.Expressions.Formatting;
 
 namespace OData.Client
@@ -17,7 +17,7 @@ namespace OData.Client
         private string _selection = string.Empty;
 
         private int? _maxPageSize;
-        
+
         private readonly IValueFormatter _valueFormatter;
 
         private readonly Uri _organizationUri = new Uri("https://universal-robots-uat.crm4.dynamics.com/");
@@ -46,7 +46,7 @@ namespace OData.Client
         {
             var filterVisitor = new FilterExpressionToStringVisitor<TEntity>(string.Empty, _valueFormatter);
             filter.Expression.Visit(filterVisitor);
-            
+
             _filter = filterVisitor.ToString();
             return this;
         }
@@ -124,19 +124,40 @@ namespace OData.Client
             return queryString;
         }
 
-        public async IAsyncEnumerator<IEntity<TEntity>> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+        public async IAsyncEnumerator<IEntity<TEntity>> GetAsyncEnumerator(
+            CancellationToken cancellationToken = default
+        )
         {
             var baseUri = new Uri(_organizationUri, "api/data/v9.1/");
-            
+
             var pluralEntityName = _pluralizer.ToPlural(EntityName.Name);
             var entityUri = new Uri(baseUri, $"{pluralEntityName}/");
-            
+
             var requestUriBuilder = new UriBuilder(entityUri);
             requestUriBuilder.Query = ToQueryString();
-            
-            var requestUri = requestUriBuilder.Uri;
-            
+
+            Uri? nextLink = requestUriBuilder.Uri;
+            var maxIterations = 5;
+            var iteration = 0;
+            while (nextLink != null && iteration < maxIterations)
+            {
+                var response = await ExecuteFindRequestAsync(nextLink, cancellationToken);
+                foreach (var entity in response.Value)
+                {
+                    yield return entity;
+                }
+                nextLink = response.NextLink;
+                iteration++;
+            }
+        }
+
+        private async Task<IFindResponse<TEntity>> ExecuteFindRequestAsync(
+            Uri requestUri,
+            CancellationToken cancellationToken
+        )
+        {
             using var httpRequest = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            
             httpRequest.Headers.Accept.ParseAdd(MediaTypeNames.Application.Json);
             httpRequest.Headers.Add("OData-MaxVersion", "4.0");
             httpRequest.Headers.Add("OData-Version", "4.0");
@@ -152,14 +173,11 @@ namespace OData.Client
                 var message = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
                 throw new HttpRequestException(message, null, httpResponse.StatusCode);
             }
-            
+
             await using var stream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
-            
+
             var response = await _serializer.DeserializeFindResponseAsync<TEntity>(stream);
-            foreach (var entity in response.Value)
-            {
-                yield return entity;
-            }
+            return response;
         }
     }
 }

@@ -31,8 +31,7 @@ namespace OData.Client.Demo
             var valueFormatter = new DefaultValueFormatter();
             var incidentCollection = new ODataCollection<Incident>(Incident.EntityName, valueFormatter, httpClient, serializer, pluralizer);
             
-            var result = await incidentCollection.Find(Incident.CaseNumber == "TS024085")
-                .Expand(Incident.PrimaryContact)
+            var result = await incidentCollection.Find()
                 .Select(Incident.IncidentId, Incident.Title, Incident.CaseNumber, Incident.PrimaryContact)
                 .MaxPageSize(2)
                 .ToListAsync();

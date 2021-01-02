@@ -2,7 +2,7 @@ namespace OData.Client
 {
     public interface IODataCollection<TEntity> where TEntity : IEntity
     {
-        IODataQuery<TEntity> Find(ODataFilter<TEntity> filter);
+        IODataQuery<TEntity> Find();
 
         // Task<TEntity?> RetrieveAsync(Guid id);
         // Task<TProjection?> RetrieveAsync<TProjection>(Guid id, Expression<Func<TEntity, TProjection>> selection);

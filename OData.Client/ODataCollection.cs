@@ -27,10 +27,9 @@ namespace OData.Client
 
         public EntityName<TEntity> EntityName { get; }
 
-        public IODataQuery<TEntity> Find(ODataFilter<TEntity> filter)
+        public IODataQuery<TEntity> Find()
         {
-            var query = new ODataQuery<TEntity>(EntityName, _valueFormatter, _httpClient, _serializer, _pluralizer);
-            return query.Filter(filter);
+            return new ODataQuery<TEntity>(EntityName, _valueFormatter, _httpClient, _serializer, _pluralizer);
         }
     }
 }

@@ -17,7 +17,7 @@ namespace OData.Client.Newtonsoft.Json
         [JsonProperty("@odata.context")]
         public Uri Context { get; }
         
-        [JsonProperty("@odata.nextLink")]
+        [JsonProperty("@odata.nextLink", NullValueHandling = NullValueHandling.Ignore)]
         public Uri? NextLink { get; }
         
         [JsonProperty("value")]
