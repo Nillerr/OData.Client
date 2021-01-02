@@ -30,14 +30,17 @@ namespace OData.Client.Demo
 
             var valueFormatter = new DefaultValueFormatter();
             var incidentCollection = new ODataCollection<Incident>(Incident.EntityName, valueFormatter, httpClient, serializer, pluralizer);
-            
-            var result = await incidentCollection.Find()
-                .Select(Incident.IncidentId, Incident.Title, Incident.CaseNumber, Incident.PrimaryContact)
-                .MaxPageSize(2)
-                .ToListAsync();
 
-            var jsonResult = JsonConvert.SerializeObject(result, Formatting.Indented);
-            Console.WriteLine(jsonResult);
+            var query = incidentCollection.Find()
+                .Filter(Incident.CaseNumber.StartsWith("TS02"))
+                .Select(Incident.IncidentId, Incident.Title, Incident.CaseNumber, Incident.PrimaryContact)
+                .MaxPageSize(1);
+
+            await foreach (var incident in query)
+            {
+                var jsonResult = JsonConvert.SerializeObject(incident, Formatting.Indented);
+                Console.WriteLine(jsonResult);  
+            } 
 
             // var baseUri = new Uri("https://microsoft.com/api/data/v9.1");
             // var entityUri = new Uri(baseUri, "accounts");
