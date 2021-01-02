@@ -168,10 +168,15 @@ namespace OData.Client
             }
 
             using var httpResponse = await _httpClient.SendAsync(httpRequest, cancellationToken);
-            if (!httpResponse.IsSuccessStatusCode)
+            
+            try
+            {
+                httpResponse.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException exception)
             {
                 var message = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
-                throw new HttpRequestException(message, null, httpResponse.StatusCode);
+                throw new HttpRequestException(message, exception, exception.StatusCode);   
             }
 
             await using var stream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);

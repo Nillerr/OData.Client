@@ -1,6 +1,6 @@
 namespace OData.Client
 {
-    public readonly struct EntityName<TEntity>
+    public sealed class EntityName<TEntity> : IEntityName<TEntity> where TEntity : IEntity
     {
         public string Name { get; }
 

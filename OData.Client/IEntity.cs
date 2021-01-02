@@ -18,7 +18,7 @@ namespace OData.Client
         /// <param name="value">The value.</param>
         /// <typeparam name="TValue">The type to convert the value to.</typeparam>
         /// <returns><see langword="true"/> if a value was successfully retrieved; otherwise, <see langword="false"/>.</returns>
-        bool TryGetValue<TValue>(Property<TEntity, TValue> property, out TValue value);
+        bool TryGetValue<TValue>(IProperty<TEntity, TValue> property, out TValue value);
 
         /// <summary>
         /// Gets the value with the specified <paramref name="property"/> converted to the specified type.
@@ -26,7 +26,9 @@ namespace OData.Client
         /// <param name="property">The property.</param>
         /// <typeparam name="TValue">The type to convert the value to.</typeparam>
         /// <returns>The converted value.</returns>
-        TValue Value<TValue>(Property<TEntity, TValue> property);
+        TValue Value<TValue>(IProperty<TEntity, TValue> property);
+
+        IEntityId<TEntity> Value(IProperty<TEntity, IEntityId<TEntity>> property);
 
         string ToJson();
     }

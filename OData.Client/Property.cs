@@ -2,7 +2,7 @@ using System;
 
 namespace OData.Client
 {
-    public sealed class Property<TEntity, TValue> : IProperty<TEntity>
+    public sealed class Property<TEntity, TValue> : IProperty<TEntity, TValue>
         where TEntity : IEntity
     {
         public Property(string name)
@@ -11,6 +11,7 @@ namespace OData.Client
         }
 
         public string Name { get; }
+        
         public Type ValueType => typeof(TValue);
 
         public static implicit operator Property<TEntity, TValue>(string str)

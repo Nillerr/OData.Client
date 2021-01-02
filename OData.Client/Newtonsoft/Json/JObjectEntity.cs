@@ -1,21 +1,27 @@
-using Newtonsoft.Json;
+using System;
 using Newtonsoft.Json.Linq;
 
 namespace OData.Client.Newtonsoft.Json
 {
     public sealed class JObjectEntity<TEntity> : IEntity<TEntity> where TEntity : IEntity
     {
-        [JsonExtensionData]
-        private JObject Root { get; set; } = null!;
+        private readonly JObject _root;
+        private readonly EntityName<TEntity> _entityName;
+
+        public JObjectEntity(JObject root, EntityName<TEntity> entityName)
+        {
+            _root = root;
+            _entityName = entityName;
+        }
 
         public bool Contains(IProperty<TEntity> property)
         {
-            return Root[property.Name] != null;
+            return _root[property.Name] != null;
         }
 
-        public bool TryGetValue<TValue>(Property<TEntity, TValue> property, out TValue value)
+        public bool TryGetValue<TValue>(IProperty<TEntity, TValue> property, out TValue value)
         {
-            if (Root.TryGetValue(property.Name, out var token))
+            if (_root.TryGetValue(property.Name, out var token))
             {
                 value = token.Value<TValue>();
                 return true;
@@ -25,14 +31,21 @@ namespace OData.Client.Newtonsoft.Json
             return false;
         }
 
-        public TValue Value<TValue>(Property<TEntity, TValue> property)
+        public TValue Value<TValue>(IProperty<TEntity, TValue> property)
         {
-            return Root.Value<TValue>(property.Name);
+            return _root.Value<TValue>(property.Name);
+        }
+
+        public IEntityId<TEntity> Value(IProperty<TEntity, IEntityId<TEntity>> property)
+        {
+            var value = _root.Value<string>(property.Name);
+            var id = Guid.Parse(value);
+            return new EntityId<TEntity>(id, _entityName);
         }
 
         public string ToJson()
         {
-            return Root.ToString();
+            return _root.ToString();
         }
     }
 }

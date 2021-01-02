@@ -5,8 +5,6 @@ namespace OData.Client
 {
     public interface IODataQuery<TEntity> : IAsyncEnumerable<IEntity<TEntity>> where TEntity : IEntity
     {
-        EntityName<TEntity> EntityName { get; }
-
         IODataQuery<TEntity> Filter(ODataFilter<TEntity> filter);
 
         IODataQuery<TEntity> Select(params IProperty<TEntity>[] properties);
@@ -19,10 +17,6 @@ namespace OData.Client
         )
             where TOther : IEntity;
 
-        int? MaxPageSize();
-
         IODataQuery<TEntity> MaxPageSize(int? maxPageSize);
-
-        string ToQueryString();
     }
 }

@@ -4,12 +4,13 @@ namespace OData.Client
     {
         public string ToPlural(string source)
         {
-            if (source.EndsWith("s"))
-            {
-                return $"{source}es";
-            }
-
-            return $"{source}s";
+            return source;
+            // if (source.EndsWith("s"))
+            // {
+            //     return $"{source}es";
+            // }
+            //
+            // return $"{source}s";
         }
     }
 }
