@@ -4,9 +4,10 @@ using System.Collections.Generic;
 namespace OData.Client
 {
     public interface IFindResponse<TEntity>
+        where TEntity : IEntity
     {
-        string Context { get; }
-        List<TEntity> Value { get; }
+        Uri Context { get; }
         Uri? NextLink { get; }
+        IReadOnlyList<IEntity<TEntity>> Value { get; }
     }
 }

@@ -1,35 +1,44 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using OData.Client.Expressions.Formatting;
+using OData.Client.Newtonsoft.Json;
 
 namespace OData.Client.Demo
 {
-    record MyRecord(Uri MyUri);
+    internal record MyRecord(Uri MyUri);
     
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
+            var json = "{\"foo\":\"bar\"}";
+            var entity = JsonConvert.DeserializeObject<JObjectEntity<Incident>>(json);
+            Console.WriteLine(entity.ToJson());
+
             // var record = JsonConvert.DeserializeObject<MyRecord>("{\"MyUri\":\"https://www.google.com\"}");
             // Console.WriteLine(record!.MyUri.ToString());
 
+            using var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthorizationToken);
+
+            var serializer = new JsonNetSerializer();
+            var pluralizer = new DefaultPluralizer();
+
             var valueFormatter = new DefaultValueFormatter();
-            var incidentCollection = new ODataCollection<Incident>(Incident.EntityName, valueFormatter);
-
-            var any = !Incident.Contacts.Any(Contact.EmailAddress.EndsWith("@universal-robots.com"));
-
-            var oDataFilter = 
-                (Incident.Title == "The title" | Incident.Title == "The Title 2") 
-                & Incident.PrimaryContact.Filter(Contact.EmailAddress) == "nije@universal-robots.com";
+            var incidentCollection = new ODataCollection<Incident>(Incident.EntityName, valueFormatter, httpClient, serializer, pluralizer);
             
-            var filter = oDataFilter & any;
+            var result = await incidentCollection.Find(Incident.CaseNumber == "TS024085")
+                .Expand(Incident.PrimaryContact)
+                .Select(Incident.IncidentId, Incident.Title, Incident.CaseNumber, Incident.PrimaryContact)
+                .MaxPageSize(2)
+                .ToListAsync();
 
-            var query = incidentCollection.Find(filter)
-                // .Expand(Incident.PrimaryContact)
-                // .Select(Incident.CaseNumber)
-                .ToQueryString();
-            
-            Console.WriteLine(query);
+            var jsonResult = JsonConvert.SerializeObject(result, Formatting.Indented);
+            Console.WriteLine(jsonResult);
 
             // var baseUri = new Uri("https://microsoft.com/api/data/v9.1");
             // var entityUri = new Uri(baseUri, "accounts");
@@ -38,11 +47,6 @@ namespace OData.Client.Demo
             //
             // var requestUri = requestUriBuilder.Uri;
             // Console.WriteLine(requestUri);
-        }
-
-        static void Foo(JObjectEntity<Incident> incident)
-        {
-            var title = incident.Value(Incident.Title);
         }
     }
 }

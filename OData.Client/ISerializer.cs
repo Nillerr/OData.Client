@@ -5,6 +5,6 @@ namespace OData.Client
 {
     public interface ISerializer
     {
-        ValueTask<IFindResponse<TEntity>> DeserializeFindResponseAsync<TEntity>(Stream stream);
+        ValueTask<IFindResponse<TEntity>> DeserializeFindResponseAsync<TEntity>(Stream stream) where TEntity : IEntity;
     }
 }

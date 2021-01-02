@@ -1,14 +1,17 @@
+using System;
+
 namespace OData.Client
 {
     public sealed class Property<TEntity, TValue> : IProperty<TEntity>
         where TEntity : IEntity
     {
-        public string Name { get; }
-
         public Property(string name)
         {
             Name = name;
         }
+
+        public string Name { get; }
+        public Type ValueType => typeof(TValue);
 
         public static implicit operator Property<TEntity, TValue>(string str)
         {
