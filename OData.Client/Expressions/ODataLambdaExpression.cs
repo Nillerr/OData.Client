@@ -11,14 +11,14 @@ namespace OData.Client.Expressions
         IODataLogicalOperand<TEntity>
         where TEntity : IEntity
     {
-        public ODataLambdaExpression(IField<TEntity> field, string function, IODataLambdaBody body)
+        public ODataLambdaExpression(IProperty<TEntity> property, string function, IODataLambdaBody body)
         {
             Function = function;
             Body = body;
-            Field = field;
+            Property = property;
         }
 
-        public IField<TEntity> Field;
+        public IProperty<TEntity> Property;
 
         public string Function { get; }
 
@@ -41,7 +41,7 @@ namespace OData.Client.Expressions
 
         public override string ToString()
         {
-            return $"{nameof(Field)}: {Field}, {nameof(Function)}: {Function}, {nameof(Body)}: {Body}";
+            return $"{nameof(Property)}: {Property}, {nameof(Function)}: {Function}, {nameof(Body)}: {Body}";
         }
     }
 }

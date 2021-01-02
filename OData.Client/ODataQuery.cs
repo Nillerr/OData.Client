@@ -32,22 +32,22 @@ namespace OData.Client
             return this;
         }
 
-        public IODataQuery<TEntity> Select(params IField<TEntity>[] fields)
+        public IODataQuery<TEntity> Select(params IProperty<TEntity>[] fields)
         {
             _selection = string.Join(",", fields.Select(field => field.Name));
             return this;
         }
 
-        public IODataQuery<TEntity> Expand<TOther>(Field<TEntity, TOther?> field) where TOther : IEntity
+        public IODataQuery<TEntity> Expand<TOther>(Property<TEntity, TOther?> property) where TOther : IEntity
         {
-            _expansions.Add(field.Name);
+            _expansions.Add(property.Name);
             return this;
         }
 
-        public IODataQuery<TEntity> Expand<TOther>(Field<TEntity, TOther?> field, IODataNestedQuery<TOther> query)
+        public IODataQuery<TEntity> Expand<TOther>(Property<TEntity, TOther?> property, IODataNestedQuery<TOther> query)
             where TOther : IEntity
         {
-            _expansions.Add($"{field.Name}({query.ToQueryString()})");
+            _expansions.Add($"{property.Name}({query.ToQueryString()})");
             return this;
         }
 

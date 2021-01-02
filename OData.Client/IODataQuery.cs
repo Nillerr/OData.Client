@@ -6,11 +6,11 @@ namespace OData.Client
 
         IODataQuery<TEntity> Filter(ODataFilter<TEntity> filter);
 
-        IODataQuery<TEntity> Select(params IField<TEntity>[] fields);
+        IODataQuery<TEntity> Select(params IProperty<TEntity>[] fields);
 
-        IODataQuery<TEntity> Expand<TOther>(Field<TEntity, TOther?> field) where TOther : IEntity;
+        IODataQuery<TEntity> Expand<TOther>(Property<TEntity, TOther?> property) where TOther : IEntity;
 
-        IODataQuery<TEntity> Expand<TOther>(Field<TEntity, TOther?> field, IODataNestedQuery<TOther> query)
+        IODataQuery<TEntity> Expand<TOther>(Property<TEntity, TOther?> property, IODataNestedQuery<TOther> query)
             where TOther : IEntity;
 
         int? MaxPageSize();

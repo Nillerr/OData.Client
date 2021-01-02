@@ -10,12 +10,12 @@ namespace OData.Client.Expressions
         IODataFunctionTarget<TEntity> 
         where TEntity : IEntity
     {
-        public ODataPropertyExpression(IField<TEntity> property)
+        public ODataPropertyExpression(IProperty<TEntity> property)
         {
             Property = property;
         }
 
-        public IField<TEntity> Property { get; }
+        public IProperty<TEntity> Property { get; }
 
         public void Visit(IODataExpressionVisitor<TEntity> visitor)
         {

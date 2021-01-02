@@ -1,6 +1,6 @@
 namespace OData.Client
 {
-    public interface IField<TEntity>
+    public interface IProperty<TEntity>
         where TEntity : IEntity
     {
         string Name { get; }

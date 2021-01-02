@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text.Json;
+using Newtonsoft.Json;
 using OData.Client.Expressions.Formatting;
 
 namespace OData.Client.Demo
@@ -10,7 +10,7 @@ namespace OData.Client.Demo
     {
         static void Main(string[] args)
         {
-            // var record = JsonSerializer.Deserialize<MyRecord>("{\"MyUri\":\"https://www.google.com\"}");
+            // var record = JsonConvert.DeserializeObject<MyRecord>("{\"MyUri\":\"https://www.google.com\"}");
             // Console.WriteLine(record!.MyUri.ToString());
 
             var valueFormatter = new DefaultValueFormatter();
@@ -38,6 +38,11 @@ namespace OData.Client.Demo
             //
             // var requestUri = requestUriBuilder.Uri;
             // Console.WriteLine(requestUri);
+        }
+
+        static void Foo(JObjectEntity<Incident> incident)
+        {
+            var title = incident.Value(Incident.Title);
         }
     }
 }

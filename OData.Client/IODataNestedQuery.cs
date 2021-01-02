@@ -4,7 +4,7 @@ namespace OData.Client
     {
         IODataQuery<TEntity> Filter(ODataFilter<TEntity> filter);
 
-        IODataNestedQuery<TEntity> Select(params IField<TEntity>[] fields);
+        IODataNestedQuery<TEntity> Select(params IProperty<TEntity>[] fields);
 
         string ToQueryString();
     }

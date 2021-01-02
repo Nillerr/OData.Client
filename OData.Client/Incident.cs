@@ -7,11 +7,11 @@ namespace OData.Client
     {
         public static readonly EntityName<Incident> EntityName = "incident";
         
-        public static readonly Field<Incident, Guid> IncidentId = "incidentid";
-        public static readonly Field<Incident, string> Title = "title";
-        public static readonly Field<Incident, string?> CaseNumber = "casenumber";
+        public static readonly Property<Incident, Guid> IncidentId = "incidentid";
+        public static readonly Property<Incident, string> Title = "title";
+        public static readonly Property<Incident, string?> CaseNumber = "casenumber";
         
-        public static readonly Field<Incident, Contact?> PrimaryContact = "primarycontactid";
-        public static readonly Field<Incident, Contact[]> Contacts = "contacts";
+        public static readonly Property<Incident, Contact?> PrimaryContact = "primarycontactid";
+        public static readonly Property<Incident, Contact[]> Contacts = "contacts";
     }
 }
