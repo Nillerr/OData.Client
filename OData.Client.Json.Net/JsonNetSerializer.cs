@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,13 +30,17 @@ namespace OData.Client.Json.Net
             using var streamReader = new StreamReader(stream, Encoding.UTF8);
             using var jsonReader = new JsonTextReader(streamReader);
             
-            var response = _serializer.Deserialize<JObjectFindResponse<TEntity>>(jsonReader);
-            if (response == null)
+            var root = _serializer.Deserialize<JObject>(jsonReader);
+            if (root == null)
             {
                 throw new JsonSerializationException("Could not deserialize response to JObject");
             }
 
-            response.Request = request;
+            var context = root.GetValue<Uri>("@odata.context");
+            var nextLink = root.GetValueOrDefault<Uri>("@odata.nextLink");
+            var value = root.GetValue<JArray>("value").ToEntities<TEntity>(context);
+            var response = new FindResponse<TEntity>(context, nextLink, value, request);
+            
             return ValueTask.FromResult<IFindResponse<TEntity>>(response);
         }
 

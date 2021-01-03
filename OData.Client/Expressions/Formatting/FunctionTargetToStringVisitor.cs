@@ -15,7 +15,7 @@ namespace OData.Client.Expressions.Formatting
 
         public void Visit(ODataPropertyExpression expression)
         {
-            _stringBuilder.Append(PropertyPrefix + expression.Property.Name);
+            _stringBuilder.Append(PropertyPrefix + expression.Property.SelectableName());
         }
 
         public override string ToString()

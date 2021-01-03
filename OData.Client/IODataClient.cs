@@ -7,6 +7,9 @@ namespace OData.Client
 {
     public interface IODataClient
     {
+        IODataCollection<TEntity> Collection<TEntity>(IEntityName<TEntity> name) 
+            where TEntity : IEntity;
+
         Task<IFindResponse<TEntity>> FindAsync<TEntity>(
             IEntityName<TEntity> name,
             ODataFindRequest<TEntity> request,

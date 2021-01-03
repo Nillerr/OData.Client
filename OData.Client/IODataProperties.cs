@@ -28,16 +28,20 @@ namespace OData.Client
         /// <summary>
         /// Binds multiple <paramref name="ids"/> to a <paramref name="property"/>.
         /// </summary>
-        /// <param name="property"></param>
-        /// <param name="ids"></param>
-        /// <typeparam name="TOther"></typeparam>
-        /// <returns></returns>
+        /// <param name="property">The collection-valued navigation property.</param>
+        /// <param name="ids">The referenced entity ids.</param>
+        /// <typeparam name="TOther">The type of referenced entities.</typeparam>
+        /// <returns>This instance, for fluent chaining.</returns>
         IODataProperties<TEntity> BindAll<TOther>(
             IProperty<TEntity, IEnumerable<TOther>> property,
             IEnumerable<IEntityId<TOther>> ids
         )
             where TOther : IEntity;
 
+        /// <summary>
+        /// Writes the properties as JSON to the specified <paramref name="stream"/>.
+        /// </summary>
+        /// <param name="stream">The stream</param>
         void WriteTo(Stream stream);
     }
 }

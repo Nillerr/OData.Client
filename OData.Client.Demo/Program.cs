@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -14,7 +13,7 @@ namespace OData.Client.Demo
     
     public class Program
     {
-        private const string? AuthorizationToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IjVPZjlQNUY5Z0NDd0NtRjJCT0hIeEREUS1EayIsImtpZCI6IjVPZjlQNUY5Z0NDd0NtRjJCT0hIeEREUS1EayJ9.eyJhdWQiOiJodHRwczovL3VuaXZlcnNhbC1yb2JvdHMtdWF0LmNybTQuZHluYW1pY3MuY29tIiwiaXNzIjoiaHR0cHM6Ly9zdHMud2luZG93cy5uZXQvMzExYTIyZmQtOTU3Ni00MGFiLTk3N2UtYTJmMGE0ZDJjZDM2LyIsImlhdCI6MTYwOTYxMzk4NywibmJmIjoxNjA5NjEzOTg3LCJleHAiOjE2MDk2MTc4ODcsImFpbyI6IkUySmdZSGl4dyszL295S05IZnFUbXUvTi9ub2lIZ0E9IiwiYXBwaWQiOiI0ODQ1MTVhNy01ZTM1LTRiM2UtYjM4OS1hMzU3Y2M3MTBhZmMiLCJhcHBpZGFjciI6IjEiLCJpZHAiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC8zMTFhMjJmZC05NTc2LTQwYWItOTc3ZS1hMmYwYTRkMmNkMzYvIiwib2lkIjoiMTY4YzgyN2QtODFlOC00NjZiLTg5YTEtN2FkMzkwNzY2NTYyIiwicmgiOiIwLkFBQUFfU0lhTVhhVnEwQ1hmcUx3cE5MTk5xY1ZSVWcxWGo1THM0bWpWOHh4Q3Z4NUFBQS4iLCJzdWIiOiIxNjhjODI3ZC04MWU4LTQ2NmItODlhMS03YWQzOTA3NjY1NjIiLCJ0aWQiOiIzMTFhMjJmZC05NTc2LTQwYWItOTc3ZS1hMmYwYTRkMmNkMzYiLCJ1dGkiOiJzQmR6ZU0xZm9rLTdHZkFiVjZoLUFBIiwidmVyIjoiMS4wIn0.O5vZGjlkkmCGvoR6rd0bI80nIKrn86tR3HX30i5yBsnUbHLQa0LlqcQvQKc9ebPH2L8BZpzX3k76W0HxRpOVq4-UaZ__wC4cue7M8A6zNp2RnI08S5NaCryxLMETf4re08fZ95ze8_DRJeRpHQZkQHUunydEuKkPnTzspmKLHwbSWiZv6b7go8K4MrlKifrsRT5xJbpAT8liOESkAtn8x0oljcAhrxXDHNFNZdnJVRPrup3b2S6Mo5daYKUR1fRIVkZ9wqC4rK0_fANMmgo8tRBvTXJ8tAAZyYMwF_297O1uvb5kpDhMoQkTQbVMd48kNQr7f1wNWt5YwjowW8Xv3w";
+        private const string? AuthorizationToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IjVPZjlQNUY5Z0NDd0NtRjJCT0hIeEREUS1EayIsImtpZCI6IjVPZjlQNUY5Z0NDd0NtRjJCT0hIeEREUS1EayJ9.eyJhdWQiOiJodHRwczovL3VuaXZlcnNhbC1yb2JvdHMtdWF0LmNybTQuZHluYW1pY3MuY29tIiwiaXNzIjoiaHR0cHM6Ly9zdHMud2luZG93cy5uZXQvMzExYTIyZmQtOTU3Ni00MGFiLTk3N2UtYTJmMGE0ZDJjZDM2LyIsImlhdCI6MTYwOTY3Mzc3MSwibmJmIjoxNjA5NjczNzcxLCJleHAiOjE2MDk2Nzc2NzEsImFpbyI6IkUySmdZTGprY0x4OC9UTzFRTGR3OXBnSHNtOVhBUUE9IiwiYXBwaWQiOiI0ODQ1MTVhNy01ZTM1LTRiM2UtYjM4OS1hMzU3Y2M3MTBhZmMiLCJhcHBpZGFjciI6IjEiLCJpZHAiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC8zMTFhMjJmZC05NTc2LTQwYWItOTc3ZS1hMmYwYTRkMmNkMzYvIiwib2lkIjoiMTY4YzgyN2QtODFlOC00NjZiLTg5YTEtN2FkMzkwNzY2NTYyIiwicmgiOiIwLkFBQUFfU0lhTVhhVnEwQ1hmcUx3cE5MTk5xY1ZSVWcxWGo1THM0bWpWOHh4Q3Z4NUFBQS4iLCJzdWIiOiIxNjhjODI3ZC04MWU4LTQ2NmItODlhMS03YWQzOTA3NjY1NjIiLCJ0aWQiOiIzMTFhMjJmZC05NTc2LTQwYWItOTc3ZS1hMmYwYTRkMmNkMzYiLCJ1dGkiOiJhU1dBOVRPNnpVNl9zbnBfMG04RUFBIiwidmVyIjoiMS4wIn0.JE2tVqHbid_ysk8R0pi77M1-pow3fjCMGQUohXck3qX2zEiLWLjp1UYt5o2573AEkY4yyjo3sCb4d-dtYOpuZUicnBLNOaqZm0AYcnRw1doP-16cFzzJJC3DLvm874Oqxzri1lypjXx01_jq8aHFZfdgaWxjmjDVfsJ2EmPQlQ2rHUD1dpVwO8LPBwGKu6vVV8Pt5K3Y9_sYqOm2EBKXuSs90t-Iru7p9qOxlik001avXKfXliAIf5yrAto_8oZln4OJqDtbOwdDhcbdcryC9pqMdF2YrQHu19c8xxCfxJztEoK-yFGx5IZx2dSMWTbs9AXttlFVKOHXz55VK3u4ig";
         
         private static readonly Uri OrganizationUri = new Uri("https://universal-robots-uat.crm4.dynamics.com");
 
@@ -25,8 +24,9 @@ namespace OData.Client.Demo
             var id = entityId.Substring(entityId.Length - 37, 36);
             Console.WriteLine(id);
             
-            var json = "{\"foo\":\"bar\"}";
+            var json = "{\"foo\":[{\"k\":\"bar\"}]}";
             var jObject = JsonConvert.DeserializeObject<JObject>(json);
+            
             var entity = new JObjectEntity<Incident>(jObject, Incident.EntityName);
             Console.WriteLine(entity.ToJson());
 
@@ -43,22 +43,23 @@ namespace OData.Client.Demo
             var valueFormatter = new DefaultValueFormatter();
             
             var oDataHttpClient = new ODataClient(OrganizationUri, httpClient, propertiesFactory, serializer, valueFormatter);
-            var incidentCollection = new ODataCollection<Incident>(Incident.EntityName, oDataHttpClient);
-
-            var foo = Activity.Contact.Where(Contact.EmailAddress) == "nije@universal-robots.com";
+            var incidentCollection = oDataHttpClient.Collection(Incident.EntityName);
 
             var query = incidentCollection.Find()
-                .Filter(Incident.CaseNumber.StartsWith("TS02") & Incident.Activities.Any(foo))
+                .Filter(Incident.CaseNumber.StartsWith("TS02"))
                 .Select(Incident.IncidentId, Incident.Title, Incident.CaseNumber, Incident.PrimaryContact)
+                .OrderBy(Incident.CaseNumber)
                 .MaxPageSize(1);
+            
+            Console.WriteLine(query);
 
             await foreach (var incident in query)
             {
                 var incidentId = incident.Value(Incident.IncidentId);
                 Console.WriteLine($"[{incidentId.Id:D}]: {incident.ToJson()}");
-                
-                var portalCommentId = AdxPortalComment.EntityName.ParseId("1e65cb68-39c2-41a8-b76b-2cf99192ef6c");
-                await incidentCollection.AssociateAsync(incidentId, Incident.Activities, portalCommentId);
+
+                // var portalCommentId = AdxPortalComment.EntityName.ParseId("1e65cb68-39c2-41a8-b76b-2cf99192ef6c");
+                // await incidentCollection.AssociateAsync(incidentId, Incident.Activities, portalCommentId);
             }
 
             // await incidentCollection.CreateAsync(e =>

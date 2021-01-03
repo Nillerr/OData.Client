@@ -1,6 +1,6 @@
 namespace OData.Client
 {
-    internal enum SortDirection
+    public enum SortDirection
     {
         Ascending,
         Descending,

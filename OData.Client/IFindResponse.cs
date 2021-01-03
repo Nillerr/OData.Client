@@ -6,9 +6,24 @@ namespace OData.Client
     public interface IFindResponse<TEntity>
         where TEntity : IEntity
     {
+        /// <summary>
+        /// The context of the request.
+        /// </summary>
         Uri Context { get; }
+        
+        /// <summary>
+        /// The link to the next page if more pages are available.
+        /// </summary>
         Uri? NextLink { get; }
+        
+        /// <summary>
+        /// The entities returned by this find request.
+        /// </summary>
         IReadOnlyList<IEntity<TEntity>> Value { get; }
+        
+        /// <summary>
+        /// The original request.
+        /// </summary>
         ODataFindRequest<TEntity> Request { get; }
     }
 }

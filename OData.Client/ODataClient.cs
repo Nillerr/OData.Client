@@ -75,6 +75,11 @@ namespace OData.Client
             return requestUri;
         }
 
+        public IODataCollection<TEntity> Collection<TEntity>(IEntityName<TEntity> name) where TEntity : IEntity
+        {
+            return new ODataCollection<TEntity>(name, this, _valueFormatter);
+        }
+
         public async Task<IFindResponse<TEntity>> FindAsync<TEntity>(
             IEntityName<TEntity> name,
             ODataFindRequest<TEntity> request,

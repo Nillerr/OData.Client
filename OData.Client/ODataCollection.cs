@@ -2,24 +2,27 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using OData.Client.Expressions.Formatting;
 
 namespace OData.Client
 {
-    public sealed class ODataCollection<TEntity> : IODataCollection<TEntity> where TEntity : IEntity
+    internal sealed class ODataCollection<TEntity> : IODataCollection<TEntity> where TEntity : IEntity
     {
         private readonly IODataClient _oDataClient;
+        private readonly IValueFormatter _valueFormatter;
 
-        public ODataCollection(EntityName<TEntity> entityName, IODataClient oDataClient)
+        public ODataCollection(IEntityName<TEntity> entityName, IODataClient oDataClient, IValueFormatter valueFormatter)
         {
             EntityName = entityName;
             _oDataClient = oDataClient;
+            _valueFormatter = valueFormatter;
         }
 
-        public EntityName<TEntity> EntityName { get; }
+        public IEntityName<TEntity> EntityName { get; }
 
         public IODataQuery<TEntity> Find()
         {
-            return new ODataQuery<TEntity>(EntityName, _oDataClient);
+            return new ODataQuery<TEntity>(EntityName, _oDataClient, _valueFormatter);
         }
 
         public async Task<IEntity<TEntity>?> RetrieveAsync(IEntityId<TEntity> id)
