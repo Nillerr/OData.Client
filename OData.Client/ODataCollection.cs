@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using OData.Client.Expressions.Formatting;
@@ -87,7 +86,7 @@ namespace OData.Client
 
         public async Task AssociateAsync<TOther>(
             IEntityId<TEntity> id,
-            IProperty<TEntity, TOther?> property,
+            IRef<TEntity, TOther> property,
             IEntityId<TOther> otherId,
             CancellationToken cancellationToken = default
         )
@@ -96,19 +95,9 @@ namespace OData.Client
             await _oDataClient.AssociateAsync(id, property, otherId, cancellationToken);
         }
 
-        public Task AssociateAsync<TOther>(
-            IEntityId<TEntity> id,
-            IProperty<TEntity, IEnumerable<TOther>> property,
-            IEntityId<TOther> otherId,
-            CancellationToken cancellationToken = default
-        ) where TOther : IEntity
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task DisassociateAsync<TOther>(
             IEntityId<TEntity> id,
-            IProperty<TEntity, TOther?> property,
+            IOptionalRef<TEntity, TOther> property,
             IEntityId<TOther> otherId,
             CancellationToken cancellationToken = default
         )
@@ -117,9 +106,20 @@ namespace OData.Client
             await _oDataClient.DisassociateAsync(id, property, otherId, cancellationToken);
         }
 
+        public async Task AssociateAsync<TOther>(
+            IEntityId<TEntity> id,
+            IRefs<TEntity, TOther> property,
+            IEntityId<TOther> otherId,
+            CancellationToken cancellationToken = default
+        )
+            where TOther : IEntity
+        {
+            await _oDataClient.AssociateAsync(id, property, otherId, cancellationToken);
+        }
+
         public async Task DisassociateAsync<TOther>(
             IEntityId<TEntity> id,
-            IProperty<TEntity, IEnumerable<TOther>> property,
+            IRefs<TEntity, TOther> property,
             IEntityId<TOther> otherId,
             CancellationToken cancellationToken = default
         )

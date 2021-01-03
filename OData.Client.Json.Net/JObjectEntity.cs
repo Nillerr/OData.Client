@@ -112,7 +112,7 @@ namespace OData.Client.Json.Net
             }
         }
 
-        public bool ContainsReference<TOther>(IEntityReference<TEntity, TOther> property) where TOther : IEntity
+        public bool ContainsReference<TOther>(IRef<TEntity, TOther> property) where TOther : IEntity
         {
             var propertyName = property.ValueName();
             return _root[propertyName] != null;

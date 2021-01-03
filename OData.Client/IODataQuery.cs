@@ -60,7 +60,7 @@ namespace OData.Client
         /// <param name="property">The property to expand.</param>
         /// <typeparam name="TOther">The type of entity referenced by the navigation property.</typeparam>
         /// <returns>This query instance.</returns>
-        IODataQuery<TEntity> Expand<TOther>(IEntityReference<TEntity, TOther> property) where TOther : IEntity;
+        IODataQuery<TEntity> Expand<TOther>(IRef<TEntity, TOther> property) where TOther : IEntity;
 
         /// <summary>
         /// Specifies a collection-valued navigation property to expand.
@@ -68,7 +68,7 @@ namespace OData.Client
         /// <param name="property">The property to expand.</param>
         /// <typeparam name="TOther">The type of entity referenced by the navigation property.</typeparam>
         /// <returns>This query instance.</returns>
-        IODataQuery<TEntity> Expand<TOther>(IProperty<TEntity, IEnumerable<TOther>> property) where TOther : IEntity;
+        IODataQuery<TEntity> Expand<TOther>(IRefs<TEntity, TOther> property) where TOther : IEntity;
 
         // IODataQuery<TEntity> Expand<TOther>(
         //     IProperty<TEntity, TOther?> property,

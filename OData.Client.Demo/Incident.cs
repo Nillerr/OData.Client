@@ -16,6 +16,9 @@ namespace OData.Client.Demo
         public static readonly Required<Incident, double> DoubleValue = "dbler";
         
         public static readonly OptionalRef<Incident, Contact> PrimaryContact = "primarycontactid";
+        
+        public static readonly Refs<Incident, Activity> Activities = "activities";
+        
         // public static readonly OptionalRef<Incident, Contact> SecondaryContact = "secondarycontactid";
         // public static readonly Property<Incident, Contact[]> Contacts = "contacts";
         

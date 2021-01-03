@@ -5,6 +5,6 @@ namespace OData.Client
         IODataSelection<TEntity> Select(IProperty<TEntity> property);
         IODataSelection<TEntity> Select(params IProperty<TEntity>[] properties);
 
-        IODataSelection<TEntity> Expand<TOther>(IEntityReference<TEntity, TOther> property) where TOther : IEntity;
+        IODataSelection<TEntity> Expand<TOther>(IRef<TEntity, TOther> property) where TOther : IEntity;
     }
 }

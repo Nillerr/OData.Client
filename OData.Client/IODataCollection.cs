@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -36,7 +35,15 @@ namespace OData.Client
 
         Task AssociateAsync<TOther>(
             IEntityId<TEntity> id,
-            IProperty<TEntity, TOther?> property,
+            IRef<TEntity, TOther> property,
+            IEntityId<TOther> otherId,
+            CancellationToken cancellationToken = default
+        ) 
+            where TOther : IEntity;
+
+        Task DisassociateAsync<TOther>(
+            IEntityId<TEntity> id,
+            IOptionalRef<TEntity, TOther> property,
             IEntityId<TOther> otherId,
             CancellationToken cancellationToken = default
         ) 
@@ -44,7 +51,7 @@ namespace OData.Client
 
         Task AssociateAsync<TOther>(
             IEntityId<TEntity> id,
-            IProperty<TEntity, IEnumerable<TOther>> property,
+            IRefs<TEntity, TOther> property,
             IEntityId<TOther> otherId,
             CancellationToken cancellationToken = default
         ) 
@@ -52,15 +59,7 @@ namespace OData.Client
 
         Task DisassociateAsync<TOther>(
             IEntityId<TEntity> id,
-            IProperty<TEntity, TOther?> property,
-            IEntityId<TOther> otherId,
-            CancellationToken cancellationToken = default
-        ) 
-            where TOther : IEntity;
-
-        Task DisassociateAsync<TOther>(
-            IEntityId<TEntity> id,
-            IProperty<TEntity, IEnumerable<TOther>> property,
+            IRefs<TEntity, TOther> property,
             IEntityId<TOther> otherId,
             CancellationToken cancellationToken = default
         ) 

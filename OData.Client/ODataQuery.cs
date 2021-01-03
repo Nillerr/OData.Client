@@ -53,14 +53,14 @@ namespace OData.Client
             return this;
         }
 
-        public IODataQuery<TEntity> Expand<TOther>(IEntityReference<TEntity, TOther> property) where TOther : IEntity
+        public IODataQuery<TEntity> Expand<TOther>(IRef<TEntity, TOther> property) where TOther : IEntity
         {
             var expansion = ODataExpansion.Create(property);
             _expansions.Add(expansion);
             return this;
         }
 
-        public IODataQuery<TEntity> Expand<TOther>(IProperty<TEntity, IEnumerable<TOther>> property) where TOther : IEntity
+        public IODataQuery<TEntity> Expand<TOther>(IRefs<TEntity, TOther> property) where TOther : IEntity
         {
             var expansion = ODataExpansion.Create(property);
             _expansions.Add(expansion);

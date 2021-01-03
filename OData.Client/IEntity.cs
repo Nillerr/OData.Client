@@ -71,7 +71,7 @@ namespace OData.Client
         /// <param name="property">The navigation property.</param>
         /// <typeparam name="TOther">The referenced entity type.</typeparam>
         /// <returns><see langword="true"/> if the navigation property is present; otherwise, <see langword="false"/>.</returns>
-        bool ContainsReference<TOther>(IEntityReference<TEntity, TOther> property)
+        bool ContainsReference<TOther>(IRef<TEntity, TOther> property)
             where TOther : IEntity;
 
         /// <summary>

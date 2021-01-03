@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Mime;
@@ -63,8 +62,9 @@ namespace OData.Client
             return requestUri;
         }
 
-        private Uri PropertyRefUri<TEntity>(IEntityId<TEntity> id, IProperty<TEntity> property)
+        private Uri PropertyRefUri<TEntity, TOther>(IEntityId<TEntity> id, IRefProperty<TEntity, TOther> property)
             where TEntity : IEntity
+            where TOther : IEntity
         {
             var entityUri = EntityUri(id);
 
@@ -242,7 +242,7 @@ namespace OData.Client
 
         public async Task AssociateAsync<TEntity, TOther>(
             IEntityId<TEntity> id,
-            IProperty<TEntity, TOther?> property,
+            IRef<TEntity, TOther> property,
             IEntityId<TOther> otherId,
             CancellationToken cancellationToken = default
         )
@@ -261,7 +261,7 @@ namespace OData.Client
 
         public async Task AssociateAsync<TEntity, TOther>(
             IEntityId<TEntity> id,
-            IProperty<TEntity, IEnumerable<TOther>> property,
+            IRefs<TEntity, TOther> property,
             IEntityId<TOther> otherId,
             CancellationToken cancellationToken = default
         )
@@ -280,7 +280,7 @@ namespace OData.Client
 
         public async Task DisassociateAsync<TEntity, TOther>(
             IEntityId<TEntity> id,
-            IProperty<TEntity, TOther?> property,
+            IOptionalRef<TEntity, TOther> property,
             IEntityId<TOther> otherId,
             CancellationToken cancellationToken = default
         )
@@ -295,7 +295,7 @@ namespace OData.Client
 
         public async Task DisassociateAsync<TEntity, TOther>(
             IEntityId<TEntity> id,
-            IProperty<TEntity, IEnumerable<TOther>> property,
+            IRefs<TEntity, TOther> property,
             IEntityId<TOther> otherId,
             CancellationToken cancellationToken = default
         )

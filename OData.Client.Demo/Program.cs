@@ -53,7 +53,7 @@ namespace OData.Client.Demo
                     & Incident.PrimaryContact.Filter(Contact.ParentCustomer.Value()) == accountId
                 )
                 .Select(Incident.IncidentId, Incident.Title, Incident.CaseNumber, Incident.PrimaryContact.Value())
-                .Expand(Incident.PrimaryContact)
+                // .Expand(Incident.PrimaryContact)
                 .OrderBy(Incident.CaseNumber)
                 .MaxPageSize(1);
             
