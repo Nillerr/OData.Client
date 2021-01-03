@@ -1,97 +1,59 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Net.Mime;
 using System.Threading;
-using System.Threading.Tasks;
-using OData.Client.Expressions.Formatting;
 
 namespace OData.Client
 {
     public sealed class ODataQuery<TEntity> : IODataQuery<TEntity> where TEntity : IEntity
     {
-        private readonly List<string> _expansions = new();
-
-        private string _filter = string.Empty;
-        private string _selection = string.Empty;
+        private readonly List<IProperty<TEntity>> _selection = new();
+        private readonly List<ODataExpansion<TEntity>> _expansions = new();
+        
+        private ODataFilter<TEntity>? _filter;
 
         private int? _maxPageSize;
 
-        private readonly IValueFormatter _valueFormatter;
+        private readonly IODataClient _oDataClient;
 
-        private readonly Uri _organizationUri = new Uri("https://universal-robots-uat.crm4.dynamics.com/");
-        private readonly HttpClient _httpClient;
-        private readonly ISerializer _serializer;
-        private readonly IPluralizer _pluralizer;
-
-        public ODataQuery(
-            EntityName<TEntity> entityName,
-            IValueFormatter valueFormatter,
-            HttpClient httpClient,
-            ISerializer serializer,
-            IPluralizer pluralizer
-        )
+        public ODataQuery(EntityName<TEntity> entityName, IODataClient oDataClient)
         {
             EntityName = entityName;
-            _valueFormatter = valueFormatter;
-            _httpClient = httpClient;
-            _serializer = serializer;
-            _pluralizer = pluralizer;
+            _oDataClient = oDataClient;
         }
 
         public EntityName<TEntity> EntityName { get; }
 
         public IODataQuery<TEntity> Filter(ODataFilter<TEntity> filter)
         {
-            var filterVisitor = new FilterExpressionToStringVisitor<TEntity>(string.Empty, _valueFormatter);
-            filter.Expression.Visit(filterVisitor);
+            if (_filter.HasValue)
+            {
+                _filter = _filter.Value & filter;
+            }
+            else
+            {
+                _filter = filter;
+            }
+            
+            return this;
+        }
 
-            _filter = filterVisitor.ToString();
+        public IODataQuery<TEntity> Select(IProperty<TEntity> property)
+        {
+            _selection.Add(property);
             return this;
         }
 
         public IODataQuery<TEntity> Select(params IProperty<TEntity>[] properties)
         {
-            _selection = string.Join(",", properties.Select(PropertySelectName));
+            _selection.AddRange(properties);
             return this;
         }
 
-        private static string PropertySelectName(IProperty<TEntity> property)
+        public IODataQuery<TEntity> Expand<TOther>(IProperty<TEntity, TOther?> property) where TOther : IEntity
         {
-            if (property.ValueType.IsAssignableTo(typeof(IEntity)))
-            {
-                return $"_{property.Name}_value";
-            }
-
-            if (property.ValueType.IsEnumerableType(out var valueType))
-            {
-                return property.Name;
-            }
-
-            return property.Name;
-        }
-
-        public IODataQuery<TEntity> Expand<TOther>(Property<TEntity, TOther?> property) where TOther : IEntity
-        {
-            _expansions.Add(property.Name);
+            var expansion = ODataExpansion.Create(property);
+            _expansions.Add(expansion);
             return this;
-        }
-
-        public IODataQuery<TEntity> Expand<TOther>(
-            Property<TEntity, TOther?> property,
-            Func<IODataNestedQuery<TOther>, IODataNestedQuery<TOther>> query
-        )
-            where TOther : IEntity
-        {
-            throw new NotImplementedException();
-            // _expansions.Add($"{property.Name}({query.ToQueryString()})");
-            // return this;
-        }
-
-        public int? MaxPageSize()
-        {
-            return _maxPageSize;
         }
 
         public IODataQuery<TEntity> MaxPageSize(int? maxPageSize)
@@ -100,89 +62,26 @@ namespace OData.Client
             return this;
         }
 
-        public string ToQueryString()
-        {
-            var queryStringParts = new List<string>(3);
-
-            if (_filter != string.Empty)
-            {
-                queryStringParts.Add("$filter=" + _filter);
-            }
-
-            if (_selection != string.Empty)
-            {
-                queryStringParts.Add("$select=" + _selection);
-            }
-
-            if (_expansions.Count > 0)
-            {
-                var expand = string.Join(",", _expansions);
-                queryStringParts.Add("$expand=" + expand);
-            }
-
-            var queryString = string.Join("&", queryStringParts);
-            return queryString;
-        }
-
         public async IAsyncEnumerator<IEntity<TEntity>> GetAsyncEnumerator(
             CancellationToken cancellationToken = default
         )
         {
-            var baseUri = new Uri(_organizationUri, "api/data/v9.1/");
+            var request = new ODataFindRequest<TEntity>(_filter, _selection, _expansions, _maxPageSize);
 
-            var pluralEntityName = _pluralizer.ToPlural(EntityName.Name);
-            var entityUri = new Uri(baseUri, $"{pluralEntityName}/");
-
-            var requestUriBuilder = new UriBuilder(entityUri);
-            requestUriBuilder.Query = ToQueryString();
-
-            Uri? nextLink = requestUriBuilder.Uri;
-            var maxIterations = 5;
+            const int maxIterations = 5;
             var iteration = 0;
-            while (nextLink != null && iteration < maxIterations)
+            
+            IFindResponse<TEntity>? response = await _oDataClient.FindAsync(EntityName, request, cancellationToken);
+            while (response != null && iteration < maxIterations)
             {
-                var response = await ExecuteFindRequestAsync(nextLink, cancellationToken);
                 foreach (var entity in response.Value)
                 {
                     yield return entity;
                 }
-                nextLink = response.NextLink;
+
+                response = await _oDataClient.FindNextAsync(response, cancellationToken);
                 iteration++;
             }
-        }
-
-        private async Task<IFindResponse<TEntity>> ExecuteFindRequestAsync(
-            Uri requestUri,
-            CancellationToken cancellationToken
-        )
-        {
-            using var httpRequest = new HttpRequestMessage(HttpMethod.Get, requestUri);
-            
-            httpRequest.Headers.Accept.ParseAdd(MediaTypeNames.Application.Json);
-            httpRequest.Headers.Add("OData-MaxVersion", "4.0");
-            httpRequest.Headers.Add("OData-Version", "4.0");
-            
-            if (_maxPageSize.HasValue)
-            {
-                httpRequest.Headers.Add("Prefer", $"odata.maxpagesize={_maxPageSize.Value}");
-            }
-
-            using var httpResponse = await _httpClient.SendAsync(httpRequest, cancellationToken);
-            
-            try
-            {
-                httpResponse.EnsureSuccessStatusCode();
-            }
-            catch (HttpRequestException exception)
-            {
-                var message = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
-                throw new HttpRequestException(message, exception, exception.StatusCode);   
-            }
-
-            await using var stream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
-
-            var response = await _serializer.DeserializeFindResponseAsync<TEntity>(stream);
-            return response;
         }
     }
 }

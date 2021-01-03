@@ -1,7 +1,11 @@
-﻿namespace OData.Client.Demo
+﻿using System;
+
+namespace OData.Client.Demo
 {
     public sealed class Incident : IEntity
     {
+        private Incident() => throw new InvalidOperationException();
+
         public static readonly EntityName<Incident> EntityName = "incidents";
 
         public static readonly Property<Incident, string> ETag = "@odata.etag";

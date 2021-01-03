@@ -9,5 +9,6 @@ namespace OData.Client
         Uri Context { get; }
         Uri? NextLink { get; }
         IReadOnlyList<IEntity<TEntity>> Value { get; }
+        ODataFindRequest<TEntity> Request { get; }
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 
 namespace OData.Client
@@ -37,6 +38,6 @@ namespace OData.Client
         )
             where TOther : IEntity;
 
-        HttpContent ToHttpContent();
+        void WriteTo(Stream stream);
     }
 }

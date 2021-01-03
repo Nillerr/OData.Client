@@ -7,8 +7,9 @@ namespace OData.Client
 {
     public static class PropertyOperators
     {
+        #nullable disable
         public static Property<TEntity, TValue> Filter<TEntity, TOther, TValue>(
-            this Property<TEntity, TOther?> property,
+            this Property<TEntity, TOther> property,
             Property<TOther, TValue> other
         )
             where TEntity : IEntity
@@ -16,6 +17,17 @@ namespace OData.Client
         {
             return $"{property.Name}/{other.Name}";
         }
+        
+        public static Property<TEntity, TValue> Where<TEntity, TOther, TValue>(
+            this Property<TEntity, TOther> property,
+            Property<TOther, TValue> other
+        )
+            where TEntity : IEntity
+            where TOther : IEntity
+        {
+            return property.Filter(other);
+        }
+        #nullable enable
 
         public static ODataFilter<TEntity> EqualTo<TEntity, TValue>(this Property<TEntity, TValue> property, TValue value)
             where TEntity : IEntity

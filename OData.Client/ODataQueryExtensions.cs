@@ -31,5 +31,11 @@ namespace OData.Client
 
             return entities;
         }
+
+        public static IODataQuery<TEntity> Where<TEntity>(this IODataQuery<TEntity> query, ODataFilter<TEntity> filter)
+            where TEntity : IEntity
+        {
+            return query.Filter(filter);
+        }
     }
 }

@@ -13,7 +13,7 @@ namespace OData.Client.Newtonsoft.Json
             Context = context;
             NextLink = nextLink;
 
-            var entities = ToEntities(value, context);
+            var entities = value.ToEntities<TEntity>(context);
             Value = entities.AsReadOnly();
         }
 
@@ -26,27 +26,6 @@ namespace OData.Client.Newtonsoft.Json
         [JsonProperty("value")]
         public IReadOnlyList<IEntity<TEntity>> Value { get; }
 
-        private static List<JObjectEntity<TEntity>> ToEntities(List<JObject> value, Uri context)
-        {
-            var entityName = EntityNameFromContext(context);
-            
-            var entities = new List<JObjectEntity<TEntity>>(value.Count);
-            foreach (var root in value)
-            {
-                var entity = new JObjectEntity<TEntity>(root, entityName);
-                entities.Add(entity);
-            }
-
-            return entities;
-        }
-
-        private static EntityName<TEntity> EntityNameFromContext(Uri context)
-        {
-            var contextString = context.ToString();
-            var startIndex = contextString.IndexOf("/$metadata#", StringComparison.Ordinal) + 11;
-            var entityNameString = contextString.Substring(startIndex, contextString.IndexOf('(', startIndex) - startIndex);
-            var entityName = new EntityName<TEntity>(entityNameString);
-            return entityName;
-        }
+        public ODataFindRequest<TEntity> Request { get; set; }
     }
 }

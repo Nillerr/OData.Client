@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
@@ -11,6 +13,12 @@ namespace OData.Client.Newtonsoft.Json
     public sealed class JObjectProperties<TEntity> : IODataProperties<TEntity> where TEntity : IEntity
     {
         private readonly JObject _root = new();
+        private readonly JsonConverter[] _converters;
+
+        public JObjectProperties(IList<JsonConverter> converters)
+        {
+            _converters = converters.ToArray();
+        }
 
         public IODataProperties<TEntity> Set<TValue>(IProperty<TEntity, TValue> property, TValue value)
         {
@@ -45,6 +53,16 @@ namespace OData.Client.Newtonsoft.Json
             
             _root[property.Name + "@odata.bind"] = array; 
             return this;
+        }
+
+        public void WriteTo(Stream stream)
+        {
+            using var streamWriter = new StreamWriter(stream, Encoding.UTF8);
+            using var jsonWriter = new JsonTextWriter(streamWriter);
+            jsonWriter.Formatting = Formatting.Indented;
+
+            _root.WriteTo(jsonWriter, _converters);
+            jsonWriter.Flush();
         }
 
         private static string Reference<TOther>(IEntityId<TOther> id)
