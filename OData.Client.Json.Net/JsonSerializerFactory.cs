@@ -4,11 +4,6 @@ using Newtonsoft.Json;
 
 namespace OData.Client.Json.Net
 {
-    public interface IJsonSerializerFactory
-    {
-        JsonSerializer CreateSerializer<TEntity>(IEntityName<TEntity> name) where TEntity : IEntity;
-    }
-
     public sealed class JsonSerializerFactory : IJsonSerializerFactory
     {
         private readonly ConcurrentDictionary<Type, JsonSerializer> _serializerCache = new();

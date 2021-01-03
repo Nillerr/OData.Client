@@ -9,6 +9,11 @@ nuget add OData.Client.Json.Net
 ```c#
 using OData.Client.Json.Net;
 
-var entitySerializerFactory = new JsonNetEntitySerializerFactory();
-var client = new ODataClient();
+var oDataClientSettings = new ODataClientSettings(
+    organizationUri: "[Organization URI]",
+    propertiesFactory: new JsonNetPropertiesFactory(),
+    entitySerializerFactory: new JsonNetEntitySerializerFactory()
+);
+
+var oDataClient = new ODataClient(oDataClientSettings);
 ```

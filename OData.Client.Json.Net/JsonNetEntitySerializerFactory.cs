@@ -8,7 +8,7 @@ namespace OData.Client.Json.Net
     {
         private readonly ConcurrentDictionary<Type, object> _serializerCache = new();
 
-        private readonly JsonSerializerFactory _serializerFactory;
+        private readonly IJsonSerializerFactory _serializerFactory;
 
         public JsonNetEntitySerializerFactory()
         {
@@ -19,6 +19,11 @@ namespace OData.Client.Json.Net
         public JsonNetEntitySerializerFactory(JsonSerializerSettings settings)
         {
             _serializerFactory = new JsonSerializerFactory(settings);
+        }
+        
+        public JsonNetEntitySerializerFactory(IJsonSerializerFactory serializerFactory)
+        {
+            _serializerFactory = serializerFactory;
         }
 
         public IEntitySerializer<TEntity> CreateSerializer<TEntity>(IEntityName<TEntity> entityName)
