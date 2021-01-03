@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace OData.Client
 {
-    public sealed class ODataFindRequest<TEntity> where TEntity : IEntity
+    public sealed class ODataFindRequest<TEntity> : IODataFindRequest<TEntity> where TEntity : IEntity
     {
         public ODataFindRequest(
             ODataFilter<TEntity>? filter,

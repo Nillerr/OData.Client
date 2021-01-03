@@ -24,6 +24,12 @@ namespace OData.Client
             return new ODataQuery<TEntity>(EntityName, _oDataClient, _valueFormatter);
         }
 
+        public IODataQuery<TEntity> Where(ODataFilter<TEntity> filter)
+        {
+            var query = Find();
+            return query.Filter(filter);
+        }
+
         public async Task<IEntity<TEntity>?> RetrieveAsync(IEntityId<TEntity> id)
         {
             var entity = await _oDataClient.RetrieveAsync(id, new ODataRetrieveRequest<TEntity>());
@@ -42,7 +48,7 @@ namespace OData.Client
             return entity;
         }
 
-        public async Task<IEntityId<TEntity>> CreateAsync(
+        public async Task<EntityId<TEntity>> CreateAsync(
             Action<IODataProperties<TEntity>> props,
             CancellationToken cancellationToken = default
         )

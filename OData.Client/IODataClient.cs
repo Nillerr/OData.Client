@@ -29,7 +29,7 @@ namespace OData.Client
         )
             where TEntity : IEntity;
 
-        Task<IEntityId<TEntity>> CreateAsync<TEntity>(
+        Task<EntityId<TEntity>> CreateAsync<TEntity>(
             IEntityName<TEntity> name,
             Action<IODataProperties<TEntity>> props,
             CancellationToken cancellationToken = default

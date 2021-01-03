@@ -9,7 +9,7 @@ namespace OData.Client.Json.Net
         public static List<JObjectEntity<TEntity>> ToEntities<TEntity>(
             this JArray value,
             IEntityName<TEntity> name,
-            JsonSerializerFactory serializerFactory
+            IJsonSerializerFactory serializerFactory
         ) where TEntity : IEntity
         {
             var serializer = serializerFactory.CreateSerializer(name);
@@ -28,17 +28,6 @@ namespace OData.Client.Json.Net
             }
 
             return entities;
-        }
-
-        public static JObjectEntity<TEntity> ToEntity<TEntity>(
-            this JObject value,
-            IEntityName<TEntity> name,
-            JsonSerializerFactory serializerFactory
-        ) where TEntity : IEntity
-        {
-            var serializer = serializerFactory.CreateSerializer(name);
-            var entity = new JObjectEntity<TEntity>(value, serializer, serializerFactory);
-            return entity;
         }
     }
 }

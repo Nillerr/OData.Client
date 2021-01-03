@@ -29,6 +29,6 @@ namespace OData.Client
         /// <summary>
         /// The original request.
         /// </summary>
-        ODataFindRequest<TEntity> Request { get; }
+        IODataFindRequest<TEntity> Request { get; }
     }
 }

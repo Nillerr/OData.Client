@@ -23,7 +23,7 @@ namespace OData.Client
             where TOther : IEntity
             where TValue : IEntity
         {
-            return $"{property.Name}/{other.Name}";
+            return $"{property.Name}/{other.ValueName()}";
         }
 
         public static ODataFilter<TEntity> IsNull<TEntity, TOther>(this OptionalRef<TEntity, TOther> property)

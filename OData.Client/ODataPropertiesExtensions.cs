@@ -1,7 +1,9 @@
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Mime;
+using System.Text;
 
 namespace OData.Client
 {
@@ -18,7 +20,7 @@ namespace OData.Client
         /// <returns>The properties specification instance, for fluent chaining.</returns>
         public static IODataProperties<TEntity> BindAll<TEntity, TOther>(
             this IODataProperties<TEntity> properties,
-            IProperty<TEntity, IEnumerable<TOther>> property,
+            IRefs<TEntity, TOther> property,
             params IEntityId<TOther>[] ids
         )
             where TEntity : IEntity
@@ -29,12 +31,19 @@ namespace OData.Client
 
         internal static HttpContent ToHttpContent<TEntity>(this IODataProperties<TEntity> properties) where TEntity : IEntity
         {
-            var contentStream = new MemoryStream();
-            properties.WriteTo(contentStream);
+            var propertiesStream = new MemoryStream();
+            properties.WriteTo(propertiesStream);
 
-            contentStream.Seek(0, SeekOrigin.Begin);
-
+            var propertiesBuffer = propertiesStream.GetBuffer();
+            var contentStream = new MemoryStream(propertiesBuffer, false);
+            
             var content = new StreamContent(contentStream);
+            
+            var mediaType = new MediaTypeHeaderValue(MediaTypeNames.Application.Json);
+            mediaType.CharSet = Encoding.UTF8.WebName;
+            
+            content.Headers.ContentType = mediaType;
+            
             return content;
         }
         

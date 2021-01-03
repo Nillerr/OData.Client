@@ -9,27 +9,32 @@ using OData.Client.Expressions.Formatting;
 
 namespace OData.Client
 {
-    public sealed class ODataClient : IODataClient
+    public sealed class ODataClient : IODataClient, IDisposable
     {
         private readonly Uri _organizationUri;
-        private readonly HttpClient _httpClient;
         private readonly IODataPropertiesFactory _propertiesFactory;
-        private readonly ISerializerFactory _serializerFactory;
+        private readonly IEntitySerializerFactory _entitySerializerFactory;
         private readonly IValueFormatter _valueFormatter;
+        
+        private readonly HttpClient _httpClient;
+        private readonly bool _disposeHttpClient;
 
-        public ODataClient(
-            Uri organizationUri,
-            HttpClient httpClient,
-            IODataPropertiesFactory propertiesFactory,
-            ISerializerFactory serializerFactory,
-            IValueFormatter valueFormatter
-        )
+        public ODataClient(ODataClientSettings settings)
         {
-            _organizationUri = organizationUri;
-            _httpClient = httpClient;
-            _propertiesFactory = propertiesFactory;
-            _serializerFactory = serializerFactory;
-            _valueFormatter = valueFormatter;
+            _organizationUri = settings.OrganizationUri;
+            _propertiesFactory = settings.PropertiesFactory;
+            _entitySerializerFactory = settings.EntitySerializerFactory;
+            _valueFormatter = settings.ValueFormatter;
+            
+            if (settings.HttpClient != null)
+            {
+                _httpClient = settings.HttpClient;
+            }
+            else
+            {
+                _httpClient = new HttpClient();
+                _disposeHttpClient = true;
+            }
         }
 
         private Uri BaseUri => new Uri(_organizationUri, "api/data/v9.1/");
@@ -94,7 +99,7 @@ namespace OData.Client
             
             await using var stream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
 
-            var serializer = _serializerFactory.CreateSerializer(name);
+            var serializer = _entitySerializerFactory.CreateSerializer(name);
             var response = await serializer.DeserializeFindResponseAsync(stream, request);
             return response;
         }
@@ -117,7 +122,7 @@ namespace OData.Client
             
             await using var stream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
 
-            var serializer = _serializerFactory.CreateSerializer(current.EntityName);
+            var serializer = _entitySerializerFactory.CreateSerializer(current.EntityName);
             var response = await serializer.DeserializeFindResponseAsync(stream, request);
             return response;
         }
@@ -125,7 +130,7 @@ namespace OData.Client
         private static HttpRequestMessage CreateFindRequest<TEntity>(
             HttpMethod method,
             Uri requestUri,
-            ODataFindRequest<TEntity> request
+            IODataFindRequest<TEntity> request
         )
             where TEntity : IEntity
         {
@@ -157,12 +162,12 @@ namespace OData.Client
 
             await ThrowIfUnsuccessfulAsync(httpResponse, cancellationToken);
 
-            var serializer = _serializerFactory.CreateSerializer(id.Name);
+            var serializer = _entitySerializerFactory.CreateSerializer(id.Name);
             var entity = await httpResponse.Content.ReadEntityAsync(serializer, cancellationToken);
             return entity;
         }
 
-        public async Task<IEntityId<TEntity>> CreateAsync<TEntity>(
+        public async Task<EntityId<TEntity>> CreateAsync<TEntity>(
             IEntityName<TEntity> name,
             Action<IODataProperties<TEntity>> props,
             CancellationToken cancellationToken = default
@@ -192,7 +197,7 @@ namespace OData.Client
             
             using var httpResponse = await SendRequestAsync(httpRequest, cancellationToken);
             
-            var serializer = _serializerFactory.CreateSerializer(name);
+            var serializer = _entitySerializerFactory.CreateSerializer(name);
             var entity = await httpResponse.Content.ReadEntityAsync(serializer, cancellationToken);
             return entity;
         }
@@ -224,7 +229,7 @@ namespace OData.Client
             
             using var httpResponse = await SendRequestAsync(httpRequest, cancellationToken);
             
-            var serializer = _serializerFactory.CreateSerializer(id.Name);
+            var serializer = _entitySerializerFactory.CreateSerializer(id.Name);
             var entity = await httpResponse.Content.ReadEntityAsync(serializer, cancellationToken);
             return entity;
         }
@@ -367,6 +372,14 @@ namespace OData.Client
             {
                 var message = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
                 throw new HttpRequestException(message, exception, exception.StatusCode);
+            }
+        }
+
+        public void Dispose()
+        {
+            if (_disposeHttpClient)
+            {
+                _httpClient.Dispose();
             }
         }
     }

@@ -4,7 +4,12 @@ using Newtonsoft.Json;
 
 namespace OData.Client.Json.Net
 {
-    public sealed class JsonSerializerFactory
+    public interface IJsonSerializerFactory
+    {
+        JsonSerializer CreateSerializer<TEntity>(IEntityName<TEntity> name) where TEntity : IEntity;
+    }
+
+    public sealed class JsonSerializerFactory : IJsonSerializerFactory
     {
         private readonly ConcurrentDictionary<Type, JsonSerializer> _serializerCache = new();
         
@@ -26,12 +31,12 @@ namespace OData.Client.Json.Net
         }
 
         /// <summary>
-        /// Creates a <see cref="JsonSerializer"/> with an <see cref="EntityIdConverter{TEntity}"/>
+        /// Creates a <see cref="JsonSerializer"/> with an <see cref="EntityIdConverter{TEntity}"/> for the entity this
+        /// serializer is built for.
         /// </summary>
-        /// <param name="type"></param>
-        /// <param name="entityName"></param>
-        /// <param name="settings"></param>
-        /// <returns></returns>
+        /// <param name="type">The type of the entity.</param>
+        /// <param name="entityName">The name of the entity.</param>
+        /// <returns>A newly created <see cref="JsonSerializer"/>.</returns>
         private JsonSerializer CreateJsonSerializer<TEntity>(Type type, IEntityName<TEntity> entityName)
             where TEntity : IEntity
         {

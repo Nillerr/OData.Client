@@ -7,7 +7,7 @@ namespace OData.Client
     public static class ODataQueryExtensions
     {
         public static async Task<IEntity<TEntity>[]> ToArrayAsync<TEntity>(
-            this IODataQuery<TEntity> query,
+            this IAsyncEnumerable<IEntity<TEntity>> query,
             CancellationToken cancellationToken = default
         )
             where TEntity : IEntity
@@ -17,7 +17,7 @@ namespace OData.Client
         }
 
         public static async Task<List<IEntity<TEntity>>> ToListAsync<TEntity>(
-            this IODataQuery<TEntity> query,
+            this IAsyncEnumerable<IEntity<TEntity>> query,
             CancellationToken cancellationToken = default
         )
             where TEntity : IEntity

@@ -20,7 +20,7 @@ namespace OData.Client
         /// <param name="headers">The HTTP response</param>
         /// <param name="name">The entity name</param>
         /// <returns>The id portion of the <c>OData-EntityId</c> header value.</returns>
-        public static IEntityId<TEntity> EntityId<TEntity>(this HttpResponseHeaders headers, IEntityName<TEntity> name)
+        public static EntityId<TEntity> EntityId<TEntity>(this HttpResponseHeaders headers, IEntityName<TEntity> name)
             where TEntity : IEntity
         {
             var entityIdValues = headers.GetValues("OData-EntityId");

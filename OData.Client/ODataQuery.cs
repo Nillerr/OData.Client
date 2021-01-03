@@ -110,19 +110,15 @@ namespace OData.Client
         {
             var request = CreateFindRequest();
 
-            const int maxIterations = 5;
-            var iteration = 0;
-            
             IFindResponse<TEntity>? response = await _oDataClient.FindAsync(EntityName, request, cancellationToken);
-            while (response != null && iteration < maxIterations)
+            while (response != null)
             {
                 foreach (var entity in response.Value)
                 {
                     yield return entity;
                 }
-
+                
                 response = await _oDataClient.FindNextAsync(response, cancellationToken);
-                iteration++;
             }
         }
 
@@ -137,7 +133,7 @@ namespace OData.Client
             var request = CreateFindRequest();
             var queryString = request.ToQueryString(_valueFormatter, QueryStringFormatting.None);
 
-            return queryString;
+            return $"{Environment.NewLine}Expression: {queryString}{Environment.NewLine}MaxPageSize: {_maxPageSize}";
         }
     }
 }

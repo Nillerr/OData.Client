@@ -3,6 +3,10 @@ using Newtonsoft.Json;
 
 namespace OData.Client.Json.Net
 {
+    /// <summary>
+    /// Converts instances of type <see cref="IEntityId{TEntity}"/> to and from JSON.
+    /// </summary>
+    /// <typeparam name="TEntity">The entity type.</typeparam>
     public sealed class EntityIdConverter<TEntity> : JsonConverter<IEntityId<TEntity>> where TEntity : IEntity
     {
         private readonly IEntityName<TEntity> _entityName;

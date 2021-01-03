@@ -27,7 +27,7 @@ namespace OData.Client.Json.Net
             return this;
         }
 
-        public IODataProperties<TEntity> Bind<TOther>(IProperty<TEntity, TOther> property, IEntityId<TOther> id)
+        public IODataProperties<TEntity> Bind<TOther>(IRef<TEntity, TOther> property, IEntityId<TOther> id)
             where TOther : IEntity
         {
             var reference = Reference(id);
@@ -37,7 +37,7 @@ namespace OData.Client.Json.Net
         }
 
         public IODataProperties<TEntity> BindAll<TOther>(
-            IProperty<TEntity, IEnumerable<TOther>> property,
+            IRefs<TEntity, TOther> property,
             IEnumerable<IEntityId<TOther>> ids
         )
             where TOther : IEntity

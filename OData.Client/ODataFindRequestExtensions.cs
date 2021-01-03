@@ -3,12 +3,6 @@ using OData.Client.Expressions.Formatting;
 
 namespace OData.Client
 {
-    public enum QueryStringFormatting
-    {
-        None,
-        Escaped,
-    }
-    
     public static class ODataFindRequestExtensions
     {
         public static string ToQueryString<TEntity>(
@@ -18,7 +12,7 @@ namespace OData.Client
         )
             where TEntity : IEntity
         {
-            var parts = new List<string>(3);
+            var parts = new List<string>(4);
 
             parts.AddFilter(valueFormatter, request.Filter, formatting);
             parts.AddSelection(request.Selection, formatting);

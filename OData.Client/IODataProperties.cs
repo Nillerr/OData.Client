@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.IO;
-using System.Net.Http;
 
 namespace OData.Client
 {
@@ -16,24 +15,24 @@ namespace OData.Client
         IODataProperties<TEntity> Set<TValue>(IProperty<TEntity, TValue> property, TValue value);
 
         /// <summary>
-        /// Binds an <paramref name="id"/> to a <paramref name="property"/>.
+        /// Binds an <paramref name="id"/> to a single-valued navigation <paramref name="property"/>.
         /// </summary>
         /// <param name="property">The property to bind to.</param>
         /// <param name="id">The id to bind to the property.</param>
         /// <typeparam name="TOther">The type of entity to bind to the property.</typeparam>
         /// <returns>This instance, for fluent chaining.</returns>
-        IODataProperties<TEntity> Bind<TOther>(IProperty<TEntity, TOther> property, IEntityId<TOther> id)
+        IODataProperties<TEntity> Bind<TOther>(IRef<TEntity, TOther> property, IEntityId<TOther> id)
             where TOther : IEntity;
 
         /// <summary>
-        /// Binds multiple <paramref name="ids"/> to a <paramref name="property"/>.
+        /// Binds multiple <paramref name="ids"/> to a collection-valued navigation <paramref name="property"/>.
         /// </summary>
         /// <param name="property">The collection-valued navigation property.</param>
         /// <param name="ids">The referenced entity ids.</param>
         /// <typeparam name="TOther">The type of referenced entities.</typeparam>
         /// <returns>This instance, for fluent chaining.</returns>
         IODataProperties<TEntity> BindAll<TOther>(
-            IProperty<TEntity, IEnumerable<TOther>> property,
+            IRefs<TEntity, TOther> property,
             IEnumerable<IEntityId<TOther>> ids
         )
             where TOther : IEntity;

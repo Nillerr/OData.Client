@@ -8,9 +8,9 @@ namespace OData.Client.Json.Net
     {
         private readonly JObject _root;
         private readonly JsonSerializer _serializer;
-        private readonly JsonSerializerFactory _serializerFactory;
+        private readonly IJsonSerializerFactory _serializerFactory;
 
-        public JObjectEntity(JObject root, JsonSerializer serializer, JsonSerializerFactory serializerFactory)
+        public JObjectEntity(JObject root, JsonSerializer serializer, IJsonSerializerFactory serializerFactory)
         {
             _root = root;
             _serializer = serializer;

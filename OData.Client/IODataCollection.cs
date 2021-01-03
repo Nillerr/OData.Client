@@ -7,11 +7,12 @@ namespace OData.Client
     public interface IODataCollection<TEntity> where TEntity : IEntity
     {
         IODataQuery<TEntity> Find();
+        IODataQuery<TEntity> Where(ODataFilter<TEntity> filter);
 
         Task<IEntity<TEntity>?> RetrieveAsync(IEntityId<TEntity> id);
         Task<IEntity<TEntity>?> RetrieveAsync(IEntityId<TEntity> id, Action<IODataSelection<TEntity>> selection);
 
-        Task<IEntityId<TEntity>> CreateAsync(
+        Task<EntityId<TEntity>> CreateAsync(
             Action<IODataProperties<TEntity>> props,
             CancellationToken cancellationToken = default
         );
