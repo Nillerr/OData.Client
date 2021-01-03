@@ -14,9 +14,8 @@ namespace OData.Client
         
         public IEntityName<TEntity> Name { get; }
 
-        public static implicit operator Guid(EntityId<TEntity> source)
-        {
-            return source.Id;
-        }
+        public static implicit operator Guid(EntityId<TEntity> source) => source.Id;
+
+        public string ToString(string? format, IFormatProvider? formatProvider) => Id.ToString("D");
     }
 }

@@ -14,7 +14,7 @@ namespace OData.Client
 
     public static class ODataExpansion
     {
-        public static ODataExpansion<TEntity> Create<TEntity, TOther>(IProperty<TEntity, TOther?> property)
+        public static ODataExpansion<TEntity> Create<TEntity, TOther>(IEntityReference<TEntity, TOther> property)
             where TEntity : IEntity
             where TOther : IEntity
         {

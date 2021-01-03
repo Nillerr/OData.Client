@@ -2,7 +2,7 @@ using System;
 
 namespace OData.Client
 {
-    public interface IEntityId
+    public interface IEntityId : IFormattable
     {
         Guid Id { get; }
     }

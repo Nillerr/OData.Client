@@ -7,6 +7,6 @@ namespace OData.Client
     /// </summary>
     internal sealed class Ref : IEntity
     {
-        public static readonly Property<Ref, Uri> Id = "@odata.id";
+        public static readonly Required<Ref, Uri> Id = "@odata.id";
     }
 }

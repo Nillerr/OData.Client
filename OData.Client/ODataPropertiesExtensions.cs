@@ -67,7 +67,7 @@ namespace OData.Client
         /// <typeparam name="TEntity">The entity.</typeparam>
         /// <typeparam name="TOther">The entity referenced by the property.</typeparam>
         /// <returns>The value-name of the property.</returns>
-        public static string ValueName<TEntity, TOther>(this IProperty<TEntity, TOther?> property)
+        public static string ValueName<TEntity, TOther>(this IEntityReference<TEntity, TOther> property)
             where TEntity : IEntity
             where TOther : IEntity
         {

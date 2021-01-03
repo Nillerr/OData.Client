@@ -8,36 +8,17 @@ namespace OData.Client
     {
         public IODataFilterExpression Expression { get; }
 
-        public ODataFilter(IODataFilterExpression expression)
-        {
-            Expression = expression;
-        }
+        public ODataFilter(IODataFilterExpression expression) => Expression = expression;
 
-        public bool Equals(ODataFilter<TEntity> other)
-        {
-            return Expression == other.Expression;
-        }
+        public bool Equals(ODataFilter<TEntity> other) => Expression == other.Expression;
+        public override bool Equals(object? obj) => obj is ODataFilter<TEntity> other && Equals(other);
+        public override int GetHashCode() => Expression.GetHashCode();
 
-        public override bool Equals(object? obj)
-        {
-            return obj is ODataFilter<TEntity> other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return Expression.GetHashCode();
-        }
-
-        public static bool operator ==(ODataFilter<TEntity> left, ODataFilter<TEntity> right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ODataFilter<TEntity> left, ODataFilter<TEntity> right)
-        {
-            return !left.Equals(right);
-        }
-
+        public override string? ToString() => Expression.ToString();
+        
+        public static bool operator ==(ODataFilter<TEntity> left, ODataFilter<TEntity> right) => left.Equals(right);
+        public static bool operator !=(ODataFilter<TEntity> left, ODataFilter<TEntity> right) => !left.Equals(right);
+        
         public static ODataFilter<TEntity> operator &(ODataFilter<TEntity> left, ODataFilter<TEntity> right)
         {
             var leftOperand = CheckOperand(left, nameof(left));
@@ -60,11 +41,6 @@ namespace OData.Client
         {
             var expression = new ODataUnaryExpression("not", filter.Expression);
             return new ODataFilter<TEntity>(expression);
-        }
-
-        public override string? ToString()
-        {
-            return Expression.ToString();
         }
 
         private static IODataLogicalOperand CheckOperand(ODataFilter<TEntity> filter, string paramName)

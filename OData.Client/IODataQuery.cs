@@ -15,6 +15,7 @@ namespace OData.Client
     /// var query = contacts.Find()
     ///     .Filter(Contact.EmailAddress == "foo@bar.com")
     ///     .Select(Contact.EmailAddress, Contact.FirstName)
+    ///     .OrderBy(Contact.CreatedAt)
     ///     .Expand(Contact.ParentCustomer);
     ///
     /// await foreach (var entity in query) {
@@ -59,7 +60,7 @@ namespace OData.Client
         /// <param name="property">The property to expand.</param>
         /// <typeparam name="TOther">The type of entity referenced by the navigation property.</typeparam>
         /// <returns>This query instance.</returns>
-        IODataQuery<TEntity> Expand<TOther>(IProperty<TEntity, TOther?> property) where TOther : IEntity;
+        IODataQuery<TEntity> Expand<TOther>(IEntityReference<TEntity, TOther> property) where TOther : IEntity;
 
         /// <summary>
         /// Specifies a collection-valued navigation property to expand.
@@ -71,7 +72,7 @@ namespace OData.Client
 
         // IODataQuery<TEntity> Expand<TOther>(
         //     IProperty<TEntity, TOther?> property,
-        //     Func<IODataNestedQuery<TOther>, IODataNestedQuery<TOther>> query
+        //     Action<IODataNestedQuery<TOther>> query
         // )
         //     where TOther : IEntity;
 

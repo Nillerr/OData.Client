@@ -23,7 +23,7 @@ namespace OData.Client
             return this;
         }
 
-        public IODataSelection<TEntity> Expand<TOther>(Property<TEntity, TOther?> property) where TOther : IEntity
+        public IODataSelection<TEntity> Expand<TOther>(IEntityReference<TEntity, TOther> property) where TOther : IEntity
         {
             var expansion = ODataExpansion.Create(property);
             _expansions.Add(expansion);

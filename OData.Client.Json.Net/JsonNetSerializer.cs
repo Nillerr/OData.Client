@@ -7,25 +7,23 @@ using Newtonsoft.Json.Linq;
 
 namespace OData.Client.Json.Net
 {
-    public sealed class JsonNetSerializer : ISerializer
+    public sealed class JsonNetSerializer<TEntity> : ISerializer<TEntity> where TEntity : IEntity
     {
+        private readonly IEntityName<TEntity> _entityName;
         private readonly JsonSerializer _serializer;
+        private readonly JsonSerializerFactory _serializerFactory;
 
-        public JsonNetSerializer()
+        public JsonNetSerializer(IEntityName<TEntity> entityName, JsonSerializerFactory serializerFactory)
         {
-            _serializer = JsonSerializer.CreateDefault();
+            _entityName = entityName;
+            _serializer = serializerFactory.CreateSerializer(entityName);
+            _serializerFactory = serializerFactory;
         }
 
-        public JsonNetSerializer(JsonSerializer serializer)
-        {
-            _serializer = serializer;
-        }
-        
-        public ValueTask<IFindResponse<TEntity>> DeserializeFindResponseAsync<TEntity>(
+        public ValueTask<IFindResponse<TEntity>> DeserializeFindResponseAsync(
             Stream stream,
             ODataFindRequest<TEntity> request
         )
-            where TEntity : IEntity
         {
             using var streamReader = new StreamReader(stream, Encoding.UTF8);
             using var jsonReader = new JsonTextReader(streamReader);
@@ -36,15 +34,15 @@ namespace OData.Client.Json.Net
                 throw new JsonSerializationException("Could not deserialize response to JObject");
             }
 
-            var context = root.GetValue<Uri>("@odata.context");
-            var nextLink = root.GetValueOrDefault<Uri>("@odata.nextLink");
-            var value = root.GetValue<JArray>("value").ToEntities<TEntity>(context);
-            var response = new FindResponse<TEntity>(context, nextLink, value, request);
+            var context = root.GetValue<Uri>("@odata.context", _serializer);
+            var nextLink = root.GetValueOrDefault<Uri>("@odata.nextLink", _serializer);
+            var value = root.GetValue<JArray>("value", _serializer).ToEntities(_entityName, _serializerFactory);
+            var response = new FindResponse<TEntity>(_entityName, context, nextLink, value, request);
             
             return ValueTask.FromResult<IFindResponse<TEntity>>(response);
         }
 
-        public ValueTask<IEntity<TEntity>> DeserializeEntityAsync<TEntity>(Stream stream) where TEntity : IEntity
+        public ValueTask<IEntity<TEntity>> DeserializeEntityAsync(Stream stream)
         {
             using var streamReader = new StreamReader(stream, Encoding.UTF8);
             using var jsonReader = new JsonTextReader(streamReader);
@@ -55,7 +53,7 @@ namespace OData.Client.Json.Net
                 throw new JsonSerializationException("Could not deserialize response to JObject");
             }
 
-            var entity = root.ToEntity<TEntity>();
+            var entity = root.ToEntity(_entityName, _serializerFactory);
             return ValueTask.FromResult<IEntity<TEntity>>(entity);
         }
     }
