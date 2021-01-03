@@ -50,10 +50,12 @@ namespace OData.Client.Demo
             var query = incidentCollection.Find()
                 .Filter(
                     Incident.CaseNumber.StartsWith("TS02")
-                    & Incident.PrimaryContact.Filter(Contact.ParentCustomer.Value()) == accountId
+                    & Incident.PrimaryContact.Where(Contact.ParentCustomer) == accountId
+                    & Incident.PrimaryContact.Where(Contact.ParentCustomer).IsNull()
+                    & Incident.PrimaryContact.Where(Contact.EmailAddress) == "nije@universal-robots.com"
                 )
                 .Select(Incident.IncidentId, Incident.Title, Incident.CaseNumber, Incident.PrimaryContact.Value())
-                // .Expand(Incident.PrimaryContact)
+                .Expand(Incident.PrimaryContact)
                 .OrderBy(Incident.CaseNumber)
                 .MaxPageSize(1);
             
@@ -67,14 +69,19 @@ namespace OData.Client.Demo
                 var primaryContactId = incident.Reference(Incident.PrimaryContact, Contact.EntityName);
                 var primaryContact = incident.Entity(Incident.PrimaryContact, Contact.EntityName)!;
                 
-                var obj = new { incidentId, primaryContactId, primaryContact = new JRaw(primaryContact.ToJson()) };
-                
                 var converters = new JsonConverter[]
                 {
                     new EntityIdConverter<Incident>(Incident.EntityName),
                     new EntityIdConverter<Contact>(Contact.EntityName)
                 };
-                
+
+                var obj = new
+                {
+                    incidentId,
+                    primaryContactId,
+                    primaryContact = JsonConvert.DeserializeObject<JObject>(primaryContact.ToJson(), converters)
+                };
+
                 var json = JsonConvert.SerializeObject(obj, Formatting.Indented, converters);
                 Console.WriteLine(json);
 

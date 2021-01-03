@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using OData.Client.Expressions;
 using OData.Client.Expressions.Functions;
 
@@ -7,8 +5,10 @@ namespace OData.Client
 {
     public static class RequiredOperators
     {
+        #region <property> <operator> <value>
+        
         public static ODataFilter<TEntity> EqualTo<TEntity, TValue>(
-            this Required<TEntity, TValue> property,
+            this IRequired<TEntity, TValue> property,
             TValue value
         )
             where TEntity : IEntity
@@ -18,7 +18,7 @@ namespace OData.Client
         }
 
         public static ODataFilter<TEntity> NotEqualTo<TEntity, TValue>(
-            this Required<TEntity, TValue> property,
+            this IRequired<TEntity, TValue> property,
             TValue value
         )
             where TEntity : IEntity
@@ -28,7 +28,7 @@ namespace OData.Client
         }
 
         public static ODataFilter<TEntity> GreaterThan<TEntity, TValue>(
-            this Required<TEntity, TValue> property,
+            this IRequired<TEntity, TValue> property,
             TValue value
         )
             where TEntity : IEntity
@@ -38,7 +38,7 @@ namespace OData.Client
         }
 
         public static ODataFilter<TEntity> LessThan<TEntity, TValue>(
-            this Required<TEntity, TValue> property,
+            this IRequired<TEntity, TValue> property,
             TValue value
         )
             where TEntity : IEntity
@@ -48,7 +48,7 @@ namespace OData.Client
         }
 
         public static ODataFilter<TEntity> GreaterThanOrEqualTo<TEntity, TValue>(
-            this Required<TEntity, TValue> property,
+            this IRequired<TEntity, TValue> property,
             TValue value
         )
             where TEntity : IEntity
@@ -58,7 +58,7 @@ namespace OData.Client
         }
 
         public static ODataFilter<TEntity> LessThanOrEqualTo<TEntity, TValue>(
-            this Required<TEntity, TValue> property,
+            this IRequired<TEntity, TValue> property,
             TValue value
         )
             where TEntity : IEntity
@@ -68,7 +68,7 @@ namespace OData.Client
         }
 
         private static ODataFilter<TEntity> Binary<TEntity, TValue>(
-            Required<TEntity, TValue> property,
+            IRequired<TEntity, TValue> property,
             string @operator,
             TValue value
         )
@@ -80,29 +80,109 @@ namespace OData.Client
             var expression = new ODataBinaryExpression(left, @operator, right);
             return new ODataFilter<TEntity>(expression);
         }
+        
+        #endregion
 
-#nullable disable
-        public static ODataFilter<TEntity> Contains<TEntity>(this Required<TEntity, string> property, string value)
+        #region <property> <operator> <property>
+
+        public static ODataFilter<TEntity> EqualTo<TEntity, TValue>(
+            this IRequired<TEntity, TValue> property,
+            IProperty<TEntity, TValue> other
+        )
+            where TEntity : IEntity
+            where TValue : notnull
+        {
+            return Binary(property, "eq", other);
+        }
+
+        public static ODataFilter<TEntity> NotEqualTo<TEntity, TValue>(
+            this IRequired<TEntity, TValue> property,
+            IProperty<TEntity, TValue> other
+        )
+            where TEntity : IEntity
+            where TValue : notnull
+        {
+            return Binary(property, "ne", other);
+        }
+
+        public static ODataFilter<TEntity> GreaterThan<TEntity, TValue>(
+            this IRequired<TEntity, TValue> property,
+            IProperty<TEntity, TValue> other
+        )
+            where TEntity : IEntity
+            where TValue : notnull
+        {
+            return Binary(property, "gt", other);
+        }
+
+        public static ODataFilter<TEntity> LessThan<TEntity, TValue>(
+            this IRequired<TEntity, TValue> property,
+            IProperty<TEntity, TValue> other
+        )
+            where TEntity : IEntity
+            where TValue : notnull
+        {
+            return Binary(property, "lt", other);
+        }
+
+        public static ODataFilter<TEntity> GreaterThanOrEqualTo<TEntity, TValue>(
+            this IRequired<TEntity, TValue> property,
+            IProperty<TEntity, TValue> other
+        )
+            where TEntity : IEntity
+            where TValue : notnull
+        {
+            return Binary(property, "ge", other);
+        }
+
+        public static ODataFilter<TEntity> LessThanOrEqualTo<TEntity, TValue>(
+            this IRequired<TEntity, TValue> property,
+            IProperty<TEntity, TValue> other
+        )
+            where TEntity : IEntity
+            where TValue : notnull
+        {
+            return Binary(property, "le", other);
+        }
+
+        private static ODataFilter<TEntity> Binary<TEntity, TValue>(
+            IRequired<TEntity, TValue> property,
+            string @operator,
+            IProperty<TEntity, TValue> other
+        )
+            where TEntity : IEntity
+            where TValue : notnull
+        {
+            var left = new ODataPropertyExpression(property);
+            var right = new ODataPropertyExpression(other);
+            var expression = new ODataBinaryExpression(left, @operator, right);
+            return new ODataFilter<TEntity>(expression);
+        }
+
+        #endregion
+
+        #region <function>(<property>,<value>)
+
+        public static ODataFilter<TEntity> Contains<TEntity>(this IRequired<TEntity, string> property, string value)
             where TEntity : IEntity
         {
             return property.Function(ODataStringContainsFunction.Instance, value);
         }
 
-        public static ODataFilter<TEntity> EndsWith<TEntity>(this Required<TEntity, string> property, string value)
+        public static ODataFilter<TEntity> EndsWith<TEntity>(this IRequired<TEntity, string> property, string value)
             where TEntity : IEntity
         {
             return property.Function(ODataStringEndsWithFunction.Instance, value);
         }
 
-        public static ODataFilter<TEntity> StartsWith<TEntity>(this Required<TEntity, string> property, string value)
+        public static ODataFilter<TEntity> StartsWith<TEntity>(this IRequired<TEntity, string> property, string value)
             where TEntity : IEntity
         {
             return property.Function(ODataStringStartsWithFunction.Instance, value);
         }
-#nullable restore
 
         private static ODataFilter<TEntity> Function<TEntity, TValue>(
-            this Required<TEntity, TValue> property,
+            this IRequired<TEntity, TValue> property,
             IODataFunction function,
             TValue value
         )
@@ -115,53 +195,6 @@ namespace OData.Client
             return new ODataFilter<TEntity>(expression);
         }
 
-        public static ODataFilter<TEntity> Any<TEntity, TOther, TOthers>(
-            this Required<TEntity, TOthers> property,
-            ODataFilter<TOther> filter
-        )
-            where TEntity : IEntity
-            where TOthers : IEnumerable<TOther>
-            where TOther : IEntity
-        {
-            var body = CheckLambdaBody(filter, nameof(filter));
-            return Lambda(property, "any", body);
-        }
-
-        public static ODataFilter<TEntity> All<TEntity, TOther, TOthers>(
-            this Required<TEntity, TOthers> property,
-            ODataFilter<TOther> filter
-        )
-            where TEntity : IEntity
-            where TOthers : IEnumerable<TOther>
-            where TOther : IEntity
-        {
-            var body = CheckLambdaBody(filter, nameof(filter));
-            return Lambda(property, "all", body);
-        }
-
-        private static ODataFilter<TEntity> Lambda<TEntity>(
-            IProperty<TEntity> property,
-            string function,
-            IODataLambdaBody body
-        )
-            where TEntity : IEntity
-        {
-            var expression = new ODataLambdaExpression(property, function, body);
-            return new ODataFilter<TEntity>(expression);
-        }
-
-        private static IODataLambdaBody CheckLambdaBody<TOther>(ODataFilter<TOther> filter, string paramName)
-            where TOther : IEntity
-        {
-            if (filter.Expression is not IODataLambdaBody body)
-            {
-                throw new ArgumentException(
-                    $"The filter must be a valid lambda body expression, was: {filter.Expression} ({filter.Expression.GetType()})",
-                    paramName
-                );
-            }
-
-            return body;
-        }
+        #endregion
     }
 }

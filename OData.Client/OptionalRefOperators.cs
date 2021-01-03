@@ -4,20 +4,9 @@ namespace OData.Client
 {
     public static class OptionalRefOperators
     {
-        public static Optional<TEntity, TValue> Filter<TEntity, TOther, TValue>(
-            this OptionalRef<TEntity, TOther> property,
-            Optional<TOther, TValue> other
-        )
-            where TEntity : IEntity
-            where TOther : IEntity
-            where TValue : notnull
-        {
-            return $"{property.Name}/{other.Name}";
-        }
-
         public static Optional<TEntity, TValue> Where<TEntity, TOther, TValue>(
             this OptionalRef<TEntity, TOther> property,
-            Optional<TOther, TValue> other
+            IProperty<TOther, TValue> other
         )
             where TEntity : IEntity
             where TOther : IEntity
@@ -25,25 +14,14 @@ namespace OData.Client
         {
             return $"{property.Name}/{other.Name}";
         }
-
-        public static Required<TEntity, TValue> Filter<TEntity, TOther, TValue>(
+        
+        public static Optional<TEntity, IEntityId<TValue>> Where<TEntity, TOther, TValue>(
             this OptionalRef<TEntity, TOther> property,
-            Required<TOther, TValue> other
+            IRef<TOther, TValue> other
         )
             where TEntity : IEntity
             where TOther : IEntity
-            where TValue : notnull
-        {
-            return $"{property.Name}/{other.Name}";
-        }
-
-        public static Required<TEntity, TValue> Where<TEntity, TOther, TValue>(
-            this OptionalRef<TEntity, TOther> property,
-            Required<TOther, TValue> other
-        )
-            where TEntity : IEntity
-            where TOther : IEntity
-            where TValue : notnull
+            where TValue : IEntity
         {
             return $"{property.Name}/{other.Name}";
         }
