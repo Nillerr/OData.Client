@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OData.Client", "OData.Clien
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OData.Client.Demo", "OData.Client.Demo\OData.Client.Demo.csproj", "{06B6F65B-1906-47A7-B19B-CC7E575E91E7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OData.Client.Json.Net", "OData.Client.Json.Net\OData.Client.Json.Net.csproj", "{7C2D5A6B-7C56-4857-943F-DFC7D4B974FD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{06B6F65B-1906-47A7-B19B-CC7E575E91E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06B6F65B-1906-47A7-B19B-CC7E575E91E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{06B6F65B-1906-47A7-B19B-CC7E575E91E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C2D5A6B-7C56-4857-943F-DFC7D4B974FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C2D5A6B-7C56-4857-943F-DFC7D4B974FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C2D5A6B-7C56-4857-943F-DFC7D4B974FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C2D5A6B-7C56-4857-943F-DFC7D4B974FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -3,37 +3,28 @@ namespace OData.Client.Expressions
     /// <summary>
     /// Used for the `not` operator.
     /// </summary>
-    public class ODataUnaryExpression<TEntity> : IODataExpression<TEntity>,
-        IODataFilterExpression<TEntity>,
-        IODataLogicalOperand<TEntity>,
-        IODataLambdaBody
-        where TEntity : IEntity
+    public class ODataUnaryExpression : IODataFilterExpression, IODataLogicalOperand, IODataLambdaBody
     {
-        public ODataUnaryExpression(string @operator, IODataFilterExpression<TEntity> operand)
+        public ODataUnaryExpression(string @operator, IODataFilterExpression operand)
         {
             Operator = @operator;
             Operand = operand;
         }
 
         public string Operator { get; }
-        public IODataFilterExpression<TEntity> Operand { get; }
-
-        public void Visit(IODataExpressionVisitor<TEntity> visitor)
-        {
-            visitor.Visit(this);
-        }
+        public IODataFilterExpression Operand { get; }
 
         public void Visit(IODataLambdaBodyVisitor visitor)
         {
             visitor.Visit(this);
         }
 
-        public void Visit(IODataFilterExpressionVisitor<TEntity> visitor)
+        public void Visit(IODataFilterExpressionVisitor visitor)
         {
             visitor.Visit(this);
         }
 
-        public void Visit(IODataLogicalOperandVisitor<TEntity> visitor)
+        public void Visit(IODataLogicalOperandVisitor visitor)
         {
             visitor.Visit(this);
         }

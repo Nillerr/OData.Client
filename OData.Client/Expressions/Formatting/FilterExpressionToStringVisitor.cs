@@ -2,8 +2,7 @@ using System.Text;
 
 namespace OData.Client.Expressions.Formatting
 {
-    public class FilterExpressionToStringVisitor<TEntity> : IODataFilterExpressionVisitor<TEntity>
-        where TEntity : IEntity
+    public class FilterExpressionToStringVisitor : IODataFilterExpressionVisitor
     {
         private readonly StringBuilder _stringBuilder = new();
         private readonly IValueFormatter _valueFormatter;
@@ -16,12 +15,12 @@ namespace OData.Client.Expressions.Formatting
 
         public string PropertyPrefix { get; }
         
-        public void Visit(ODataBinaryExpression<TEntity> expression)
+        public void Visit(ODataBinaryExpression expression)
         {
-            var leftVisitor = new BinaryLeftOperandToStringVisitor<TEntity>(PropertyPrefix);
+            var leftVisitor = new BinaryLeftOperandToStringVisitor(PropertyPrefix);
             expression.Left.Visit(leftVisitor);
 
-            var rightVisitor = new BinaryRightOperandToStringVisitor<TEntity>(PropertyPrefix, _valueFormatter);
+            var rightVisitor = new BinaryRightOperandToStringVisitor(PropertyPrefix, _valueFormatter);
             expression.Right.Visit(rightVisitor);
 
             var left = leftVisitor.ToString();
@@ -30,12 +29,12 @@ namespace OData.Client.Expressions.Formatting
             _stringBuilder.Append($"({left} {expression.Operator} {right})");
         }
 
-        public void Visit(ODataFunctionExpression<TEntity> expression)
+        public void Visit(ODataFunctionExpression expression)
         {
-            var targetVisitor = new FunctionTargetToStringVisitor<TEntity>(PropertyPrefix);
+            var targetVisitor = new FunctionTargetToStringVisitor(PropertyPrefix);
             expression.Target.Visit(targetVisitor);
 
-            var argumentVisitor = new FunctionArgumentToStringVisitor<TEntity>(_valueFormatter);
+            var argumentVisitor = new FunctionArgumentToStringVisitor(_valueFormatter);
             expression.Argument.Visit(argumentVisitor);
 
             var target = targetVisitor.ToString();
@@ -45,7 +44,7 @@ namespace OData.Client.Expressions.Formatting
             _stringBuilder.Append($"{function}({target},{argument})");
         }
 
-        public void Visit(ODataLambdaExpression<TEntity> expression)
+        public void Visit(ODataLambdaExpression expression)
         {
             var visitor = new LambdaBodyToStringVisitor("o", _valueFormatter);
             expression.Body.Visit(visitor);
@@ -53,12 +52,12 @@ namespace OData.Client.Expressions.Formatting
             _stringBuilder.Append($"{expression.Property.Name}/{expression.Function}(o:{visitor})");
         }
 
-        public void Visit(ODataLogicalExpression<TEntity> expression)
+        public void Visit(ODataLogicalExpression expression)
         {
-            var leftVisitor = new LogicalOperandToStringVisitor<TEntity>(PropertyPrefix, _valueFormatter);
+            var leftVisitor = new LogicalOperandToStringVisitor(PropertyPrefix, _valueFormatter);
             expression.Left.Visit(leftVisitor);
 
-            var rightVisitor = new LogicalOperandToStringVisitor<TEntity>(PropertyPrefix, _valueFormatter);
+            var rightVisitor = new LogicalOperandToStringVisitor(PropertyPrefix, _valueFormatter);
             expression.Right.Visit(rightVisitor);
 
             var left = leftVisitor.ToString();
@@ -67,9 +66,9 @@ namespace OData.Client.Expressions.Formatting
             _stringBuilder.Append($"({left} {expression.Operator} {right})");
         }
 
-        public void Visit(ODataUnaryExpression<TEntity> expression)
+        public void Visit(ODataUnaryExpression expression)
         {
-            var operandVisitor = new FilterExpressionToStringVisitor<TEntity>(PropertyPrefix, _valueFormatter);
+            var operandVisitor = new FilterExpressionToStringVisitor(PropertyPrefix, _valueFormatter);
             expression.Operand.Visit(operandVisitor);
 
             var operand = operandVisitor.ToString();

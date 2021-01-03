@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
-namespace OData.Client.Newtonsoft.Json
+namespace OData.Client.Json.Net
 {
     internal static class JObjectListExtensions
     {

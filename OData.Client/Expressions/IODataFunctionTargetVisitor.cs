@@ -1,7 +1,7 @@
 namespace OData.Client.Expressions
 {
-    public interface IODataFunctionTargetVisitor<TEntity> where TEntity : IEntity
+    public interface IODataFunctionTargetVisitor
     {
-        void Visit(ODataPropertyExpression<TEntity> expression);
+        void Visit(ODataPropertyExpression expression);
     }
 }

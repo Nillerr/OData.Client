@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OData.Client.Expressions.Formatting;
-using OData.Client.Newtonsoft.Json;
+using OData.Client.Json.Net;
 
 namespace OData.Client.Demo
 {

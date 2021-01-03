@@ -1,18 +1,25 @@
 namespace OData.Client.Expressions
 {
     /// <summary>
-    /// Function call expression, used for `contains({field},'{value}')`, `startswith({field},'{value}')` and `endswith({field},'{value}')`
+    /// A function call expression invoked on a <see cref="Target"/> with a single <see cref="Argument"/>, such as
+    /// <c>endswith(emailaddress1,'@contorso.com')</c>.
     /// </summary>
-    /// <typeparam name="TEntity"></typeparam>
-    public class ODataFunctionExpression<TEntity> : IODataLogicalOperand<TEntity>,
-        IODataFilterExpression<TEntity>,
-        IODataLambdaBody
-        where TEntity : IEntity
+    /// <example>
+    /// <code>
+    /// public static IODataFilter&lt;TEntity&gt; EndsWith&lt;TEntity, string&gt;(
+    ///     this IProperty&lt;TEntity, string&gt; property, string value)
+    /// {
+    ///     var expression = new ODataFunctionExpression&lt;TEntity&gt;("endswith", property.Name, value);
+    ///     return new ODataFilter&lt;TEntity&gt;(expression);
+    /// }
+    /// </code>
+    /// </example>
+    public class ODataFunctionExpression : IODataLogicalOperand, IODataFilterExpression, IODataLambdaBody
     {
         public ODataFunctionExpression(
-            IODataFunction<TEntity> function,
-            IODataFunctionTarget<TEntity> target,
-            IODataFunctionArgument<TEntity> argument
+            IODataFunction function,
+            IODataFunctionTarget target,
+            IODataFunctionArgument argument
         )
         {
             Function = function;
@@ -20,26 +27,24 @@ namespace OData.Client.Expressions
             Argument = argument;
         }
 
-        public IODataFunction<TEntity> Function { get; }
-        public IODataFunctionTarget<TEntity> Target { get; }
-        public IODataFunctionArgument<TEntity> Argument { get; }
-
-        public void Visit(IODataExpressionVisitor<TEntity> visitor)
-        {
-            visitor.Visit(this);
-        }
+        /// <summary>
+        /// The name of the function.
+        /// </summary>
+        public IODataFunction Function { get; }
+        public IODataFunctionTarget Target { get; }
+        public IODataFunctionArgument Argument { get; }
 
         public void Visit(IODataLambdaBodyVisitor visitor)
         {
             visitor.Visit(this);
         }
 
-        public void Visit(IODataLogicalOperandVisitor<TEntity> visitor)
+        public void Visit(IODataLogicalOperandVisitor visitor)
         {
             visitor.Visit(this);
         }
 
-        public void Visit(IODataFilterExpressionVisitor<TEntity> visitor)
+        public void Visit(IODataFilterExpressionVisitor visitor)
         {
             visitor.Visit(this);
         }

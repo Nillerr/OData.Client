@@ -8,7 +8,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace OData.Client.Newtonsoft.Json
+namespace OData.Client.Json.Net
 {
     public sealed class JObjectProperties<TEntity> : IODataProperties<TEntity> where TEntity : IEntity
     {

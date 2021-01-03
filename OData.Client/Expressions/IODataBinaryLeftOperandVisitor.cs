@@ -1,7 +1,7 @@
 namespace OData.Client.Expressions
 {
-    public interface IODataBinaryLeftOperandVisitor<TEntity> where TEntity : IEntity
+    public interface IODataBinaryLeftOperandVisitor
     {
-        void Visit(ODataPropertyExpression<TEntity> expression);
+        void Visit(ODataPropertyExpression expression);
     }
 }

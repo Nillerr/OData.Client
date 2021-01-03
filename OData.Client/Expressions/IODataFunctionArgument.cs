@@ -1,7 +1,14 @@
 namespace OData.Client.Expressions
 {
-    public interface IODataFunctionArgument<TEntity> : IODataExpression<TEntity> where TEntity : IEntity
+    /// <summary>
+    /// A function argument that is valid as the argument of a <see cref="ODataFunctionExpression"/>.
+    /// </summary>
+    public interface IODataFunctionArgument
     {
-        void Visit(IODataFunctionArgumentVisitor<TEntity> visitor);
+        /// <summary>
+        /// Visits the function argument, invoking the corresponding method on the <paramref name="visitor"/>.
+        /// </summary>
+        /// <param name="visitor">The visitor.</param>
+        void Visit(IODataFunctionArgumentVisitor visitor);
     }
 }

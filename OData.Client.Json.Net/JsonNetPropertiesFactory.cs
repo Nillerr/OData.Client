@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace OData.Client.Newtonsoft.Json
+namespace OData.Client.Json.Net
 {
     public sealed class JsonNetPropertiesFactory : IODataPropertiesFactory
     {

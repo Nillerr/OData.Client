@@ -16,7 +16,7 @@ namespace OData.Client
 
             var oDataFilter = filter.Value;
 
-            var filterVisitor = new FilterExpressionToStringVisitor<TEntity>(string.Empty, valueFormatter);
+            var filterVisitor = new FilterExpressionToStringVisitor(string.Empty, valueFormatter);
             oDataFilter.Expression.Visit(filterVisitor);
 
             var filterString = filterVisitor.ToString();

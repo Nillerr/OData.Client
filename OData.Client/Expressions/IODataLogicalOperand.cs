@@ -1,11 +1,14 @@
 namespace OData.Client.Expressions
 {
     /// <summary>
-    /// Represents an expression valid as the operand of a <see cref="ODataLogicalExpression{TEntity}"/>.
+    /// An expression that is valid as the operand of a <see cref="ODataLogicalExpression"/>.
     /// </summary>
-    /// <typeparam name="TEntity"></typeparam>
-    public interface IODataLogicalOperand<TEntity> : IODataExpression<TEntity> where TEntity : IEntity
+    public interface IODataLogicalOperand
     {
-        void Visit(IODataLogicalOperandVisitor<TEntity> visitor);
+        /// <summary>
+        /// Visits the expression, invoking the corresponding method on the <paramref name="visitor"/>.
+        /// </summary>
+        /// <param name="visitor">The visitor.</param>
+        void Visit(IODataLogicalOperandVisitor visitor);
     }
 }

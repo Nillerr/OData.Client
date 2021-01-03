@@ -2,8 +2,7 @@ using System.Text;
 
 namespace OData.Client.Expressions.Formatting
 {
-    internal sealed class FunctionArgumentToStringVisitor<TEntity> : IODataFunctionArgumentVisitor<TEntity>
-        where TEntity : IEntity
+    internal sealed class FunctionArgumentToStringVisitor : IODataFunctionArgumentVisitor
     {
         private readonly StringBuilder _stringBuilder = new();
         private readonly IValueFormatter _valueFormatter;
@@ -13,9 +12,9 @@ namespace OData.Client.Expressions.Formatting
             _valueFormatter = valueFormatter;
         }
 
-        public void Visit(ODataConstantExpression<TEntity> expression)
+        public void Visit(ODataConstantExpression expression)
         {
-            var stringValue = _valueFormatter.ToString(expression.Value);
+            var stringValue = _valueFormatter.ToString(expression);
             _stringBuilder.Append(stringValue);
         }
 

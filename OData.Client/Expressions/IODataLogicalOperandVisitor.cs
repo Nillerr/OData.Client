@@ -1,11 +1,11 @@
 namespace OData.Client.Expressions
 {
-    public interface IODataLogicalOperandVisitor<TEntity> where TEntity : IEntity
+    public interface IODataLogicalOperandVisitor
     {
-        void Visit(ODataBinaryExpression<TEntity> expression);
-        void Visit(ODataFunctionExpression<TEntity> expression);
-        void Visit(ODataLambdaExpression<TEntity> expression);
-        void Visit(ODataLogicalExpression<TEntity> expression);
-        void Visit(ODataUnaryExpression<TEntity> expression);
+        void Visit(ODataBinaryExpression expression);
+        void Visit(ODataFunctionExpression expression);
+        void Visit(ODataLambdaExpression expression);
+        void Visit(ODataLogicalExpression expression);
+        void Visit(ODataUnaryExpression expression);
     }
 }

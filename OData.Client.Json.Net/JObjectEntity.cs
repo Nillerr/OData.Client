@@ -1,7 +1,6 @@
-using System;
 using Newtonsoft.Json.Linq;
 
-namespace OData.Client.Newtonsoft.Json
+namespace OData.Client.Json.Net
 {
     public sealed class JObjectEntity<TEntity> : IEntity<TEntity> where TEntity : IEntity
     {
@@ -38,9 +37,8 @@ namespace OData.Client.Newtonsoft.Json
 
         public IEntityId<TEntity> Value(IProperty<TEntity, IEntityId<TEntity>> property)
         {
-            var value = _root.Value<string>(property.Name);
-            var id = Guid.Parse(value);
-            return new EntityId<TEntity>(id, _entityName);
+            var stringValue = _root.Value<string>(property.Name);
+            return _entityName.ParseId(stringValue);
         }
 
         public string ToJson()

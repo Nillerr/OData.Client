@@ -1,7 +1,14 @@
 namespace OData.Client.Expressions
 {
-    public interface IODataBinaryRightOperand<TEntity> : IODataExpression<TEntity> where TEntity : IEntity
+    /// <summary>
+    /// An expression that is valid as the right operand of <see cref="ODataBinaryExpression"/>.
+    /// </summary>
+    public interface IODataBinaryRightOperand
     {
-        void Visit(IODataBinaryRightOperandVisitor<TEntity> visitor);
+        /// <summary>
+        /// Visits the expression, invoking the corresponding method on the <paramref name="visitor"/>.
+        /// </summary>
+        /// <param name="visitor">The visitor.</param>
+        void Visit(IODataBinaryRightOperandVisitor visitor);
     }
 }

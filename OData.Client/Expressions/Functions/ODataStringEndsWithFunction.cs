@@ -1,13 +1,12 @@
 namespace OData.Client.Expressions.Functions
 {
-    public sealed class ODataStringEndsWithFunction<TEntity> : IODataFunction<TEntity> where TEntity : IEntity
+    public sealed class ODataStringEndsWithFunction : ODataFunction
     {
-        public static readonly ODataStringEndsWithFunction<TEntity> Instance = new();
+        public static readonly ODataStringEndsWithFunction Instance = new();
 
         private ODataStringEndsWithFunction()
+            : base("endswith")
         {
         }
-
-        public string Name { get; } = "endswith";
     }
 }

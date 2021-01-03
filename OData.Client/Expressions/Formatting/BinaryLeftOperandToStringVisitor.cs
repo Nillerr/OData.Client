@@ -2,7 +2,7 @@ using System.Text;
 
 namespace OData.Client.Expressions.Formatting
 {
-    internal sealed class BinaryLeftOperandToStringVisitor<TEntity> : IODataBinaryLeftOperandVisitor<TEntity> where TEntity : IEntity
+    internal sealed class BinaryLeftOperandToStringVisitor : IODataBinaryLeftOperandVisitor
     {
         private readonly StringBuilder _stringBuilder = new();
         
@@ -13,7 +13,7 @@ namespace OData.Client.Expressions.Formatting
 
         public string PropertyPrefix { get; }
         
-        public void Visit(ODataPropertyExpression<TEntity> expression)
+        public void Visit(ODataPropertyExpression expression)
         {
             _stringBuilder.Append(expression.Property.Name);
         }

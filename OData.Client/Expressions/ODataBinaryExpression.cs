@@ -1,14 +1,17 @@
 namespace OData.Client.Expressions
 {
-    public class ODataBinaryExpression<TEntity> : IODataLogicalOperand<TEntity>,
-        IODataFilterExpression<TEntity>,
-        IODataLambdaBody
-        where TEntity : IEntity
+    /// <summary>
+    /// A binary comparison expression, e.g. <c>{left} eq {right}</c> or <c>{left} gt {right}</c>.
+    /// </summary>
+    /// <remarks>
+    /// Logical expression (<c>not</c>, <c>and</c>, <c>or</c>) are represented by <see cref="ODataLogicalExpression"/>.
+    /// </remarks>
+    public class ODataBinaryExpression : IODataLogicalOperand, IODataFilterExpression, IODataLambdaBody
     {
         public ODataBinaryExpression(
-            IODataBinaryLeftOperand<TEntity> left,
+            IODataBinaryLeftOperand left,
             string @operator,
-            IODataBinaryRightOperand<TEntity> right
+            IODataBinaryRightOperand right
         )
         {
             Left = left;
@@ -16,26 +19,21 @@ namespace OData.Client.Expressions
             Right = right;
         }
 
-        public IODataBinaryLeftOperand<TEntity> Left { get; }
+        public IODataBinaryLeftOperand Left { get; }
         public string Operator { get; }
-        public IODataBinaryRightOperand<TEntity> Right { get; }
-
-        public void Visit(IODataExpressionVisitor<TEntity> visitor)
-        {
-            visitor.Visit(this);
-        }
+        public IODataBinaryRightOperand Right { get; }
 
         public void Visit(IODataLambdaBodyVisitor visitor)
         {
             visitor.Visit(this);
         }
 
-        public void Visit(IODataLogicalOperandVisitor<TEntity> visitor)
+        public void Visit(IODataLogicalOperandVisitor visitor)
         {
             visitor.Visit(this);
         }
 
-        public void Visit(IODataFilterExpressionVisitor<TEntity> visitor)
+        public void Visit(IODataFilterExpressionVisitor visitor)
         {
             visitor.Visit(this);
         }

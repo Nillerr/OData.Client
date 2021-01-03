@@ -4,35 +4,28 @@ namespace OData.Client.Expressions
     /// Represents a property
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public class ODataPropertyExpression<TEntity> : IODataExpression<TEntity>,
-        IODataBinaryLeftOperand<TEntity>,
-        IODataBinaryRightOperand<TEntity>,
-        IODataFunctionTarget<TEntity> 
-        where TEntity : IEntity
+    public class ODataPropertyExpression : IODataBinaryLeftOperand,
+        IODataBinaryRightOperand,
+        IODataFunctionTarget 
     {
-        public ODataPropertyExpression(IProperty<TEntity> property)
+        public ODataPropertyExpression(IProperty property)
         {
             Property = property;
         }
 
-        public IProperty<TEntity> Property { get; }
+        public IProperty Property { get; }
 
-        public void Visit(IODataExpressionVisitor<TEntity> visitor)
+        public void Visit(IODataBinaryRightOperandVisitor visitor)
         {
             visitor.Visit(this);
         }
 
-        public void Visit(IODataBinaryRightOperandVisitor<TEntity> visitor)
+        public void Visit(IODataBinaryLeftOperandVisitor visitor)
         {
             visitor.Visit(this);
         }
 
-        public void Visit(IODataBinaryLeftOperandVisitor<TEntity> visitor)
-        {
-            visitor.Visit(this);
-        }
-
-        public void Visit(IODataFunctionTargetVisitor<TEntity> visitor)
+        public void Visit(IODataFunctionTargetVisitor visitor)
         {
             visitor.Visit(this);
         }

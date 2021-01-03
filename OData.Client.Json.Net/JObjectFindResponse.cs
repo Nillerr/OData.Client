@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace OData.Client.Newtonsoft.Json
+namespace OData.Client.Json.Net
 {
     internal sealed class JObjectFindResponse<TEntity> : IFindResponse<TEntity>
         where TEntity : IEntity

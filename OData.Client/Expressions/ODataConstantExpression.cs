@@ -1,32 +1,28 @@
+using System;
+
 namespace OData.Client.Expressions
 {
     /// <summary>
-    /// Represents a constant value
+    /// A constant value expression, e.g. <c>"foo@email.com"</c> or <c>5</c>.
     /// </summary>
-    /// <typeparam name="TEntity"></typeparam>
-    public class ODataConstantExpression<TEntity> : IODataExpression<TEntity>,
-        IODataBinaryRightOperand<TEntity>,
-        IODataFunctionArgument<TEntity>
-        where TEntity : IEntity
+    public class ODataConstantExpression : IODataBinaryRightOperand, IODataFunctionArgument
     {
-        public ODataConstantExpression(object? value)
+        public ODataConstantExpression(object? value, Type valueType)
         {
             Value = value;
+            ValueType = valueType;
         }
 
         public object? Value { get; }
+        
+        public Type ValueType { get; }
 
-        public void Visit(IODataExpressionVisitor<TEntity> visitor)
+        public void Visit(IODataBinaryRightOperandVisitor visitor)
         {
             visitor.Visit(this);
         }
 
-        public void Visit(IODataBinaryRightOperandVisitor<TEntity> visitor)
-        {
-            visitor.Visit(this);
-        }
-
-        public void Visit(IODataFunctionArgumentVisitor<TEntity> visitor)
+        public void Visit(IODataFunctionArgumentVisitor visitor)
         {
             visitor.Visit(this);
         }

@@ -1,7 +1,14 @@
 namespace OData.Client.Expressions
 {
-    public interface IODataFilterExpression<TEntity> : IODataExpression<TEntity> where TEntity : IEntity
+    /// <summary>
+    /// An expression that is valid as the root of a filter.
+    /// </summary>
+    public interface IODataFilterExpression
     {
-        void Visit(IODataFilterExpressionVisitor<TEntity> visitor);
+        /// <summary>
+        /// Visits the expression, invoking the corresponding method on the <paramref name="visitor"/>.
+        /// </summary>
+        /// <param name="visitor">The visitor.</param>
+        void Visit(IODataFilterExpressionVisitor visitor);
     }
 }
