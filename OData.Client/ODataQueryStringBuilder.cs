@@ -10,7 +10,8 @@ namespace OData.Client
         public static void AddFilter<TEntity>(
             this List<string> queryStringParts,
             IValueFormatter valueFormatter,
-            ODataFilter<TEntity>? filter
+            ODataFilter<TEntity>? filter,
+            QueryStringFormatting formatting
         )
             where TEntity : IEntity
         {
@@ -25,12 +26,15 @@ namespace OData.Client
             oDataFilter.Expression.Visit(filterVisitor);
 
             var filterString = filterVisitor.ToString();
-            queryStringParts.Add("$filter=" + filterString);
+            
+            var valuePart = ValuePart(filterString, formatting);
+            queryStringParts.Add("$filter=" + valuePart);
         }
 
         public static void AddExpansions<TEntity>(
             this List<string> queryStringParts,
-            IEnumerable<ODataExpansion<TEntity>> expansions
+            IEnumerable<ODataExpansion<TEntity>> expansions,
+            QueryStringFormatting formatting
         )
             where TEntity : IEntity
         {
@@ -38,13 +42,15 @@ namespace OData.Client
             var expandString = string.Join(",", expandedProperties);
             if (expandString != string.Empty)
             {
-                queryStringParts.Add("$expand=" + expandString);
+                var valuePart = ValuePart(expandString, formatting);
+                queryStringParts.Add("$expand=" + valuePart);
             }
         }
 
         public static void AddSelection<TEntity>(
             this List<string> queryStringParts,
-            IEnumerable<IProperty<TEntity>> selection
+            IEnumerable<IProperty<TEntity>> selection,
+            QueryStringFormatting formatting
         )
             where TEntity : IEntity
         {
@@ -52,31 +58,40 @@ namespace OData.Client
             var selectionString = string.Join(",", selectedProperties);
             if (selectionString != string.Empty)
             {
-                queryStringParts.Add("$select=" + selectionString);
+                var valuePart = ValuePart(selectionString, formatting);
+                queryStringParts.Add("$select=" + valuePart);
             }
         }
-        
+
         public static void AddSorting<TEntity>(
             this List<string> queryStringParts,
-            IEnumerable<Sorting<TEntity>> sorting
+            IEnumerable<Sorting<TEntity>> sorting,
+            QueryStringFormatting formatting
         )
             where TEntity : IEntity
         {
             var selectedSorting = sorting
-                .Select(sort => $"{sort.Property.SelectableName()}%20{sort.Direction.ToQueryPart()}");
+                .Select(sort => $"{sort.Property.SelectableName()} {sort.Direction.ToQueryPart()}");
             
             var orderByString = string.Join(",", selectedSorting);
             if (orderByString != string.Empty)
             {
-                queryStringParts.Add("$orderby=" + orderByString);
+                var valuePart = ValuePart(orderByString, formatting);
+                queryStringParts.Add("$orderby=" + valuePart);
             }
         }
 
-        public static string ToQueryPart(this SortDirection direction) => direction switch
+        private static string ToQueryPart(this SortDirection direction) => direction switch
         {
             SortDirection.Ascending => "asc",
             SortDirection.Descending => "desc",
             _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
         };
+
+        private static string ValuePart(string value, QueryStringFormatting formatting)
+        {
+            var valuePart = formatting == QueryStringFormatting.Escaped ? Uri.EscapeDataString(value) : value;
+            return valuePart;
+        }
     }
 }

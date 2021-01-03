@@ -135,7 +135,7 @@ namespace OData.Client
         public override string ToString()
         {
             var request = CreateFindRequest();
-            var queryString = request.ToQueryString(_valueFormatter);
+            var queryString = request.ToQueryString(_valueFormatter, QueryStringFormatting.None);
 
             return queryString;
         }

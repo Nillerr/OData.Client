@@ -46,7 +46,7 @@ namespace OData.Client.Demo
             var incidentCollection = oDataHttpClient.Collection(Incident.EntityName);
 
             var query = incidentCollection.Find()
-                .Filter(Incident.CaseNumber.StartsWith("TS02"))
+                .Filter(Incident.CaseNumber.StartsWith("TS02") & Incident.DoubleValue == 2.34)
                 .Select(Incident.IncidentId, Incident.Title, Incident.CaseNumber, Incident.PrimaryContact)
                 .OrderBy(Incident.CaseNumber)
                 .MaxPageSize(1);

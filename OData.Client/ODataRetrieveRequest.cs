@@ -11,17 +11,6 @@ namespace OData.Client
 
         public IEnumerable<ODataExpansion<TEntity>> Expansions => _expansions;
 
-        public string ToQueryString()
-        {
-            var parts = new List<string>(3);
-
-            parts.AddSelection(Selection);
-            parts.AddExpansions(Expansions);
-
-            var queryString = string.Join("&", parts);
-            return queryString;
-        }
-
         public IODataSelection<TEntity> Select(IProperty<TEntity> property)
         {
             _selection.Add(property);

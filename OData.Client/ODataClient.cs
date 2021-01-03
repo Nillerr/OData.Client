@@ -45,7 +45,7 @@ namespace OData.Client
             var collectionUri = CollectionUri(name);
 
             var requestUriBuilder = new UriBuilder(collectionUri);
-            requestUriBuilder.Query = request.ToQueryString(_valueFormatter);
+            requestUriBuilder.Query = request.ToQueryString(_valueFormatter, QueryStringFormatting.Escaped);
 
             var requestUri = requestUriBuilder.Uri;
             return requestUri;
@@ -57,7 +57,7 @@ namespace OData.Client
             var entityUri = EntityUri(id);
 
             var requestUriBuilder = new UriBuilder(entityUri);
-            requestUriBuilder.Query = request.ToQueryString();
+            requestUriBuilder.Query = request.ToQueryString(QueryStringFormatting.Escaped);
 
             var requestUri = requestUriBuilder.Uri;
             return requestUri;

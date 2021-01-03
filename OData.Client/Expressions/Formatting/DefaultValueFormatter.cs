@@ -39,12 +39,12 @@ namespace OData.Client.Expressions.Formatting
 
         private static string Quoted(IConvertible value)
         {
-            return $"'{Uri.EscapeDataString(value.ToString(CultureInfo.InvariantCulture))}'";
+            return $"'{value.ToString(CultureInfo.InvariantCulture)}'";
         }
 
         private static string Quoted(IFormattable value, string? format = null)
         {
-            return $"'{Uri.EscapeDataString(value.ToString(format, CultureInfo.InvariantCulture))}'";
+            return $"'{value.ToString(format, CultureInfo.InvariantCulture)}'";
         }
     }
 }
