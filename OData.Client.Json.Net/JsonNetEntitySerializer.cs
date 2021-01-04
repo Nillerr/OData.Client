@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,23 +7,29 @@ using Newtonsoft.Json.Linq;
 
 namespace OData.Client.Json.Net
 {
-    public sealed class JsonNetEntitySerializer<TEntity> : IEntitySerializer<TEntity> where TEntity : IEntity
+    public sealed class JsonNetEntitySerializer : IEntitySerializer
     {
-        private readonly IEntityName<TEntity> _entityName;
         private readonly JsonSerializer _serializer;
-        private readonly IJsonSerializerFactory _serializerFactory;
 
-        public JsonNetEntitySerializer(IEntityName<TEntity> entityName, IJsonSerializerFactory serializerFactory)
+        public JsonNetEntitySerializer()
         {
-            _entityName = entityName;
-            _serializer = serializerFactory.CreateSerializer(entityName);
-            _serializerFactory = serializerFactory;
+            _serializer = JsonSerializer.Create();
         }
 
-        public ValueTask<IFindResponse<TEntity>> DeserializeFindResponseAsync(
+        public JsonNetEntitySerializer(JsonSerializerSettings settings)
+        {
+            _serializer = JsonSerializer.Create(settings);
+        }
+
+        public JsonNetEntitySerializer(JsonSerializer serializer)
+        {
+            _serializer = serializer;
+        }
+
+        public ValueTask<IFindResponse<TEntity>> DeserializeFindResponseAsync<TEntity>(
             Stream stream,
             IODataFindRequest<TEntity> request
-        )
+        ) where TEntity : IEntity
         {
             using var streamReader = new StreamReader(stream, Encoding.UTF8);
             using var jsonReader = new JsonTextReader(streamReader);
@@ -38,32 +43,13 @@ namespace OData.Client.Json.Net
 
             var context = root.GetValue<Uri>("@odata.context", _serializer);
             var nextLink = root.GetValueOrDefault<Uri>("@odata.nextLink", _serializer);
-            var value = root.GetValue<JArray>("value", _serializer).ToEntities(_entityName, _serializerFactory);
-            var response = new FindResponse<TEntity>(_entityName, context, nextLink, value, request);
+            var value = root.GetValue<JArray>("value", _serializer).ToEntities<TEntity>(_serializer);
+            var response = new FindResponse<TEntity>(context, nextLink, value, request);
             
             return ValueTask.FromResult<IFindResponse<TEntity>>(response);
         }
-        
-        private List<JObjectEntity<TEntity>> ToEntities(JArray value)
-        {
-            var serializer = _serializerFactory.CreateSerializer(_entityName);
-            
-            var entities = new List<JObjectEntity<TEntity>>(value.Count);
-            foreach (var token in value)
-            {
-                if (token is not JObject root)
-                {
-                    throw new JsonSerializationException($"Unexpected token '{token.Type:G}', expected '{JTokenType.Object}'.");
-                }
 
-                var entity = new JObjectEntity<TEntity>(root, serializer, _serializerFactory);
-                entities.Add(entity);
-            }
-
-            return entities;
-        }
-
-        public ValueTask<IEntity<TEntity>> DeserializeEntityAsync(Stream stream)
+        public ValueTask<IEntity<TEntity>> DeserializeEntityAsync<TEntity>(Stream stream) where TEntity : IEntity
         {
             using var streamReader = new StreamReader(stream, Encoding.UTF8);
             using var jsonReader = new JsonTextReader(streamReader);
@@ -74,14 +60,13 @@ namespace OData.Client.Json.Net
                 throw new JsonSerializationException("Could not deserialize response to JObject");
             }
 
-            var entity = ToEntity(root);
+            var entity = ToEntity<TEntity>(root);
             return ValueTask.FromResult<IEntity<TEntity>>(entity);
         }
 
-        private JObjectEntity<TEntity> ToEntity(JObject value)
+        private JObjectEntity<TEntity> ToEntity<TEntity>(JObject value) where TEntity : IEntity
         {
-            var serializer = _serializerFactory.CreateSerializer(_entityName);
-            var entity = new JObjectEntity<TEntity>(value, serializer, _serializerFactory);
+            var entity = new JObjectEntity<TEntity>(value, _serializer);
             return entity;
         }
     }

@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace OData.Client
 {
+    /// <summary>
+    /// A wrapper around <see cref="HttpClient"/>.
+    /// </summary>
     public interface IODataHttpClient
     {
         Task<HttpResponseMessage> SendAsync(

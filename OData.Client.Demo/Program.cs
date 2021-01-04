@@ -23,24 +23,26 @@ namespace OData.Client.Demo
             services.Configure<ODataAuthenticatorSettings>(configuration.GetSection("OData").GetSection("Authenticator"));
 
             await using var serviceProvider = services.BuildServiceProvider();
-            var authenticatorOptions = serviceProvider.GetRequiredService<IOptions<ODataAuthenticatorSettings>>();
-            
-            var serializerSettings = new JsonSerializerSettings();
-            var entitySerializerFactory = new JsonNetEntitySerializerFactory();
-            var propertiesFactory = new JsonNetPropertiesFactory(serializerSettings.Converters);
 
             var clock = new SystemClock();
             var httpClientProvider = new DefaultHttpClientProvider();
 
+            var authenticatorOptions = serviceProvider.GetRequiredService<IOptions<ODataAuthenticatorSettings>>();
             var authenticator = new ODataAuthenticator(clock, httpClientProvider, authenticatorOptions);
+            
+            var oDataHttpClient = new DefaultODataHttpClient(clock, authenticator, httpClientProvider);
 
-            var oDataHttpClient = new ODataHttpClient(clock, authenticator, httpClientProvider);
-
+            var organizationUri = new Uri(authenticatorOptions.Value.Resource);
+            
+            var serializerSettings = new JsonSerializerSettings();
+            var entitySerializer = new JsonNetEntitySerializer();
+            var propertiesFactory = new JsonNetPropertiesFactory(serializerSettings);
+            
             var oDataClientSettings = new ODataClientSettings(
-                new Uri(authenticatorOptions.Value.Resource),
-                propertiesFactory,
-                entitySerializerFactory,
-                oDataHttpClient
+                organizationUri: organizationUri,
+                propertiesFactory: propertiesFactory,
+                entitySerializer: entitySerializer,
+                httpClient: oDataHttpClient
             );
             
             var oDataClient = new ODataClient(oDataClientSettings);

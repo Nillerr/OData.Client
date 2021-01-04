@@ -6,7 +6,14 @@ using System.Threading.Tasks;
 
 namespace OData.Client
 {
-    public sealed class ODataHttpClient : IODataHttpClient
+    /// <summary>
+    /// A wrapper around <see cref="HttpClient"/> which handles rate limiting and attaches authorization headers to
+    /// the request using the supplied <see cref="IODataAuthenticator"/>. If any request made using this class
+    /// encounters a <c>429 Too Many Requests</c> response, the request will be retried at the time specified by the
+    /// accompanying <c>Retry-After</c> header, and subsequent requests will wait until the receiver is ready to
+    /// receive requests before submitting theirs.
+    /// </summary>
+    public sealed class DefaultODataHttpClient : IODataHttpClient
     {
         private static readonly ODataHttpRequestOptions DefaultRequestOptions = new ODataHttpRequestOptions();
         
@@ -14,7 +21,7 @@ namespace OData.Client
         private readonly IODataAuthenticator _authenticator;
         private readonly IHttpClientProvider _httpClientProvider;
 
-        public ODataHttpClient(IClock clock, IODataAuthenticator authenticator, IHttpClientProvider httpClientProvider)
+        public DefaultODataHttpClient(IClock clock, IODataAuthenticator authenticator, IHttpClientProvider httpClientProvider)
         {
             _clock = new UtcClock(clock);
             _authenticator = authenticator;

@@ -1,9 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Net.Mime;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -13,11 +9,12 @@ namespace OData.Client.Json.Net
     public sealed class JObjectProperties<TEntity> : IODataProperties<TEntity> where TEntity : IEntity
     {
         private readonly JObject _root = new();
-        private readonly JsonConverter[] _converters;
 
-        public JObjectProperties(IList<JsonConverter> converters)
+        private readonly JsonSerializer _serializer;
+
+        public JObjectProperties(JsonSerializer serializer)
         {
-            _converters = converters.ToArray();
+            _serializer = serializer;
         }
 
         public IODataProperties<TEntity> Set<TValue>(IProperty<TEntity, TValue> property, TValue value)
@@ -59,34 +56,26 @@ namespace OData.Client.Json.Net
         {
             using var streamWriter = new StreamWriter(stream, Encoding.UTF8);
             using var jsonWriter = new JsonTextWriter(streamWriter);
+            
+            // TODO @nije: Formatting
             jsonWriter.Formatting = Formatting.Indented;
 
-            _root.WriteTo(jsonWriter, _converters);
+            _serializer.Serialize(jsonWriter, _root);
+            
             jsonWriter.Flush();
         }
 
-        private static string Reference<TOther>(IEntityId<TOther> id)
+        private string Reference<TOther>(IEntityId<TOther> id)
             where TOther : IEntity
         {
             return $"/{id.Name.Name}({id.Id:D})";
         }
 
-        private static JToken Token<TValue>(TValue value)
+        private JToken Token<TValue>(TValue value) => value switch
         {
-            if (value is null)
-            {
-                return JValue.CreateNull();
-            }
-
-            return JToken.FromObject(value);
-        }
-
-        public HttpContent ToHttpContent()
-        {
-            var json = _root.ToString(Formatting.Indented);
-            Console.WriteLine(json);
-            var content = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);
-            return content;
-        }
+            null => JValue.CreateNull(),
+            IEntityId<TEntity> entityId => JValue.CreateString(entityId.Id.ToString("D")),
+            _ => JToken.FromObject(value, _serializer)
+        };
     }
 }

@@ -8,20 +8,19 @@ namespace OData.Client
         public ODataClientSettings(
             Uri organizationUri,
             IODataPropertiesFactory propertiesFactory,
-            IEntitySerializerFactory entitySerializerFactory,
+            IEntitySerializer entitySerializer,
             IODataHttpClient httpClient
         )
         {
             OrganizationUri = organizationUri;
             PropertiesFactory = propertiesFactory;
-            EntitySerializerFactory = entitySerializerFactory;
+            EntitySerializer = entitySerializer;
             HttpClient = httpClient;
         }
 
         public Uri OrganizationUri { get; set; }
         public IODataPropertiesFactory PropertiesFactory { get; set; }
-        public IEntitySerializerFactory EntitySerializerFactory { get; set; }
-
+        public IEntitySerializer EntitySerializer { get; set; }
         public IODataHttpClient HttpClient { get; set; }
         
         public IValueFormatter ValueFormatter { get; set; } = new DefaultValueFormatter();

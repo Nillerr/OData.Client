@@ -8,14 +8,14 @@ namespace OData.Client
     {
         public static async Task<IEntity<TEntity>> ReadEntityAsync<TEntity>(
             this HttpContent content,
-            IEntitySerializer<TEntity> entitySerializer,
+            IEntitySerializer entitySerializer,
             CancellationToken cancellationToken = default
         )
             where TEntity : IEntity
         {
             await using var stream = await content.ReadAsStreamAsync(cancellationToken);
 
-            var entity = await entitySerializer.DeserializeEntityAsync(stream);
+            var entity = await entitySerializer.DeserializeEntityAsync<TEntity>(stream);
             return entity;
         }
     }

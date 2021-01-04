@@ -1,7 +1,12 @@
 namespace OData.Client
 {
-    public interface IEntityName<out TEntity> where TEntity : IEntity
+    public interface IEntityName
     {
         string Name { get; }
+    }
+    
+    public interface IEntityName<out TEntity> : IEntityName 
+        where TEntity : IEntity
+    {
     }
 }

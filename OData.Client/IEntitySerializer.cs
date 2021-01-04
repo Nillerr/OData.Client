@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 
 namespace OData.Client
 {
-    public interface IEntitySerializer<TEntity> where TEntity : IEntity
+    public interface IEntitySerializer
     {
-        ValueTask<IFindResponse<TEntity>> DeserializeFindResponseAsync(
+        ValueTask<IFindResponse<TEntity>> DeserializeFindResponseAsync<TEntity>(
             Stream stream,
             IODataFindRequest<TEntity> request
-        );
+        ) where TEntity : IEntity;
 
-        ValueTask<IEntity<TEntity>> DeserializeEntityAsync(Stream stream);
+        ValueTask<IEntity<TEntity>> DeserializeEntityAsync<TEntity>(Stream stream) where TEntity : IEntity;
     }
 }

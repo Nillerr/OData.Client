@@ -18,8 +18,12 @@ namespace OData.Client
         private readonly IHttpClientProvider _httpClientProvider;
         
         private readonly IOptions<ODataAuthenticatorSettings> _options;
-        
-        public ODataAuthenticator(IClock clock, IHttpClientProvider httpClientProvider, IOptions<ODataAuthenticatorSettings> options)
+
+        public ODataAuthenticator(
+            IClock clock,
+            IHttpClientProvider httpClientProvider,
+            IOptions<ODataAuthenticatorSettings> options
+        )
         {
             _clock = new UtcClock(clock);
             _httpClientProvider = httpClientProvider;

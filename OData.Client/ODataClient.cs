@@ -13,7 +13,7 @@ namespace OData.Client
     {
         private readonly Uri _organizationUri;
         private readonly IODataPropertiesFactory _propertiesFactory;
-        private readonly IEntitySerializerFactory _entitySerializerFactory;
+        private readonly IEntitySerializer _entitySerializer;
         private readonly IODataHttpClient _oDataHttpClient;
         private readonly IValueFormatter _valueFormatter;
 
@@ -21,7 +21,7 @@ namespace OData.Client
         {
             _organizationUri = settings.OrganizationUri;
             _propertiesFactory = settings.PropertiesFactory;
-            _entitySerializerFactory = settings.EntitySerializerFactory;
+            _entitySerializer = settings.EntitySerializer;
             _oDataHttpClient = settings.HttpClient;
             _valueFormatter = settings.ValueFormatter;
         }
@@ -92,8 +92,7 @@ namespace OData.Client
             
             await using var stream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
 
-            var serializer = _entitySerializerFactory.CreateSerializer(name);
-            var response = await serializer.DeserializeFindResponseAsync(stream, request);
+            var response = await _entitySerializer.DeserializeFindResponseAsync(stream, request);
             return response;
         }
 
@@ -120,8 +119,7 @@ namespace OData.Client
             
             await using var stream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
 
-            var serializer = _entitySerializerFactory.CreateSerializer(current.EntityName);
-            var response = await serializer.DeserializeFindResponseAsync(stream, request);
+            var response = await _entitySerializer.DeserializeFindResponseAsync(stream, request);
             return response;
         }
 
@@ -166,8 +164,7 @@ namespace OData.Client
                 return null;
             }
 
-            var serializer = _entitySerializerFactory.CreateSerializer(id.Name);
-            var entity = await httpResponse.Content.ReadEntityAsync(serializer, cancellationToken);
+            var entity = await httpResponse.Content.ReadEntityAsync<TEntity>(_entitySerializer, cancellationToken);
             return entity;
         }
 
@@ -207,8 +204,7 @@ namespace OData.Client
             using var httpResponse = await _oDataHttpClient
                 .SendAsync(CreateRequest, cancellationToken: cancellationToken);
             
-            var serializer = _entitySerializerFactory.CreateSerializer(name);
-            var entity = await httpResponse.Content.ReadEntityAsync(serializer, cancellationToken);
+            var entity = await httpResponse.Content.ReadEntityAsync<TEntity>(_entitySerializer, cancellationToken);
             return entity;
         }
 
@@ -245,8 +241,7 @@ namespace OData.Client
             using var httpResponse = await _oDataHttpClient
                 .SendAsync(CreateRequest, cancellationToken: cancellationToken);
             
-            var serializer = _entitySerializerFactory.CreateSerializer(id.Name);
-            var entity = await httpResponse.Content.ReadEntityAsync(serializer, cancellationToken);
+            var entity = await httpResponse.Content.ReadEntityAsync<TEntity>(_entitySerializer, cancellationToken);
             return entity;
         }
 

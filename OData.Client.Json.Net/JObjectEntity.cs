@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -8,13 +9,11 @@ namespace OData.Client.Json.Net
     {
         private readonly JObject _root;
         private readonly JsonSerializer _serializer;
-        private readonly IJsonSerializerFactory _serializerFactory;
 
-        public JObjectEntity(JObject root, JsonSerializer serializer, IJsonSerializerFactory serializerFactory)
+        public JObjectEntity(JObject root, JsonSerializer serializer)
         {
             _root = root;
             _serializer = serializer;
-            _serializerFactory = serializerFactory;
         }
 
         public bool Contains(IProperty<TEntity> property)
@@ -27,11 +26,35 @@ namespace OData.Client.Json.Net
             if (_root.TryGetValue(property.Name, out var token))
             {
                 var reader = new JTokenReader(token);
+                if (TryDeserializeEntityId(reader, out value))
+                {
+                    return true;
+                }
+             
                 value = _serializer.Deserialize<TValue>(reader);
                 return true;
             }
 
             value = default!;
+            return false;
+        }
+
+        private bool TryDeserializeEntityId<TValue>(JsonReader reader, out TValue? value) where TValue : notnull
+        {
+            if (typeof(TValue).IsEntityId(out var entityType))
+            {
+                var guid = _serializer.Deserialize<Guid?>(reader);
+                if (guid.HasValue)
+                {
+                    value = entityType.CreateEntityId<TValue>(guid.Value);
+                    return true;
+                }
+
+                value = default;
+                return true;
+            }
+
+            value = default;
             return false;
         }
 
@@ -51,8 +74,7 @@ namespace OData.Client.Json.Net
             {
                 var otherRoot = token.Value<JObject>();
                 
-                var serializer = _serializerFactory.CreateSerializer(other);
-                entity = new JObjectEntity<TOther>(otherRoot, serializer, _serializerFactory);
+                entity = new JObjectEntity<TOther>(otherRoot, _serializer);
                 
                 return true;
             }
@@ -81,7 +103,7 @@ namespace OData.Client.Json.Net
             if (_root.TryGetValue(property.Name, out var token))
             {
                 var roots = _root.Value<JArray>(token);
-                entities = EntitiesFrom(roots, other);
+                entities = EntitiesFrom<TOther>(roots);
                 return true;
             }
 
@@ -102,13 +124,12 @@ namespace OData.Client.Json.Net
             throw new JsonSerializationException($"A property '{property.Name}' could not be found.");
         }
 
-        private IEnumerable<IEntity<TOther>> EntitiesFrom<TOther>(JArray roots, IEntityName<TOther> name)
+        private IEnumerable<IEntity<TOther>> EntitiesFrom<TOther>(JArray roots)
             where TOther : IEntity
         {
-            var serializer = _serializerFactory.CreateSerializer(name);
             foreach (var root in roots.Children<JObject>())
             {
-                yield return new JObjectEntity<TOther>(root, serializer, _serializerFactory);
+                yield return new JObjectEntity<TOther>(root, _serializer);
             }
         }
 

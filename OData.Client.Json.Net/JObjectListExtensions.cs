@@ -6,24 +6,18 @@ namespace OData.Client.Json.Net
 {
     internal static class JObjectListExtensions
     {
-        public static List<JObjectEntity<TEntity>> ToEntities<TEntity>(
-            this JArray value,
-            IEntityName<TEntity> name,
-            IJsonSerializerFactory serializerFactory
-        ) where TEntity : IEntity
+        public static List<JObjectEntity<TEntity>> ToEntities<TEntity>(this JArray value, JsonSerializer serializer)
+            where TEntity : IEntity
         {
-            var serializer = serializerFactory.CreateSerializer(name);
-            
             var entities = new List<JObjectEntity<TEntity>>(value.Count);
             foreach (var token in value)
             {
                 if (token is not JObject root)
                 {
-                    // TODO Throw a JSON Serialization Exception
-                    throw new JsonSerializationException("Throw a JSON Serialization Exception");
+                    throw new JsonSerializationException($"Unexpected token '{token.Type:G}', expected '{JTokenType.Object}'.");
                 }
 
-                var entity = new JObjectEntity<TEntity>(root, serializer, serializerFactory);
+                var entity = new JObjectEntity<TEntity>(root, serializer);
                 entities.Add(entity);
             }
 

@@ -1,31 +1,29 @@
-using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 
 namespace OData.Client.Json.Net
 {
     public sealed class JsonNetPropertiesFactory : IODataPropertiesFactory
     {
-        private readonly IList<JsonConverter> _converters;
+        private readonly JsonSerializer _serializer;
 
         public JsonNetPropertiesFactory()
         {
-            _converters = JsonSerializer.CreateDefault().Converters;
+            _serializer = JsonSerializer.Create();
         }
         
         public JsonNetPropertiesFactory(JsonSerializerSettings settings)
         {
-            _converters = settings.Converters.ToList();
+            _serializer = JsonSerializer.Create(settings);
         }
         
-        public JsonNetPropertiesFactory(IList<JsonConverter> converters)
+        public JsonNetPropertiesFactory(JsonSerializer serializer)
         {
-            _converters = converters;
+            _serializer = serializer;
         }
 
         public IODataProperties<TEntity> Create<TEntity>() where TEntity : IEntity
         {
-            return new JObjectProperties<TEntity>(_converters);
+            return new JObjectProperties<TEntity>(_serializer);
         }
     }
 }
