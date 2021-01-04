@@ -1,5 +1,3 @@
-using JetBrains.Annotations;
-
 namespace OData.Client
 {
     /// <inheritdoc />
@@ -10,7 +8,6 @@ namespace OData.Client
     /// }
     /// </code>
     /// </example>
-    [PublicAPI]
     public sealed class EntityType<TEntity> : IEntityType<TEntity>
         where TEntity : IEntity
     {

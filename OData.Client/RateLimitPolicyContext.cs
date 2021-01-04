@@ -1,13 +1,11 @@
 using System;
 using System.Net.Http;
-using JetBrains.Annotations;
 
 namespace OData.Client
 {
     /// <summary>
     /// The context used in <see cref="IRateLimitPolicy.ShouldRetry"/>.
     /// </summary>
-    [PublicAPI]
     public sealed class RateLimitPolicyContext
     {
         /// <summary>

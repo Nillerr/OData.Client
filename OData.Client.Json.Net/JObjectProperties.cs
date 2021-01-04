@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -75,7 +76,8 @@ namespace OData.Client.Json.Net
         private JToken Token<TValue>(TValue value) => value switch
         {
             null => JValue.CreateNull(),
-            IEntityId<TEntity> entityId => JValue.CreateString(entityId.Id.ToString("D", CultureInfo.InvariantCulture)),
+            IEntityId<TEntity> entityId => entityId.Id.ToString("D", CultureInfo.InvariantCulture),
+            Enum enumValue => Convert.ToInt32(enumValue),
             _ => JToken.FromObject(value, _serializer)
         };
     }

@@ -9,6 +9,9 @@ using OData.Client.Expressions.Formatting;
 
 namespace OData.Client
 {
+    /// <summary>
+    /// An OData client implementation for interacting with an OData API.
+    /// </summary>
     public sealed class ODataClient : IODataClient
     {
         private readonly Uri _organizationUri;
@@ -17,6 +20,10 @@ namespace OData.Client
         private readonly IODataHttpClient _oDataHttpClient;
         private readonly IValueFormatter _valueFormatter;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ODataClient"/> with the specified <paramref name="settings"/>.
+        /// </summary>
+        /// <param name="settings">The client settings.</param>
         public ODataClient(ODataClientSettings settings)
         {
             _organizationUri = settings.OrganizationUri;
@@ -69,11 +76,13 @@ namespace OData.Client
             return requestUri;
         }
 
+        /// <inheritdoc />
         public IODataCollection<TEntity> Collection<TEntity>(IEntityType<TEntity> type) where TEntity : IEntity
         {
             return new ODataCollection<TEntity>(type, this, _valueFormatter);
         }
 
+        /// <inheritdoc />
         public async Task<IFindResponse<TEntity>> FindAsync<TEntity>(
             IEntityType<TEntity> type,
             ODataFindRequest<TEntity> request,
@@ -97,6 +106,7 @@ namespace OData.Client
             return response;
         }
 
+        /// <inheritdoc />
         public async Task<IFindResponse<TEntity>?> FindNextAsync<TEntity>(
             IFindResponse<TEntity> current,
             CancellationToken cancellationToken = default
@@ -142,6 +152,7 @@ namespace OData.Client
             return httpRequest;
         }
 
+        /// <inheritdoc />
         public async Task<IEntity<TEntity>?> RetrieveAsync<TEntity>(
             IEntityId<TEntity> id,
             ODataRetrieveRequest<TEntity> request,
@@ -171,6 +182,7 @@ namespace OData.Client
             return entity;
         }
 
+        /// <inheritdoc />
         public async Task<EntityId<TEntity>> CreateAsync<TEntity>(
             IEntityType<TEntity> type,
             Action<IODataProperties<TEntity>> props,
@@ -192,6 +204,7 @@ namespace OData.Client
             return entityId;
         }
 
+        /// <inheritdoc />
         public async Task<IEntity<TEntity>> CreateRepresentationAsync<TEntity>(
             IEntityType<TEntity> type,
             Action<IODataProperties<TEntity>> props,
@@ -213,6 +226,7 @@ namespace OData.Client
             return entity;
         }
 
+        /// <inheritdoc />
         public async Task UpdateAsync<TEntity>(
             IEntityId<TEntity> id,
             Action<IODataProperties<TEntity>> props,
@@ -231,6 +245,7 @@ namespace OData.Client
                 .SendAsync(CreateRequest, cancellationToken: cancellationToken);
         }
 
+        /// <inheritdoc />
         public async Task<IEntity<TEntity>> UpdateRepresentationAsync<TEntity>(
             IEntityId<TEntity> id,
             Action<IODataProperties<TEntity>> props,
@@ -252,6 +267,7 @@ namespace OData.Client
             return entity;
         }
 
+        /// <inheritdoc />
         public async Task DeleteAsync<TEntity>(IEntityId<TEntity> id, CancellationToken cancellationToken = default)
             where TEntity : IEntity
         {
@@ -265,6 +281,7 @@ namespace OData.Client
                 .SendAsync(CreateRequest, cancellationToken: cancellationToken);
         }
 
+        /// <inheritdoc />
         public async Task AssociateAsync<TEntity, TOther>(
             IEntityId<TEntity> id,
             IRef<TEntity, TOther> property,
@@ -288,6 +305,7 @@ namespace OData.Client
                 .SendAsync(CreateRequest, cancellationToken: cancellationToken);
         }
 
+        /// <inheritdoc />
         public async Task AssociateAsync<TEntity, TOther>(
             IEntityId<TEntity> id,
             IRefs<TEntity, TOther> property,
@@ -311,10 +329,10 @@ namespace OData.Client
                 .SendAsync(CreateRequest, cancellationToken: cancellationToken);
         }
 
+        /// <inheritdoc />
         public async Task DisassociateAsync<TEntity, TOther>(
             IEntityId<TEntity> id,
             IOptionalRef<TEntity, TOther> property,
-            IEntityId<TOther> otherId,
             CancellationToken cancellationToken = default
         )
             where TEntity : IEntity
@@ -331,6 +349,7 @@ namespace OData.Client
                 .SendAsync(CreateRequest, cancellationToken: cancellationToken);
         }
 
+        /// <inheritdoc />
         public async Task DisassociateAsync<TEntity, TOther>(
             IEntityId<TEntity> id,
             IRefs<TEntity, TOther> property,

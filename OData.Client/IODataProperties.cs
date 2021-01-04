@@ -3,6 +3,10 @@ using System.IO;
 
 namespace OData.Client
 {
+    /// <summary>
+    /// A specification of properties to set when creating or updating an entity.
+    /// </summary>
+    /// <typeparam name="TEntity">The type of entity.</typeparam>
     public interface IODataProperties<in TEntity> where TEntity : IEntity
     {
         /// <summary>

@@ -11,6 +11,12 @@ namespace OData.Client.Demo
 {
     internal record MyRecord(Uri MyUri);
 
+    public enum MyEnum
+    {
+        Foo = 3,
+        Bar = 5,
+    }
+    
     public class Program
     {
         public static async Task Main(string[] args)

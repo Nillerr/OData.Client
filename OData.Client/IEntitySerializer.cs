@@ -1,13 +1,11 @@
 using System.IO;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 
 namespace OData.Client
 {
     /// <summary>
     /// Serializes JSON to entities.
     /// </summary>
-    [PublicAPI]
     public interface IEntitySerializer
     {
         /// <summary>

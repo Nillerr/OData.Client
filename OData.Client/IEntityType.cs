@@ -6,7 +6,6 @@ namespace OData.Client
     /// A type of entity.
     /// </summary>
     /// <typeparam name="TEntity">The CLR type representing the entity.</typeparam>
-    [PublicAPI]
     public interface IEntityType<[UsedImplicitly] out TEntity>
         where TEntity : IEntity
     {
