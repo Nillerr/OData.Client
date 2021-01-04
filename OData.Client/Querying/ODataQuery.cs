@@ -18,14 +18,14 @@ namespace OData.Client
         private readonly IODataClient _oDataClient;
         private readonly IValueFormatter _valueFormatter;
 
-        public ODataQuery(IEntityName<TEntity> entityName, IODataClient oDataClient, IValueFormatter valueFormatter)
+        public ODataQuery(IEntityType<TEntity> entityType, IODataClient oDataClient, IValueFormatter valueFormatter)
         {
-            EntityName = entityName;
+            EntityType = entityType;
             _oDataClient = oDataClient;
             _valueFormatter = valueFormatter;
         }
 
-        public IEntityName<TEntity> EntityName { get; }
+        public IEntityType<TEntity> EntityType { get; }
 
         public IODataQuery<TEntity> Filter(ODataFilter<TEntity> filter)
         {
@@ -110,7 +110,7 @@ namespace OData.Client
         {
             var request = CreateFindRequest();
 
-            IFindResponse<TEntity>? response = await _oDataClient.FindAsync(EntityName, request, cancellationToken);
+            IFindResponse<TEntity>? response = await _oDataClient.FindAsync(EntityType, request, cancellationToken);
             while (response != null)
             {
                 foreach (var entity in response.Value)

@@ -42,7 +42,8 @@ namespace OData.Client
         /// <returns>The converted value.</returns>
         /// <exception cref="ODataNullValueException">The value of the property was null.</exception>
         public static TValue Value<TEntity, TValue>(this IEntity<TEntity> source, IRequired<TEntity, TValue> property)
-            where TValue : notnull where TEntity : IEntity
+            where TEntity : IEntity
+            where TValue : notnull
         {
             var nullable = source.Value(property.AsOptional());
             return CheckNotNull(nullable, property);
@@ -51,7 +52,7 @@ namespace OData.Client
         public static bool TryGetEntity<TEntity, TOther>(
             this IEntity<TEntity> source,
             IRequiredRef<TEntity, TOther> property,
-            IEntityName<TOther> other,
+            IEntityType<TOther> other,
             [MaybeNullWhen(false)] out IEntity<TOther> entity
         )
             where TEntity : IEntity
@@ -70,7 +71,7 @@ namespace OData.Client
         public static IEntity<TOther> Entity<TEntity, TOther>(
             this IEntity<TEntity> source,
             IRequiredRef<TEntity, TOther> property,
-            IEntityName<TOther> other
+            IEntityType<TOther> other
         )
             where TEntity : IEntity
             where TOther : IEntity
@@ -93,7 +94,7 @@ namespace OData.Client
         public static bool TryGetReference<TEntity, TOther>(
             this IEntity<TEntity> source,
             IRequiredRef<TEntity, TOther> property,
-            IEntityName<TOther> other,
+            IEntityType<TOther> other,
             [MaybeNullWhen(false)] out IEntityId<TOther> id
         )
             where TEntity : IEntity
@@ -122,7 +123,7 @@ namespace OData.Client
         public static IEntityId<TOther> Reference<TEntity, TOther>(
             this IEntity<TEntity> source,
             IRequiredRef<TEntity, TOther> property,
-            IEntityName<TOther> other
+            IEntityType<TOther> other
         )
             where TEntity : IEntity
             where TOther : IEntity

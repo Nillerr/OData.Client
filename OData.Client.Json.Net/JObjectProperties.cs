@@ -58,8 +58,8 @@ namespace OData.Client.Json.Net
             using var streamWriter = new StreamWriter(stream, Encoding.UTF8);
             using var jsonWriter = new JsonTextWriter(streamWriter);
 
-            // TODO @nije: Formatting
-            jsonWriter.Formatting = Formatting.Indented;
+            // TODO @nije: Remove formatting
+            jsonWriter.Formatting = Newtonsoft.Json.Formatting.Indented;
 
             _serializer.Serialize(jsonWriter, _root);
 
@@ -69,7 +69,7 @@ namespace OData.Client.Json.Net
         private string Reference<TOther>(IEntityId<TOther> id)
             where TOther : IEntity
         {
-            return $"/{id.Name.Name}({id.Id:D})";
+            return $"/{id.Type.Name}({id.Id:D})";
         }
 
         private JToken Token<TValue>(TValue value) => value switch

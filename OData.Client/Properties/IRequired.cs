@@ -10,6 +10,7 @@ namespace OData.Client
         where TEntity : IEntity
         where TValue : notnull
     {
+        IRequired<TEntity, T> As<T>() where T : notnull;
         IOptional<TEntity, TValue> AsOptional();
     }
 }

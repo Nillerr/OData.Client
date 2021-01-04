@@ -7,6 +7,9 @@ using System.Text;
 
 namespace OData.Client
 {
+    /// <summary>
+    /// A set of extensions for <see cref="IODataProperties{TEntity}"/>.
+    /// </summary>
     public static class ODataPropertiesExtensions
     {
         /// <summary>
@@ -29,6 +32,21 @@ namespace OData.Client
             return properties.BindAll(property, ids.AsEnumerable());
         }
 
+        /// <summary>
+        /// Returns the name of the single-value navigation property as is is used in <c>$select=</c> expressions,
+        /// meaning it will be reformatted as: <c>"_{property.Name}_value"</c>.
+        /// </summary>
+        /// <param name="property">The single-value navigation property.</param>
+        /// <typeparam name="TEntity">The entity.</typeparam>
+        /// <typeparam name="TOther">The entity referenced by the property.</typeparam>
+        /// <returns>The value-name of the property.</returns>
+        public static string ValueName<TEntity, TOther>(this IRef<TEntity, TOther> property)
+            where TEntity : IEntity
+            where TOther : IEntity
+        {
+            return $"_{property.Name}_value";
+        }
+
         internal static HttpContent ToHttpContent<TEntity>(this IODataProperties<TEntity> properties) where TEntity : IEntity
         {
             var propertiesStream = new MemoryStream();
@@ -46,7 +64,7 @@ namespace OData.Client
             
             return content;
         }
-        
+
         /// <summary>
         /// Returns the name of the property as it is used in <c>$filter=</c> and <c>$select=</c> expressions, meaning
         /// if the property is a single-value navigation property, it will be reformatted as: <c>"_{property.Name}_value"</c>. 
@@ -66,21 +84,6 @@ namespace OData.Client
             // }
 
             return property.Name;
-        }
-
-        /// <summary>
-        /// Returns the name of the single-value navigation property as is is used in <c>$select=</c> expressions,
-        /// meaning it will be reformatted as: <c>"_{property.Name}_value"</c>.
-        /// </summary>
-        /// <param name="property">The single-value navigation property.</param>
-        /// <typeparam name="TEntity">The entity.</typeparam>
-        /// <typeparam name="TOther">The entity referenced by the property.</typeparam>
-        /// <returns>The value-name of the property.</returns>
-        public static string ValueName<TEntity, TOther>(this IRef<TEntity, TOther> property)
-            where TEntity : IEntity
-            where TOther : IEntity
-        {
-            return $"_{property.Name}_value";
         }
     }
 }

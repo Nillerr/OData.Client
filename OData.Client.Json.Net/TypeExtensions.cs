@@ -1,62 +1,38 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 namespace OData.Client.Json.Net
 {
     internal static class TypeExtensions
     {
-        public static TValue? CreateEntityId<TValue>(this Type entityType, Guid value)
+        /// <summary>
+        /// Determines if the type is either a <see cref="IEntityId{TEntity}"/> or <see cref="EntityId{TEntity}"/>.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns><see langword="true"/> if the type is a constructed generic type of
+        /// <see cref="IEntityId{TEntity}"/> or <see cref="IsEntityId"/>; otherwise <see langword="false"/>.</returns>
+        public static bool IsEntityId(this Type type)
         {
-            var entityIdType = typeof(EntityId<>).MakeGenericType(entityType);
-            
-            var instance = Activator.CreateInstance(entityIdType, value);
-            if (instance is null)
-            {
-                return default;
-            }
-
-            return (TValue) instance;
-        }
-        
-        public static bool IsEntityId(this Type type, [MaybeNullWhen(false)] out Type entityType)
-        {
-            if (type.IsInterface && type.IsEntityIdInterface(out entityType))
+            if (type.IsInterface && type.IsEntityIdInterface())
             {
                 return true;
             }
 
-            if (type.IsClass && type.IsEntityIdClass(out entityType))
+            if (type.IsClass && type.IsEntityIdClass())
             {
                 return true;
             }
 
-            entityType = null;
             return false;
         }
 
-        private static bool IsEntityIdClass(this Type type, [MaybeNullWhen(false)] out Type entityType)
+        private static bool IsEntityIdClass(this Type type)
         {
-            if (type.IsConstructedGenericType && type.GetGenericTypeDefinition() == typeof(EntityId<>))
-            {
-                entityType = type.GetGenericArguments().Single();
-                return true;
-            }
-
-            entityType = null;
-            return false;
+            return type.IsConstructedGenericType && type.GetGenericTypeDefinition() == typeof(EntityId<>);
         }
 
-        private static bool IsEntityIdInterface(this Type type, [MaybeNullWhen(false)] out Type entityType)
+        private static bool IsEntityIdInterface(this Type type)
         {
-            if (type.IsConstructedGenericType && type.GetGenericTypeDefinition() == typeof(IEntityId<>))
-            {
-                entityType = type.GetGenericArguments().Single();
-                return true;
-            }
-
-            entityType = null;
-            return false;
+            return type.IsConstructedGenericType && type.GetGenericTypeDefinition() == typeof(IEntityId<>);
         }
     }
 }

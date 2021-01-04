@@ -6,6 +6,6 @@ namespace OData.Client
     {
         Guid Id { get; }
         
-        IEntityName<TEntity> Name { get; }
+        IEntityType<TEntity> Type { get; }
     }
 }

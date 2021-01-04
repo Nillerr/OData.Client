@@ -6,11 +6,11 @@ namespace OData.Client
 {
     public interface IODataClient
     {
-        IODataCollection<TEntity> Collection<TEntity>(IEntityName<TEntity> name) 
+        IODataCollection<TEntity> Collection<TEntity>(IEntityType<TEntity> type) 
             where TEntity : IEntity;
 
         Task<IFindResponse<TEntity>> FindAsync<TEntity>(
-            IEntityName<TEntity> name,
+            IEntityType<TEntity> type,
             ODataFindRequest<TEntity> request,
             CancellationToken cancellationToken = default
         )
@@ -30,14 +30,14 @@ namespace OData.Client
             where TEntity : IEntity;
 
         Task<EntityId<TEntity>> CreateAsync<TEntity>(
-            IEntityName<TEntity> name,
+            IEntityType<TEntity> type,
             Action<IODataProperties<TEntity>> props,
             CancellationToken cancellationToken = default
         )
             where TEntity : IEntity;
 
         Task<IEntity<TEntity>> CreateRepresentationAsync<TEntity>(
-            IEntityName<TEntity> name,
+            IEntityType<TEntity> type,
             Action<IODataProperties<TEntity>> props,
             CancellationToken cancellationToken = default
         )

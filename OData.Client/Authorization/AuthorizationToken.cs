@@ -2,6 +2,9 @@ using System;
 
 namespace OData.Client
 {
+    /// <summary>
+    /// An authorization token used when interacting with the OData API.
+    /// </summary>
     public sealed class AuthorizationToken
     {
         public AuthorizationToken(string tokenType, DateTime expiresOnUtc, string accessToken)

@@ -5,29 +5,23 @@ using OData.Client.Expressions.Formatting;
 
 namespace OData.Client
 {
-    internal sealed class ODataCollection<TEntity> : IODataCollection<TEntity> where TEntity : IEntity
+    internal sealed class ODataCollection<TEntity> : IODataCollection<TEntity>
+        where TEntity : IEntity
     {
+        private readonly IEntityType<TEntity> _entityType;
         private readonly IODataClient _oDataClient;
         private readonly IValueFormatter _valueFormatter;
 
-        public ODataCollection(IEntityName<TEntity> entityName, IODataClient oDataClient, IValueFormatter valueFormatter)
+        public ODataCollection(IEntityType<TEntity> entityType, IODataClient oDataClient, IValueFormatter valueFormatter)
         {
-            EntityName = entityName;
+            _entityType = entityType;
             _oDataClient = oDataClient;
             _valueFormatter = valueFormatter;
         }
 
-        public IEntityName<TEntity> EntityName { get; }
-
         public IODataQuery<TEntity> Find()
         {
-            return new ODataQuery<TEntity>(EntityName, _oDataClient, _valueFormatter);
-        }
-
-        public IODataQuery<TEntity> Where(ODataFilter<TEntity> filter)
-        {
-            var query = Find();
-            return query.Filter(filter);
+            return new ODataQuery<TEntity>(_entityType, _oDataClient, _valueFormatter);
         }
 
         public async Task<IEntity<TEntity>?> RetrieveAsync(IEntityId<TEntity> id)
@@ -53,7 +47,7 @@ namespace OData.Client
             CancellationToken cancellationToken = default
         )
         {
-            var entityId = await _oDataClient.CreateAsync(EntityName, props, cancellationToken);
+            var entityId = await _oDataClient.CreateAsync(_entityType, props, cancellationToken);
             return entityId;
         }
 
@@ -62,7 +56,7 @@ namespace OData.Client
             CancellationToken cancellationToken = default
         )
         {
-            var entity = await _oDataClient.CreateRepresentationAsync(EntityName, props, cancellationToken);
+            var entity = await _oDataClient.CreateRepresentationAsync(_entityType, props, cancellationToken);
             return entity;
         }
 

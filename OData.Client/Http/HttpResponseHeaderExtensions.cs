@@ -19,9 +19,9 @@ namespace OData.Client
         /// TODO @nije: Revise the wording and consider introducing an EntityId type holding the type of entity as well as the Guid
         /// </remarks>
         /// <param name="headers">The HTTP response</param>
-        /// <param name="name">The entity name</param>
+        /// <param name="type">The entity name</param>
         /// <returns>The id portion of the <c>OData-EntityId</c> header value.</returns>
-        public static EntityId<TEntity> EntityId<TEntity>(this HttpResponseHeaders headers, IEntityName<TEntity> name)
+        public static EntityId<TEntity> EntityId<TEntity>(this HttpResponseHeaders headers, IEntityType<TEntity> type)
             where TEntity : IEntity
         {
             var entityIdValues = headers.GetValues("OData-EntityId");
@@ -31,7 +31,7 @@ namespace OData.Client
             var entityIdString = entityIdValue.Substring(entityIdValue.Length - guidLength - 1, guidLength);
 
             var id = Guid.Parse(entityIdString);
-            var entityId = new EntityId<TEntity>(id, name);
+            var entityId = new EntityId<TEntity>(id, type);
             return entityId;
         }
         

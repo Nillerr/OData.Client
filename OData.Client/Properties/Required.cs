@@ -41,6 +41,7 @@ namespace OData.Client
 
         public override int GetHashCode() => Name.GetHashCode();
 
+        public IRequired<TEntity, T> As<T>() where T : notnull => new Required<TEntity, T>(Name);
         public IOptional<TEntity, TValue> AsOptional() => new Optional<TEntity, TValue>(Name);
 
         public static bool operator ==(Required<TEntity, TValue>? property, Required<TEntity, TValue>? other) => Equals(property, other);

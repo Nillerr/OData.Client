@@ -1,36 +1,61 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace OData.Client.Json.Net
 {
-    public sealed class JObjectEntity<TEntity> : IEntity<TEntity> where TEntity : IEntity
+    /// <summary>
+    /// A collection of properties retrieved for an entity.
+    /// </summary>
+    /// <typeparam name="TEntity">The type of entity.</typeparam>
+    public sealed class JObjectEntity<TEntity> : IEntity<TEntity>
+        where TEntity : IEntity
     {
+        private readonly IEntityType<TEntity> _entityType;
         private readonly JObject _root;
         private readonly JsonSerializer _serializer;
 
-        public JObjectEntity(JObject root, JsonSerializer serializer)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JObjectEntity{TEntity}"/> class.
+        /// </summary>
+        /// <param name="entityType">The entity type.</param>
+        /// <param name="root">The object containing the entity properties.</param>
+        /// <param name="serializer">The serializer to deserialize values with.</param>
+        public JObjectEntity(IEntityType<TEntity> entityType, JObject root, JsonSerializer serializer)
         {
+            _entityType = entityType;
             _root = root;
             _serializer = serializer;
         }
 
+        /// <inheritdoc />
+        public IEntityId<TEntity> Id(IRequired<TEntity, IEntityId<TEntity>> property)
+        {
+            var propertyAsGuid = property.As<Guid>();
+            var value = this.Value(propertyAsGuid);
+            var entityId = _entityType.Id(value);
+            return entityId;
+        }
+
+        /// <inheritdoc />
         public bool Contains(IProperty<TEntity> property)
         {
             return _root[property.Name] != null;
         }
 
+        /// <inheritdoc />
         public bool TryGetValue<TValue>(IOptional<TEntity, TValue> property, out TValue? value) where TValue : notnull
         {
+            if (property.ValueType.IsEntityId())
+            {
+                throw new ArgumentException($"The property '{property.Name}' is an entity id, and as such must use the '{nameof(JObjectEntity<TEntity>)}.{nameof(Id)}' method to retrieve the value.", nameof(property));
+            }
+            
             if (_root.TryGetValue(property.Name, out var token))
             {
                 var reader = new JTokenReader(token);
-                if (TryDeserializeEntityId(reader, out value))
-                {
-                    return true;
-                }
-             
                 value = _serializer.Deserialize<TValue>(reader);
                 return true;
             }
@@ -39,25 +64,7 @@ namespace OData.Client.Json.Net
             return false;
         }
 
-        private bool TryDeserializeEntityId<TValue>(JsonReader reader, out TValue? value) where TValue : notnull
-        {
-            if (typeof(TValue).IsEntityId(out var entityType))
-            {
-                var guid = _serializer.Deserialize<Guid?>(reader);
-                if (guid.HasValue)
-                {
-                    value = entityType.CreateEntityId<TValue>(guid.Value);
-                    return true;
-                }
-
-                value = default;
-                return true;
-            }
-
-            value = default;
-            return false;
-        }
-
+        /// <inheritdoc />
         public TValue? Value<TValue>(IOptional<TEntity, TValue> property) where TValue : notnull
         {
             if (TryGetValue(property, out var value))
@@ -68,14 +75,13 @@ namespace OData.Client.Json.Net
             throw new JsonSerializationException($"A property '{property.Name}' could not be found.");
         }
 
-        public bool TryGetEntity<TOther>(IOptionalRef<TEntity, TOther> property, IEntityName<TOther> other, out IEntity<TOther> entity) where TOther : IEntity
+        /// <inheritdoc />
+        public bool TryGetEntity<TOther>(IOptionalRef<TEntity, TOther> property, IEntityType<TOther> other, out IEntity<TOther> entity) where TOther : IEntity
         {
             if (_root.TryGetValue(property.Name, out var token))
             {
                 var otherRoot = token.Value<JObject>();
-                
-                entity = new JObjectEntity<TOther>(otherRoot, _serializer);
-                
+                entity = new JObjectEntity<TOther>(other, otherRoot, _serializer);
                 return true;
             }
 
@@ -83,7 +89,8 @@ namespace OData.Client.Json.Net
             return false;
         }
 
-        public IEntity<TOther> Entity<TOther>(IOptionalRef<TEntity, TOther> property, IEntityName<TOther> other) where TOther : IEntity
+        /// <inheritdoc />
+        public IEntity<TOther> Entity<TOther>(IOptionalRef<TEntity, TOther> property, IEntityType<TOther> other) where TOther : IEntity
         {
             if (TryGetEntity(property, other, out var entity))
             {
@@ -93,9 +100,10 @@ namespace OData.Client.Json.Net
             throw new JsonSerializationException($"A property '{property.Name}' could not be found.");
         }
 
+        /// <inheritdoc />
         public bool TryGetEntities<TOther>(
             IRequired<TEntity, IEnumerable<TOther>> property,
-            IEntityName<TOther> other,
+            IEntityType<TOther> other,
             out IEnumerable<IEntity<TOther>> entities
         ) 
             where TOther : IEntity
@@ -103,7 +111,7 @@ namespace OData.Client.Json.Net
             if (_root.TryGetValue(property.Name, out var token))
             {
                 var roots = _root.Value<JArray>(token);
-                entities = EntitiesFrom<TOther>(roots);
+                entities = EntitiesFrom<TOther>(roots, other);
                 return true;
             }
 
@@ -111,9 +119,10 @@ namespace OData.Client.Json.Net
             return false;
         }
 
+        /// <inheritdoc />
         public IEnumerable<IEntity<TOther>> Entities<TOther>(
             IRequired<TEntity, IEnumerable<TOther>> property,
-            IEntityName<TOther> other
+            IEntityType<TOther> other
         ) where TOther : IEntity
         {
             if (TryGetEntities(property, other, out var entity))
@@ -124,24 +133,26 @@ namespace OData.Client.Json.Net
             throw new JsonSerializationException($"A property '{property.Name}' could not be found.");
         }
 
-        private IEnumerable<IEntity<TOther>> EntitiesFrom<TOther>(JArray roots)
+        private IEnumerable<IEntity<TOther>> EntitiesFrom<TOther>(JArray roots, IEntityType<TOther> other)
             where TOther : IEntity
         {
             foreach (var root in roots.Children<JObject>())
             {
-                yield return new JObjectEntity<TOther>(root, _serializer);
+                yield return new JObjectEntity<TOther>(other, root, _serializer);
             }
         }
 
+        /// <inheritdoc />
         public bool ContainsReference<TOther>(IRef<TEntity, TOther> property) where TOther : IEntity
         {
             var propertyName = property.ValueName();
             return _root[propertyName] != null;
         }
 
+        /// <inheritdoc />
         public bool TryGetReference<TOther>(
             IOptionalRef<TEntity, TOther> property,
-            IEntityName<TOther> other,
+            IEntityType<TOther> other,
             out IEntityId<TOther> id
         ) where TOther : IEntity
         {
@@ -157,7 +168,8 @@ namespace OData.Client.Json.Net
             return false;
         }
 
-        public IEntityId<TOther> Reference<TOther>(IOptionalRef<TEntity, TOther> property, IEntityName<TOther> other) 
+        /// <inheritdoc />
+        public IEntityId<TOther> Reference<TOther>(IOptionalRef<TEntity, TOther> property, IEntityType<TOther> other) 
             where TOther : IEntity
         {
             if (TryGetReference(property, other, out var reference))
@@ -168,9 +180,16 @@ namespace OData.Client.Json.Net
             throw new JsonSerializationException($"A property '{property.Name}' could not be found.");
         }
 
-        public string ToJson()
+        /// <inheritdoc />
+        public string ToJson(Formatting formatting)
         {
-            return _root.ToString();
+            using var stringWriter = new StringWriter();
+            using var jsonTextWriter = new JsonTextWriter(stringWriter);
+            jsonTextWriter.Formatting = (Newtonsoft.Json.Formatting) formatting;
+            
+            _serializer.Serialize(jsonTextWriter, _root);
+
+            return stringWriter.ToString();
         }
     }
 }

@@ -7,6 +7,11 @@ namespace OData.Client
         where TEntity : IEntity
     {
         /// <summary>
+        /// Name of the entity.
+        /// </summary>
+        IEntityType<TEntity> EntityType { get; }
+        
+        /// <summary>
         /// The context of the request.
         /// </summary>
         Uri Context { get; }

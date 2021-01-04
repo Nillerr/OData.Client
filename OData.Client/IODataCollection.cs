@@ -4,10 +4,14 @@ using System.Threading.Tasks;
 
 namespace OData.Client
 {
-    public interface IODataCollection<TEntity> where TEntity : IEntity
+    /// <summary>
+    /// A specialized client for interacting with the OData API, narrowed to <typeparamref name="TEntity"/>.
+    /// </summary>
+    /// <typeparam name="TEntity">The type of entity this collection performs operations on.</typeparam>
+    public interface IODataCollection<TEntity>
+        where TEntity : IEntity
     {
         IODataQuery<TEntity> Find();
-        IODataQuery<TEntity> Where(ODataFilter<TEntity> filter);
 
         Task<IEntity<TEntity>?> RetrieveAsync(IEntityId<TEntity> id);
         Task<IEntity<TEntity>?> RetrieveAsync(IEntityId<TEntity> id, Action<IODataSelection<TEntity>> selection);
