@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<assembly name="OData.Client">
+  <member name="T:OData.Client.DefaultHttpClientProvider">
+    <attribute ctor="M:JetBrains.Annotations.PublicAPIAttribute.#ctor" />
+  </member>
+</assembly>
