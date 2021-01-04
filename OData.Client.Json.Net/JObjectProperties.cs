@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using Newtonsoft.Json;
@@ -47,8 +48,8 @@ namespace OData.Client.Json.Net
                 var token = JValue.CreateString(reference);
                 array.Add(token);
             }
-            
-            _root[property.Name + "@odata.bind"] = array; 
+
+            _root[property.Name + "@odata.bind"] = array;
             return this;
         }
 
@@ -56,12 +57,12 @@ namespace OData.Client.Json.Net
         {
             using var streamWriter = new StreamWriter(stream, Encoding.UTF8);
             using var jsonWriter = new JsonTextWriter(streamWriter);
-            
+
             // TODO @nije: Formatting
             jsonWriter.Formatting = Formatting.Indented;
 
             _serializer.Serialize(jsonWriter, _root);
-            
+
             jsonWriter.Flush();
         }
 
@@ -74,7 +75,7 @@ namespace OData.Client.Json.Net
         private JToken Token<TValue>(TValue value) => value switch
         {
             null => JValue.CreateNull(),
-            IEntityId<TEntity> entityId => JValue.CreateString(entityId.Id.ToString("D")),
+            IEntityId<TEntity> entityId => JValue.CreateString(entityId.Id.ToString("D", CultureInfo.InvariantCulture)),
             _ => JToken.FromObject(value, _serializer)
         };
     }

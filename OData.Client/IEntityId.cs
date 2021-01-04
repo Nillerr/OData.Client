@@ -2,13 +2,10 @@ using System;
 
 namespace OData.Client
 {
-    public interface IEntityId : IFormattable
+    public interface IEntityId<out TEntity> : IFormattable where TEntity : IEntity
     {
         Guid Id { get; }
-    }
-
-    public interface IEntityId<out TEntity> : IEntityId where TEntity : IEntity
-    {
+        
         IEntityName<TEntity> Name { get; }
     }
 }
