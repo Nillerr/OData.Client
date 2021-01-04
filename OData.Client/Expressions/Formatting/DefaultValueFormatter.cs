@@ -25,6 +25,8 @@ namespace OData.Client.Expressions.Formatting
                 double value => Unquoted(value),
                 decimal value => Unquoted(value),
                 
+                Enum value => Unquoted(Convert.ToInt32(value)),
+                
                 IConvertible value => Quoted(value),
                 IFormattable value => Quoted(value),
                 

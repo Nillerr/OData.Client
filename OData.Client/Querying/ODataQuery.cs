@@ -5,7 +5,9 @@ using OData.Client.Expressions.Formatting;
 
 namespace OData.Client
 {
-    public sealed class ODataQuery<TEntity> : IODataQuery<TEntity>, IODataOrderedQuery<TEntity> where TEntity : IEntity
+    /// <inheritdoc cref="IODataQuery{TEntity}" />
+    public sealed class ODataQuery<TEntity> : IODataQuery<TEntity>, IODataOrderedQuery<TEntity>
+        where TEntity : IEntity
     {
         private readonly List<IProperty<TEntity>> _selection = new();
         private readonly List<ODataExpansion<TEntity>> _expansions = new();
@@ -14,19 +16,25 @@ namespace OData.Client
         private ODataFilter<TEntity>? _filter;
 
         private int? _maxPageSize;
-
+        
+        private readonly IEntityType<TEntity> _entityType;
         private readonly IODataClient _oDataClient;
         private readonly IValueFormatter _valueFormatter;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ODataQuery{TEntity}"/> class.
+        /// </summary>
+        /// <param name="entityType">The entity type.</param>
+        /// <param name="oDataClient">The OData client.</param>
+        /// <param name="valueFormatter">The value formatter.</param>
         public ODataQuery(IEntityType<TEntity> entityType, IODataClient oDataClient, IValueFormatter valueFormatter)
         {
-            EntityType = entityType;
+            _entityType = entityType;
             _oDataClient = oDataClient;
             _valueFormatter = valueFormatter;
         }
 
-        public IEntityType<TEntity> EntityType { get; }
-
+        /// <inheritdoc />
         public IODataQuery<TEntity> Filter(ODataFilter<TEntity> filter)
         {
             if (_filter.HasValue)
@@ -41,18 +49,21 @@ namespace OData.Client
             return this;
         }
 
+        /// <inheritdoc />
         public IODataQuery<TEntity> Select(IProperty<TEntity> property)
         {
             _selection.Add(property);
             return this;
         }
 
+        /// <inheritdoc />
         public IODataQuery<TEntity> Select(params IProperty<TEntity>[] properties)
         {
             _selection.AddRange(properties);
             return this;
         }
 
+        /// <inheritdoc />
         public IODataQuery<TEntity> Expand<TOther>(IRef<TEntity, TOther> property) where TOther : IEntity
         {
             var expansion = ODataExpansion.Create(property);
@@ -60,6 +71,7 @@ namespace OData.Client
             return this;
         }
 
+        /// <inheritdoc />
         public IODataQuery<TEntity> Expand<TOther>(IRefs<TEntity, TOther> property) where TOther : IEntity
         {
             var expansion = ODataExpansion.Create(property);
@@ -67,6 +79,7 @@ namespace OData.Client
             return this;
         }
 
+        /// <inheritdoc />
         public IODataOrderedQuery<TEntity> OrderBy<TValue>(IProperty<TEntity, TValue?> property) where TValue : IComparable
         {
             _sorting.Clear();
@@ -74,6 +87,7 @@ namespace OData.Client
             return this;
         }
 
+        /// <inheritdoc />
         public IODataOrderedQuery<TEntity> OrderByDescending<TValue>(IProperty<TEntity, TValue?> property) where TValue : IComparable
         {
             _sorting.Clear();
@@ -81,12 +95,14 @@ namespace OData.Client
             return this;
         }
 
+        /// <inheritdoc />
         public IODataOrderedQuery<TEntity> ThenBy<TValue>(IProperty<TEntity, TValue?> property) where TValue : IComparable
         {
             SortBy(property, SortDirection.Ascending);
             return this;
         }
 
+        /// <inheritdoc />
         public IODataOrderedQuery<TEntity> ThenByDescending<TValue>(IProperty<TEntity, TValue?> property) where TValue : IComparable
         {
             SortBy(property, SortDirection.Descending);
@@ -98,19 +114,21 @@ namespace OData.Client
             _sorting.Add(new Sorting<TEntity>(property, direction));
         }
 
+        /// <inheritdoc />
         public IODataQuery<TEntity> MaxPageSize(int? maxPageSize)
         {
             _maxPageSize = maxPageSize;
             return this;
         }
 
+        /// <inheritdoc />
         public async IAsyncEnumerator<IEntity<TEntity>> GetAsyncEnumerator(
             CancellationToken cancellationToken = default
         )
         {
             var request = CreateFindRequest();
 
-            IFindResponse<TEntity>? response = await _oDataClient.FindAsync(EntityType, request, cancellationToken);
+            IFindResponse<TEntity>? response = await _oDataClient.FindAsync(_entityType, request, cancellationToken);
             while (response != null)
             {
                 foreach (var entity in response.Value)
@@ -128,6 +146,7 @@ namespace OData.Client
             return request;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             var request = CreateFindRequest();

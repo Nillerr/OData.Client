@@ -41,8 +41,6 @@ namespace OData.Client
 
         public override int GetHashCode() => Name.GetHashCode();
 
-        public IOptionalRef<TEntity, TOther> AsOptional() => new OptionalRef<TEntity, TOther>(Name);
-
         public static bool operator ==(RequiredRef<TEntity, TOther>? property, RequiredRef<TEntity, TOther>? other) => Equals(property, other);
         public static bool operator !=(RequiredRef<TEntity, TOther>? property, RequiredRef<TEntity, TOther>? other) => !Equals(property, other);
 

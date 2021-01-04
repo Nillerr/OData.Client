@@ -3,8 +3,19 @@ using OData.Client.Expressions.Formatting;
 
 namespace OData.Client
 {
+    /// <summary>
+    /// Extension methods on <see cref="ODataFindRequest{TEntity}"/>.
+    /// </summary>
     public static class ODataFindRequestExtensions
     {
+        /// <summary>
+        /// Returns a query string representation of the request using the specified value formatter and formatting.
+        /// </summary>
+        /// <param name="request">The request.</param>
+        /// <param name="valueFormatter">The value formatter.</param>
+        /// <param name="formatting">The formatting to apply to the query string.</param>
+        /// <typeparam name="TEntity">The type of entity.</typeparam>
+        /// <returns>The query string representation of the request.</returns>
         public static string ToQueryString<TEntity>(
             this ODataFindRequest<TEntity> request,
             IValueFormatter valueFormatter,
@@ -23,6 +34,13 @@ namespace OData.Client
             return queryString;
         }
 
+        /// <summary>
+        /// Returns a query string representation of the request using the specified formatting.
+        /// </summary>
+        /// <param name="request">The request.</param>
+        /// <param name="formatting">The formatting to apply to the query string.</param>
+        /// <typeparam name="TEntity">The type of entity.</typeparam>
+        /// <returns>The query string representation of the request.</returns>
         public static string ToQueryString<TEntity>(
             this ODataRetrieveRequest<TEntity> request,
             QueryStringFormatting formatting

@@ -90,7 +90,7 @@ namespace OData.Client
 
         private static string ValuePart(string value, QueryStringFormatting formatting)
         {
-            var valuePart = formatting == QueryStringFormatting.Escaped ? Uri.EscapeDataString(value) : value;
+            var valuePart = formatting == QueryStringFormatting.UrlEscaped ? Uri.EscapeDataString(value) : value;
             return valuePart;
         }
     }

@@ -1,8 +1,7 @@
 namespace OData.Client
 {
     /// <summary>
-    /// A required property is any property that cannot be <see langword="null"/>, including collection-valued
-    /// navigation properties.
+    /// A non-nullable property of an entity.
     /// </summary>
     /// <typeparam name="TEntity">The type of entity.</typeparam>
     /// <typeparam name="TValue">The type of value.</typeparam>
@@ -10,7 +9,5 @@ namespace OData.Client
         where TEntity : IEntity
         where TValue : notnull
     {
-        IRequired<TEntity, T> As<T>() where T : notnull;
-        IOptional<TEntity, TValue> AsOptional();
     }
 }

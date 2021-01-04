@@ -33,7 +33,7 @@ namespace OData.Client.Json.Net
         /// <inheritdoc />
         public IEntityId<TEntity> Id(IRequired<TEntity, IEntityId<TEntity>> property)
         {
-            var propertyAsGuid = property.As<Guid>();
+            var propertyAsGuid = new Required<TEntity, Guid>(property.Name);
             var value = this.Value(propertyAsGuid);
             var entityId = _entityType.Id(value);
             return entityId;
@@ -102,7 +102,7 @@ namespace OData.Client.Json.Net
 
         /// <inheritdoc />
         public bool TryGetEntities<TOther>(
-            IRequired<TEntity, IEnumerable<TOther>> property,
+            IRefs<TEntity, TOther> property,
             IEntityType<TOther> other,
             out IEnumerable<IEntity<TOther>> entities
         ) 
@@ -115,19 +115,19 @@ namespace OData.Client.Json.Net
                 return true;
             }
 
-            entities = null!;
+            entities = Array.Empty<IEntity<TOther>>();
             return false;
         }
 
         /// <inheritdoc />
         public IEnumerable<IEntity<TOther>> Entities<TOther>(
-            IRequired<TEntity, IEnumerable<TOther>> property,
+            IRefs<TEntity, TOther> property,
             IEntityType<TOther> other
         ) where TOther : IEntity
         {
-            if (TryGetEntities(property, other, out var entity))
+            if (TryGetEntities(property, other, out var entities))
             {
-                return entity;
+                return entities;
             }
 
             throw new JsonSerializationException($"A property '{property.Name}' could not be found.");

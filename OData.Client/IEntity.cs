@@ -50,13 +50,13 @@ namespace OData.Client
         TValue? Value<TValue>(IOptional<TEntity, TValue> property) where TValue : notnull;
 
         /// <summary>
-        /// Tries to get the reference entity with the specified single-valued navigation <paramref name="property"/>. 
+        /// Tries to get the entity referenced by the specified single-valued navigation <paramref name="property"/>. 
         /// </summary>
         /// <param name="property">The single-valued navigation property.</param>
-        /// <param name="other">The type of the referenced entity.</param>
-        /// <param name="entity">The referenced entity.</param>
-        /// <typeparam name="TOther"></typeparam>
-        /// <returns></returns>
+        /// <param name="other">The referenced entity type.</param>
+        /// <param name="entity">The referenced entity, or <see langword="null"/> if no entity is referenced.</param>
+        /// <typeparam name="TOther">The type of referenced entity.</typeparam>
+        /// <returns><see langword="true"/> if an entity was successfully retrieved; otherwise, <see langword="false"/>.</returns>
         bool TryGetEntity<TOther>(
             IOptionalRef<TEntity, TOther> property,
             IEntityType<TOther> other,
@@ -64,18 +64,41 @@ namespace OData.Client
         )
             where TOther : IEntity;
 
+        /// <summary>
+        /// Gets the entity referenced by the specified single-valued navigation <paramref name="property"/>.
+        /// </summary>
+        /// <param name="property">The single-valued navigation property.</param>
+        /// <param name="other">The referenced entity type.</param>
+        /// <typeparam name="TOther">The type of referenced entity.</typeparam>
+        /// <returns>The referenced entity, or <see langword="null"/> if no entity is referenced.</returns>
         IEntity<TOther>? Entity<TOther>(IOptionalRef<TEntity, TOther> property, IEntityType<TOther> other)
             where TOther : IEntity;
 
+        /// <summary>
+        /// Tries to get the entities referenced by the specified collection-valued navigation
+        /// <paramref name="property"/>.
+        /// </summary>
+        /// <param name="property">The collection-valued navigation property.</param>
+        /// <param name="other">The referenced entity type.</param>
+        /// <param name="entities">The referenced entities.</param>
+        /// <typeparam name="TOther">The type of referenced entities.</typeparam>
+        /// <returns><see langword="true"/> if entities were successfully retrieved; otherwise, <see langword="false"/>.</returns>
         bool TryGetEntities<TOther>(
-            IRequired<TEntity, IEnumerable<TOther>> property,
+            IRefs<TEntity, TOther> property,
             IEntityType<TOther> other,
-            out IEnumerable<IEntity<TOther>>? entities
+            out IEnumerable<IEntity<TOther>> entities
         )
             where TOther : IEntity;
 
-        IEnumerable<IEntity<TOther>>? Entities<TOther>(
-            IRequired<TEntity, IEnumerable<TOther>> property,
+        /// <summary>
+        /// Gets the entities referenced by the specified collection-valued navigation <paramref name="property"/>.
+        /// </summary>
+        /// <param name="property">The collection-valued navigation property.</param>
+        /// <param name="other">The referenced entity type.</param>
+        /// <typeparam name="TOther">The type of referenced entities.</typeparam>
+        /// <returns></returns>
+        IEnumerable<IEntity<TOther>> Entities<TOther>(
+            IRefs<TEntity, TOther> property,
             IEntityType<TOther> other
         )
             where TOther : IEntity;

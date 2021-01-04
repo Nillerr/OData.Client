@@ -1,14 +1,31 @@
 namespace OData.Client
 {
-    public readonly struct Sorting<TEntity> where TEntity : IEntity
+    /// <summary>
+    /// A combination of a property to sort by, and a direction to sort it in.
+    /// </summary>
+    /// <typeparam name="TEntity">The type of entity.</typeparam>
+    public readonly struct Sorting<TEntity>
+        where TEntity : IEntity
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Sorting{TEntity}"/> struct.
+        /// </summary>
+        /// <param name="property">The property to sort by.</param>
+        /// <param name="direction">The direction to sort in.</param>
         public Sorting(IProperty<TEntity> property, SortDirection direction)
         {
             Property = property;
             Direction = direction;
         }
 
+        /// <summary>
+        /// The property to sort by.
+        /// </summary>
         public IProperty<TEntity> Property { get; }
+        
+        /// <summary>
+        /// The direction to sort in.
+        /// </summary>
         public SortDirection Direction { get; }
     }
 }

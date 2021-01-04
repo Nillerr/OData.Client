@@ -2,6 +2,10 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace OData.Client
 {
+    /// <summary>
+    /// Extensions for working with <see cref="IRequired{TEntity,TValue}"/> and
+    /// <see cref="IRequiredRef{TEntity,TOther}"/> properties on entities.
+    /// </summary>
     public static class EntityExtensions
     {
         /// <summary>
@@ -13,7 +17,7 @@ namespace OData.Client
         /// <typeparam name="TEntity">The type of entity.</typeparam>
         /// <typeparam name="TValue">The type to convert the value to.</typeparam>
         /// <returns><see langword="true"/> if a value was successfully retrieved; otherwise, <see langword="false"/>.</returns>
-        /// <exception cref="ODataNullValueException">The value of the property was null.</exception>
+        /// <exception cref="ODataNullValueException">The value of the property was <see langword="null"/>.</exception>
         public static bool TryGetValue<TEntity, TValue>(
             this IEntity<TEntity> source,
             IRequired<TEntity, TValue> property,
@@ -22,7 +26,8 @@ namespace OData.Client
             where TEntity : IEntity
             where TValue : notnull
         {
-            if (source.TryGetValue(property.AsOptional(), out var nullable))
+            var optional = new Optional<TEntity, TValue>(property.Name);
+            if (source.TryGetValue(optional, out var nullable))
             {
                 value = CheckNotNull(nullable, property);
                 return true;
@@ -40,15 +45,27 @@ namespace OData.Client
         /// <typeparam name="TEntity">The type of entity.</typeparam>
         /// <typeparam name="TValue">The type to convert the value to.</typeparam>
         /// <returns>The converted value.</returns>
-        /// <exception cref="ODataNullValueException">The value of the property was null.</exception>
+        /// <exception cref="ODataNullValueException">The value of the property was <see langword="null"/>.</exception>
         public static TValue Value<TEntity, TValue>(this IEntity<TEntity> source, IRequired<TEntity, TValue> property)
             where TEntity : IEntity
             where TValue : notnull
         {
-            var nullable = source.Value(property.AsOptional());
+            var optional = new Optional<TEntity, TValue>(property.Name);
+            var nullable = source.Value(optional);
             return CheckNotNull(nullable, property);
         }
 
+        /// <summary>
+        /// Tries to get the entity referenced by the specified single-valued navigation <paramref name="property"/>. 
+        /// </summary>
+        /// <param name="source">The entity.</param>
+        /// <param name="property">The single-valued navigation property.</param>
+        /// <param name="other">The referenced entity type.</param>
+        /// <param name="entity">The referenced entity, or <see langword="null"/> if no entity is referenced.</param>
+        /// <typeparam name="TEntity">The type of entity.</typeparam>
+        /// <typeparam name="TOther">The type of referenced entity.</typeparam>
+        /// <returns><see langword="true"/> if an entity was successfully retrieved; otherwise, <see langword="false"/>.</returns>
+        /// <exception cref="ODataNullValueException">The value of the property was <see langword="null"/>.</exception>
         public static bool TryGetEntity<TEntity, TOther>(
             this IEntity<TEntity> source,
             IRequiredRef<TEntity, TOther> property,
@@ -58,7 +75,8 @@ namespace OData.Client
             where TEntity : IEntity
             where TOther : IEntity
         {
-            if (source.TryGetEntity(property.AsOptional(), other, out var nullable))
+            var optional = new OptionalRef<TEntity, TOther>(property.Name);
+            if (source.TryGetEntity(optional, other, out var nullable))
             {
                 entity = CheckNotNull(nullable, property);
                 return true;
@@ -68,6 +86,16 @@ namespace OData.Client
             return false;
         }
 
+        /// <summary>
+        /// Gets the entity referenced by the specified single-valued navigation <paramref name="property"/>.
+        /// </summary>
+        /// <param name="source">The entity.</param>
+        /// <param name="property">The single-valued navigation property.</param>
+        /// <param name="other">The referenced entity type.</param>
+        /// <typeparam name="TEntity">The type of entity.</typeparam>
+        /// <typeparam name="TOther">The type of referenced entity.</typeparam>
+        /// <returns>The referenced entity.</returns>
+        /// <exception cref="ODataNullValueException">The value of the property was <see langword="null"/>.</exception>
         public static IEntity<TOther> Entity<TEntity, TOther>(
             this IEntity<TEntity> source,
             IRequiredRef<TEntity, TOther> property,
@@ -76,7 +104,8 @@ namespace OData.Client
             where TEntity : IEntity
             where TOther : IEntity
         {
-            var nullable = source.Entity(property.AsOptional(), other);
+            var optional = new OptionalRef<TEntity, TOther>(property.Name);
+            var nullable = source.Entity(optional, other);
             return CheckNotNull(nullable, property);
         }
 
@@ -90,7 +119,7 @@ namespace OData.Client
         /// <typeparam name="TEntity">The type of entity.</typeparam>
         /// <typeparam name="TOther">The referenced entity type.</typeparam>
         /// <returns><see langword="true"/> if a value was successfully retrieved; otherwise, <see langword="false"/>.</returns>
-        /// <exception cref="ODataNullValueException">The value of the property was null.</exception>
+        /// <exception cref="ODataNullValueException">The value of the property was <see langword="null"/>.</exception>
         public static bool TryGetReference<TEntity, TOther>(
             this IEntity<TEntity> source,
             IRequiredRef<TEntity, TOther> property,
@@ -100,7 +129,8 @@ namespace OData.Client
             where TEntity : IEntity
             where TOther : IEntity
         {
-            if (source.TryGetReference(property.AsOptional(), other, out var nullable))
+            var optional = new OptionalRef<TEntity, TOther>(property.Name);
+            if (source.TryGetReference(optional, other, out var nullable))
             {
                 id = CheckNotNull(nullable, property);
                 return true;
@@ -119,7 +149,7 @@ namespace OData.Client
         /// <typeparam name="TEntity">The type of entity.</typeparam>
         /// <typeparam name="TOther">The referenced entity type.</typeparam>
         /// <returns>The converted value.</returns>
-        /// <exception cref="ODataNullValueException">The value of the property was null.</exception>
+        /// <exception cref="ODataNullValueException">The value of the property was <see langword="null"/>.</exception>
         public static IEntityId<TOther> Reference<TEntity, TOther>(
             this IEntity<TEntity> source,
             IRequiredRef<TEntity, TOther> property,
@@ -128,7 +158,8 @@ namespace OData.Client
             where TEntity : IEntity
             where TOther : IEntity
         {
-            var nullable = source.Reference(property.AsOptional(), other);
+            var optional = new OptionalRef<TEntity, TOther>(property.Name);
+            var nullable = source.Reference(optional, other);
             return CheckNotNull(nullable, property);
         }
 
@@ -139,7 +170,7 @@ namespace OData.Client
         /// <param name="property">The property containing the value.</param>
         /// <typeparam name="TValue">The type of value.</typeparam>
         /// <returns>The value.</returns>
-        /// <exception cref="ODataNullValueException"><paramref name="value"/> was null.</exception>
+        /// <exception cref="ODataNullValueException"><paramref name="value"/> was <see langword="null"/>.</exception>
         private static TValue CheckNotNull<TValue>(TValue? value, IProperty property)
             where TValue : notnull
         {

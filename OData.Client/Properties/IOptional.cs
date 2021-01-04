@@ -1,7 +1,7 @@
 namespace OData.Client
 {
     /// <summary>
-    /// An optional property is any property that can be <see langword="null"/>.
+    /// A nullable property of an entity.
     /// </summary>
     /// <typeparam name="TEntity">The type of entity.</typeparam>
     /// <typeparam name="TValue">The type of value.</typeparam>

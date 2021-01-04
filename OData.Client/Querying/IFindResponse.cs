@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 namespace OData.Client
 {
+    /// <summary>
+    /// The response returned by an OData entity query.
+    /// </summary>
+    /// <typeparam name="TEntity">The type of entity.</typeparam>
     public interface IFindResponse<TEntity>
         where TEntity : IEntity
     {
@@ -17,7 +21,7 @@ namespace OData.Client
         Uri Context { get; }
         
         /// <summary>
-        /// The link to the next page if more pages are available.
+        /// The link for fetching the next page, or <see langword="null"/> if no more pages are available.
         /// </summary>
         Uri? NextLink { get; }
         

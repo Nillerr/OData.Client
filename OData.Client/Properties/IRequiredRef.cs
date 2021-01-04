@@ -10,6 +10,5 @@ namespace OData.Client
         where TEntity : IEntity
         where TOther : IEntity
     {
-        IOptionalRef<TEntity, TOther> AsOptional();
     }
 }

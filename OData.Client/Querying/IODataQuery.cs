@@ -29,7 +29,7 @@ namespace OData.Client
     public interface IODataQuery<TEntity> : IAsyncEnumerable<IEntity<TEntity>> where TEntity : IEntity
     {
         /// <summary>
-        /// Specifies a filter.
+        /// Specifies a filter, appending it to any existing filters.
         /// </summary>
         /// <remarks>
         /// Subsequent calls to filter will AND the new filter with the existing filter.
@@ -76,8 +76,20 @@ namespace OData.Client
         // )
         //     where TOther : IEntity;
 
+        /// <summary>
+        /// Specifies a property to sort by in ascending order.
+        /// </summary>
+        /// <param name="property">The property to sort by.</param>
+        /// <typeparam name="TValue">The type of value of the property.</typeparam>
+        /// <returns>This query instance.</returns>
         IODataOrderedQuery<TEntity> OrderBy<TValue>(IProperty<TEntity, TValue?> property) where TValue : IComparable;
 
+        /// <summary>
+        /// Specifies a property to sort by in descending order.
+        /// </summary>
+        /// <param name="property">The property to sort by.</param>
+        /// <typeparam name="TValue">The type of value of the property.</typeparam>
+        /// <returns>This query instance.</returns>
         IODataOrderedQuery<TEntity> OrderByDescending<TValue>(IProperty<TEntity, TValue?> property) where TValue : IComparable;
 
         /// <summary>
