@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using OData.Client.Json.Net;
@@ -11,13 +13,18 @@ namespace OData.Client.Demo
 
     public class Program
     {
-        private static readonly Uri OrganizationUri = new Uri("https://universal-robots-uat.crm4.dynamics.com");
-
         public static async Task Main(string[] args)
         {
-            // using var httpClient = new HttpClient();
-            // httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthorizationToken);
+            var configuration = new ConfigurationBuilder()
+                .AddUserSecrets<Program>()
+                .Build();
 
+            var services = new ServiceCollection();
+            services.Configure<ODataAuthenticatorSettings>(configuration.GetSection("OData").GetSection("Authenticator"));
+
+            await using var serviceProvider = services.BuildServiceProvider();
+            var authenticatorOptions = serviceProvider.GetRequiredService<IOptions<ODataAuthenticatorSettings>>();
+            
             var serializerSettings = new JsonSerializerSettings();
             var entitySerializerFactory = new JsonNetEntitySerializerFactory();
             var propertiesFactory = new JsonNetPropertiesFactory(serializerSettings.Converters);
@@ -25,16 +32,12 @@ namespace OData.Client.Demo
             var clock = new SystemClock();
             var httpClientProvider = new DefaultHttpClientProvider();
 
-            var authenticatorSettings = new ODataAuthenticatorSettings();
-            authenticatorSettings.Resource = OrganizationUri.ToString();
-            
-            var authenticatorOptions = new OptionsWrapper<ODataAuthenticatorSettings>(authenticatorSettings);
             var authenticator = new ODataAuthenticator(clock, httpClientProvider, authenticatorOptions);
 
             var oDataHttpClient = new ODataHttpClient(clock, authenticator, httpClientProvider);
 
             var oDataClientSettings = new ODataClientSettings(
-                OrganizationUri,
+                new Uri(authenticatorOptions.Value.Resource),
                 propertiesFactory,
                 entitySerializerFactory,
                 oDataHttpClient
@@ -83,7 +86,7 @@ namespace OData.Client.Demo
 
             Console.WriteLine(query);
 
-            await foreach (var incident in query.Take(5))
+            await foreach (var incident in query.Take(2))
             {
                 Console.WriteLine(incident.ToJson());
             }

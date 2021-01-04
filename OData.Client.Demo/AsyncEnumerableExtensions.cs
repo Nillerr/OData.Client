@@ -17,13 +17,13 @@ namespace OData.Client.Demo
             
             await foreach (var element in source.WithCancellation(cancellationToken))
             {
+                yield return element;
+                counted += 1;
+                
                 if (counted >= count)
                 {
                     yield break;
                 }
-                
-                yield return element;
-                counted += 1;
             }
         }
     }

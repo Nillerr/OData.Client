@@ -2,9 +2,9 @@ namespace OData.Client
 {
     public sealed class ODataAuthenticatorSettings
     {
-        public string TenantId { get; set; }
-        public string Resource { get; set; }
-        public string ClientId { get; set; }
-        public string ClientSecret { get; set; }
+        public string TenantId { get; set; } = null!;
+        public string Resource { get; set; } = null!;
+        public string ClientId { get; set; } = null!;
+        public string ClientSecret { get; set; } = null!;
     }
 }
