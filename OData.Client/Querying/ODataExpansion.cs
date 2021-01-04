@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace OData.Client
 {
     public readonly struct ODataExpansion<TEntity> where TEntity : IEntity

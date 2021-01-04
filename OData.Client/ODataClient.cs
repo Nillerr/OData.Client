@@ -155,7 +155,7 @@ namespace OData.Client
                 return CreateDefaultRequest(HttpMethod.Get, requestUri);
             }
 
-            var httpRequestOptions = new HttpRequestOptions();
+            var httpRequestOptions = new ODataHttpRequestOptions();
             httpRequestOptions.AllowedStatusCodes.Add(HttpStatusCode.NotFound);
             
             using var httpResponse = await _oDataHttpClient

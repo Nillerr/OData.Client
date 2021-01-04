@@ -5,6 +5,7 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Nito.AsyncEx;
 
 namespace OData.Client
@@ -15,12 +16,17 @@ namespace OData.Client
         
         private readonly IClock _clock;
         private readonly IHttpClientProvider _httpClientProvider;
-
-        public ODataAuthenticator(IClock clock, IHttpClientProvider httpClientProvider)
+        
+        private readonly IOptions<ODataAuthenticatorSettings> _options;
+        
+        public ODataAuthenticator(IClock clock, IHttpClientProvider httpClientProvider, IOptions<ODataAuthenticatorSettings> options)
         {
             _clock = new UtcClock(clock);
             _httpClientProvider = httpClientProvider;
+            _options = options;
         }
+
+        private ODataAuthenticatorSettings Options => _options.Value;
 
         public AuthorizationToken? AuthorizationToken { get; set; }
 
@@ -53,21 +59,25 @@ namespace OData.Client
 
         private async Task<AuthorizationToken> AuthenticateAsync(CancellationToken cancellationToken)
         {
-            var authRequest = new HttpRequestMessage(HttpMethod.Post, tokenUrl);
+            var requestUri = new Uri($"https://login.microsoftonline.com/{Options.TenantId}/oauth2/token");
+
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, requestUri);
 
             var formData = new Dictionary<string, string>();
-            formData["resource"] = serviceUrl.ToString();
-            formData["client_id"] = clientId;
-            formData["client_secret"] = clientSecret;
+            formData["resource"] = Options.Resource;
+            formData["client_id"] = Options.ClientId;
+            formData["client_secret"] = Options.ClientSecret;
             formData["grant_type"] = "client_credentials";
 
-            authRequest.Content = new FormUrlEncodedContent(formData!);
+            httpRequest.Content = new FormUrlEncodedContent(formData!);
 
             var httpClient = _httpClientProvider.HttpClient;
-            var response = await httpClient.SendAsync(authRequest, cancellationToken);
-            response.EnsureSuccessStatusCode();
+            
+            var httpResponse = await httpClient.SendAsync(httpRequest, cancellationToken);
+            // TODO @nije: Throw an exception including the content
+            httpResponse.EnsureSuccessStatusCode();
 
-            var stringContent = await response.Content.ReadAsStreamAsync(cancellationToken);
+            var stringContent = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
             
             var token = await JsonSerializer.DeserializeAsync<TokenResponse>(stringContent, cancellationToken: cancellationToken);
             if (token == null)

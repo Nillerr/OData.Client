@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using OData.Client.Json.Net;
 
@@ -12,21 +11,34 @@ namespace OData.Client.Demo
 
     public class Program
     {
-        private const string? AuthorizationToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IjVPZjlQNUY5Z0NDd0NtRjJCT0hIeEREUS1EayIsImtpZCI6IjVPZjlQNUY5Z0NDd0NtRjJCT0hIeEREUS1EayJ9.eyJhdWQiOiJodHRwczovL3VuaXZlcnNhbC1yb2JvdHMtdWF0LmNybTQuZHluYW1pY3MuY29tIiwiaXNzIjoiaHR0cHM6Ly9zdHMud2luZG93cy5uZXQvMzExYTIyZmQtOTU3Ni00MGFiLTk3N2UtYTJmMGE0ZDJjZDM2LyIsImlhdCI6MTYwOTcwMDYyMiwibmJmIjoxNjA5NzAwNjIyLCJleHAiOjE2MDk3MDQ1MjIsImFpbyI6IkUySmdZRmoyL2FUT3A5MXpHMDVmczdtbVgrWThCd0E9IiwiYXBwaWQiOiI0ODQ1MTVhNy01ZTM1LTRiM2UtYjM4OS1hMzU3Y2M3MTBhZmMiLCJhcHBpZGFjciI6IjEiLCJpZHAiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC8zMTFhMjJmZC05NTc2LTQwYWItOTc3ZS1hMmYwYTRkMmNkMzYvIiwib2lkIjoiMTY4YzgyN2QtODFlOC00NjZiLTg5YTEtN2FkMzkwNzY2NTYyIiwicmgiOiIwLkFBQUFfU0lhTVhhVnEwQ1hmcUx3cE5MTk5xY1ZSVWcxWGo1THM0bWpWOHh4Q3Z4NUFBQS4iLCJzdWIiOiIxNjhjODI3ZC04MWU4LTQ2NmItODlhMS03YWQzOTA3NjY1NjIiLCJ0aWQiOiIzMTFhMjJmZC05NTc2LTQwYWItOTc3ZS1hMmYwYTRkMmNkMzYiLCJ1dGkiOiJxY1VZc3U3dDhVcThuNzMyTmYwTkFBIiwidmVyIjoiMS4wIn0.ANrJMF7kZH2dHC9fx-iJvjbM505H-k6vJ42s7Pu4D6uBjiqANkqjP2cWfSswcf9I9mfB3jOe6rBrOY-cKaDvcsgdcuhs_cFFtAth2DcHaSKAzLz9HpM0PPXMpVGBjSujvhJ3nTDBxWpwKkqwNZPtvoD9vvFIM6oJW6KJyQ3FvuDRkgEwcABzhBn_VhKWkaFSPnmC2QpPZ-uPErYZpfA0nA-Ad3W5JVIJ8YMoAmsp97xoR_pg-iaPIqfDubHL9kanqx28VzZZP1BlHbyDXJhLfnOFJQ95nS64bBuRqh8F3h0HypB-1kBoT_W7nSAUNPR-t50dh6zM8lzwq55EH4bNUw";
-        
         private static readonly Uri OrganizationUri = new Uri("https://universal-robots-uat.crm4.dynamics.com");
 
         public static async Task Main(string[] args)
         {
-            using var httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthorizationToken);
+            // using var httpClient = new HttpClient();
+            // httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthorizationToken);
 
             var serializerSettings = new JsonSerializerSettings();
             var entitySerializerFactory = new JsonNetEntitySerializerFactory();
             var propertiesFactory = new JsonNetPropertiesFactory(serializerSettings.Converters);
+
+            var clock = new SystemClock();
+            var httpClientProvider = new DefaultHttpClientProvider();
+
+            var authenticatorSettings = new ODataAuthenticatorSettings();
+            authenticatorSettings.Resource = OrganizationUri.ToString();
             
-            var oDataClientSettings = new ODataClientSettings(OrganizationUri, propertiesFactory, entitySerializerFactory);
-            oDataClientSettings.HttpClient = httpClient;
+            var authenticatorOptions = new OptionsWrapper<ODataAuthenticatorSettings>(authenticatorSettings);
+            var authenticator = new ODataAuthenticator(clock, httpClientProvider, authenticatorOptions);
+
+            var oDataHttpClient = new ODataHttpClient(clock, authenticator, httpClientProvider);
+
+            var oDataClientSettings = new ODataClientSettings(
+                OrganizationUri,
+                propertiesFactory,
+                entitySerializerFactory,
+                oDataHttpClient
+            );
             
             var oDataClient = new ODataClient(oDataClientSettings);
             var incidents = oDataClient.Collection(Incident.EntityName);

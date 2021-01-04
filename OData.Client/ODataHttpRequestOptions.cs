@@ -3,7 +3,7 @@ using System.Net;
 
 namespace OData.Client
 {
-    public sealed class HttpRequestOptions
+    public sealed class ODataHttpRequestOptions
     {
         public HashSet<HttpStatusCode> AllowedStatusCodes { get; } = new();
     }

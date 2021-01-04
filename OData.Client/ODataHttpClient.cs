@@ -8,7 +8,7 @@ namespace OData.Client
 {
     public sealed class ODataHttpClient : IODataHttpClient
     {
-        private static readonly HttpRequestOptions DefaultRequestOptions = new HttpRequestOptions();
+        private static readonly ODataHttpRequestOptions DefaultRequestOptions = new ODataHttpRequestOptions();
         
         private readonly IClock _clock;
         private readonly IODataAuthenticator _authenticator;
@@ -27,7 +27,7 @@ namespace OData.Client
 
         public async Task<HttpResponseMessage> SendAsync(
             Func<HttpRequestMessage> requestFactory,
-            HttpRequestOptions? options = null,
+            ODataHttpRequestOptions? options = null,
             CancellationToken cancellationToken = default
         )
         {
