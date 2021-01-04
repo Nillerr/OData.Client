@@ -1,5 +1,4 @@
 using System;
-using System.Net.Http;
 using OData.Client.Expressions.Formatting;
 
 namespace OData.Client
@@ -9,19 +8,21 @@ namespace OData.Client
         public ODataClientSettings(
             Uri organizationUri,
             IODataPropertiesFactory propertiesFactory,
-            IEntitySerializerFactory entitySerializerFactory
+            IEntitySerializerFactory entitySerializerFactory,
+            IODataHttpClient httpClient
         )
         {
             OrganizationUri = organizationUri;
             PropertiesFactory = propertiesFactory;
             EntitySerializerFactory = entitySerializerFactory;
+            HttpClient = httpClient;
         }
 
         public Uri OrganizationUri { get; set; }
         public IODataPropertiesFactory PropertiesFactory { get; set; }
         public IEntitySerializerFactory EntitySerializerFactory { get; set; }
-        
-        public HttpClient? HttpClient { get; set; }
+
+        public IODataHttpClient HttpClient { get; set; }
         
         public IValueFormatter ValueFormatter { get; set; } = new DefaultValueFormatter();
     }

@@ -9,32 +9,21 @@ using OData.Client.Expressions.Formatting;
 
 namespace OData.Client
 {
-    public sealed class ODataClient : IODataClient, IDisposable
+    public sealed class ODataClient : IODataClient
     {
         private readonly Uri _organizationUri;
         private readonly IODataPropertiesFactory _propertiesFactory;
         private readonly IEntitySerializerFactory _entitySerializerFactory;
+        private readonly IODataHttpClient _oDataHttpClient;
         private readonly IValueFormatter _valueFormatter;
-        
-        private readonly HttpClient _httpClient;
-        private readonly bool _disposeHttpClient;
 
         public ODataClient(ODataClientSettings settings)
         {
             _organizationUri = settings.OrganizationUri;
             _propertiesFactory = settings.PropertiesFactory;
             _entitySerializerFactory = settings.EntitySerializerFactory;
+            _oDataHttpClient = settings.HttpClient;
             _valueFormatter = settings.ValueFormatter;
-            
-            if (settings.HttpClient != null)
-            {
-                _httpClient = settings.HttpClient;
-            }
-            else
-            {
-                _httpClient = new HttpClient();
-                _disposeHttpClient = true;
-            }
         }
 
         private Uri BaseUri => new Uri(_organizationUri, "api/data/v9.1/");
@@ -92,10 +81,14 @@ namespace OData.Client
         )
             where TEntity : IEntity
         {
-            var requestUri = FindUri(name, request);
+            HttpRequestMessage CreateRequest()
+            {
+                var requestUri = FindUri(name, request);
+                return CreateFindRequest(HttpMethod.Get, requestUri, request);
+            }
             
-            using var httpRequest = CreateFindRequest(HttpMethod.Get, requestUri, request);
-            using var httpResponse = await SendRequestAsync(httpRequest, cancellationToken);
+            using var httpResponse = await _oDataHttpClient
+                .SendAsync(CreateRequest, cancellationToken: cancellationToken);
             
             await using var stream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
 
@@ -114,11 +107,16 @@ namespace OData.Client
             {
                 return null;
             }
-
+            
             var request = current.Request;
             
-            using var httpRequest = CreateFindRequest(HttpMethod.Get, requestUri, request);
-            using var httpResponse = await SendRequestAsync(httpRequest, cancellationToken);
+            HttpRequestMessage CreateRequest()
+            {
+                return CreateFindRequest(HttpMethod.Get, requestUri, request);
+            }
+
+            using var httpResponse = await _oDataHttpClient
+                .SendAsync(CreateRequest, cancellationToken: cancellationToken);
             
             await using var stream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
 
@@ -151,16 +149,22 @@ namespace OData.Client
         ) 
             where TEntity : IEntity
         {
-            var requestUri = RetrieveUri(id, request);
+            HttpRequestMessage CreateRequest()
+            {
+                var requestUri = RetrieveUri(id, request);
+                return CreateDefaultRequest(HttpMethod.Get, requestUri);
+            }
 
-            using var httpRequest = CreateDefaultRequest(HttpMethod.Get, requestUri);
-            using var httpResponse = await _httpClient.SendAsync(httpRequest, cancellationToken);
+            var httpRequestOptions = new HttpRequestOptions();
+            httpRequestOptions.AllowedStatusCodes.Add(HttpStatusCode.NotFound);
+            
+            using var httpResponse = await _oDataHttpClient
+                .SendAsync(CreateRequest, httpRequestOptions, cancellationToken);
+            
             if (httpResponse.StatusCode == HttpStatusCode.NotFound)
             {
                 return null;
             }
-
-            await ThrowIfUnsuccessfulAsync(httpResponse, cancellationToken);
 
             var serializer = _entitySerializerFactory.CreateSerializer(id.Name);
             var entity = await httpResponse.Content.ReadEntityAsync(serializer, cancellationToken);
@@ -174,10 +178,14 @@ namespace OData.Client
         )
             where TEntity : IEntity
         {
-            var requestUri = CollectionUri(name);
+            HttpRequestMessage CreateRequest()
+            {
+                var requestUri = CollectionUri(name);
+                return CreatePropsRequest(HttpMethod.Post, requestUri, props);
+            }
 
-            using var httpRequest = CreatePropsRequest(HttpMethod.Post, requestUri, props);
-            using var httpResponse = await SendRequestAsync(httpRequest, cancellationToken);
+            using var httpResponse = await _oDataHttpClient
+                .SendAsync(CreateRequest, cancellationToken: cancellationToken);
 
             var entityId = httpResponse.Headers.EntityId(name);
             return entityId;
@@ -190,12 +198,14 @@ namespace OData.Client
         )
             where TEntity : IEntity
         {
-            var requestUri = CollectionUri(name);
+            HttpRequestMessage CreateRequest()
+            {
+                var requestUri = CollectionUri(name);
+                return CreatePropsRepresentationRequest(HttpMethod.Post, requestUri, props);
+            }
 
-            using var httpRequest = CreatePropsRequest(HttpMethod.Post, requestUri, props);
-            httpRequest.Headers.Add("Prefer", "return=representation");
-            
-            using var httpResponse = await SendRequestAsync(httpRequest, cancellationToken);
+            using var httpResponse = await _oDataHttpClient
+                .SendAsync(CreateRequest, cancellationToken: cancellationToken);
             
             var serializer = _entitySerializerFactory.CreateSerializer(name);
             var entity = await httpResponse.Content.ReadEntityAsync(serializer, cancellationToken);
@@ -209,10 +219,14 @@ namespace OData.Client
         )
             where TEntity : IEntity
         {
-            var requestUri = EntityUri(id);
+            HttpRequestMessage CreateRequest()
+            {
+                var requestUri = EntityUri(id);
+                return CreatePropsRequest(HttpMethod.Patch, requestUri, props);
+            }
 
-            using var httpRequest = CreatePropsRequest(HttpMethod.Patch, requestUri, props);
-            using var httpResponse = await SendRequestAsync(httpRequest, cancellationToken);
+            using var httpResponse = await _oDataHttpClient
+                .SendAsync(CreateRequest, cancellationToken: cancellationToken);
         }
 
         public async Task<IEntity<TEntity>> UpdateRepresentationAsync<TEntity>(
@@ -222,12 +236,14 @@ namespace OData.Client
         )
             where TEntity : IEntity
         {
-            var requestUri = EntityUri(id);
+            HttpRequestMessage CreateRequest()
+            {
+                var requestUri = EntityUri(id);
+                return CreatePropsRepresentationRequest(HttpMethod.Patch, requestUri, props);
+            }
 
-            using var httpRequest = CreatePropsRequest(HttpMethod.Patch, requestUri, props);
-            httpRequest.Headers.Add("Prefer", "return=representation");
-            
-            using var httpResponse = await SendRequestAsync(httpRequest, cancellationToken);
+            using var httpResponse = await _oDataHttpClient
+                .SendAsync(CreateRequest, cancellationToken: cancellationToken);
             
             var serializer = _entitySerializerFactory.CreateSerializer(id.Name);
             var entity = await httpResponse.Content.ReadEntityAsync(serializer, cancellationToken);
@@ -237,12 +253,13 @@ namespace OData.Client
         public async Task DeleteAsync<TEntity>(IEntityId<TEntity> id, CancellationToken cancellationToken = default)
             where TEntity : IEntity
         {
-            var requestUri = EntityUri(id);
+            HttpRequestMessage CreateRequest()
+            {
+                return CreateEmptyRequest(HttpMethod.Delete, EntityUri(id));
+            }
 
-            using var httpRequest = CreateDefaultRequest(HttpMethod.Delete, requestUri);
-            httpRequest.Content = new StringContent(string.Empty, Encoding.UTF8, MediaTypeNames.Application.Json);
-
-            using var httpResponse = await SendRequestAsync(httpRequest, cancellationToken);
+            using var httpResponse = await _oDataHttpClient
+                .SendAsync(CreateRequest, cancellationToken: cancellationToken);
         }
 
         public async Task AssociateAsync<TEntity, TOther>(
@@ -254,14 +271,16 @@ namespace OData.Client
             where TEntity : IEntity
             where TOther : IEntity
         {
-            var requestUri = PropertyRefUri(id, property);
-
-            using var httpRequest = CreatePropsRequest<Ref>(HttpMethod.Put, requestUri, props =>
+            HttpRequestMessage CreateRequest()
             {
-                props.Set(Ref.Id, EntityUri(otherId));
-            });
+                return CreatePropsRequest<Ref>(HttpMethod.Put, PropertyRefUri(id, property), props =>
+                {
+                    props.Set(Ref.Id, EntityUri(otherId));
+                });
+            }
 
-            using var httpResponse = await SendRequestAsync(httpRequest, cancellationToken);
+            using var httpResponse = await _oDataHttpClient
+                .SendAsync(CreateRequest, cancellationToken: cancellationToken);
         }
 
         public async Task AssociateAsync<TEntity, TOther>(
@@ -273,14 +292,16 @@ namespace OData.Client
             where TEntity : IEntity
             where TOther : IEntity
         {
-            var requestUri = PropertyRefUri(id, property);
-
-            using var httpRequest = CreatePropsRequest<Ref>(HttpMethod.Put, requestUri, props =>
+            HttpRequestMessage CreateRequest()
             {
-                props.Set(Ref.Id, EntityUri(otherId));
-            });
+                return CreatePropsRequest<Ref>(HttpMethod.Put, PropertyRefUri(id, property), props =>
+                {
+                    props.Set(Ref.Id, EntityUri(otherId));
+                });
+            }
 
-            using var httpResponse = await SendRequestAsync(httpRequest, cancellationToken);
+            using var httpResponse = await _oDataHttpClient
+                .SendAsync(CreateRequest, cancellationToken: cancellationToken);
         }
 
         public async Task DisassociateAsync<TEntity, TOther>(
@@ -292,10 +313,14 @@ namespace OData.Client
             where TEntity : IEntity
             where TOther : IEntity
         {
-            var requestUri = PropertyRefUri(id, property);
+            HttpRequestMessage CreateRequest()
+            {
+                var requestUri = PropertyRefUri(id, property);
+                return CreateDefaultRequest(HttpMethod.Delete, requestUri);
+            }
 
-            using var httpRequest = CreateDefaultRequest(HttpMethod.Delete, requestUri);
-            using var httpResponse = await SendRequestAsync(httpRequest, cancellationToken);
+            using var httpResponse = await _oDataHttpClient
+                .SendAsync(CreateRequest, cancellationToken: cancellationToken);
         }
 
         public async Task DisassociateAsync<TEntity, TOther>(
@@ -307,16 +332,20 @@ namespace OData.Client
             where TEntity : IEntity
             where TOther : IEntity
         {
-            var propertyRefUri = PropertyRefUri(id, property);
-            var otherEntityUri = EntityUri(otherId);
+            HttpRequestMessage CreateRequest()
+            {
+                var propertyRefUri = PropertyRefUri(id, property);
+                var otherEntityUri = EntityUri(otherId);
 
-            var requestUriBuilder = new UriBuilder(propertyRefUri);
-            requestUriBuilder.Query = $"$id={otherEntityUri}";
+                var requestUriBuilder = new UriBuilder(propertyRefUri);
+                requestUriBuilder.Query = $"$id={otherEntityUri}";
 
-            var requestUri = requestUriBuilder.Uri;
+                var requestUri = requestUriBuilder.Uri;
+                return CreateDefaultRequest(HttpMethod.Delete, requestUri);
+            }
 
-            using var httpRequest = CreateDefaultRequest(HttpMethod.Delete, requestUri);
-            using var httpResponse = await SendRequestAsync(httpRequest, cancellationToken);
+            using var httpResponse = await _oDataHttpClient
+                .SendAsync(CreateRequest, cancellationToken: cancellationToken);
         }
 
         private HttpRequestMessage CreatePropsRequest<T>(
@@ -333,6 +362,25 @@ namespace OData.Client
             return CreateMutationRequest(method, requestUri, httpContent);
         }
 
+        private HttpRequestMessage CreatePropsRepresentationRequest<T>(
+            HttpMethod method,
+            Uri requestUri,
+            Action<IODataProperties<T>> props
+        )
+            where T : IEntity
+        {
+            var httpRequest = CreatePropsRequest(method, requestUri, props);
+            httpRequest.Headers.Add("Prefer", "return=representation");
+            return httpRequest;
+        }
+
+        private static HttpRequestMessage CreateEmptyRequest(HttpMethod httpMethod, Uri requestUri)
+        {
+            var httpRequest = CreateDefaultRequest(httpMethod, requestUri);
+            httpRequest.Content = new StringContent(string.Empty, Encoding.UTF8, MediaTypeNames.Application.Json);
+            return httpRequest;
+        }
+
         private static HttpRequestMessage CreateMutationRequest(HttpMethod method, Uri requestUri, HttpContent content)
         {
             var httpRequest = CreateDefaultRequest(method, requestUri);
@@ -347,40 +395,6 @@ namespace OData.Client
             httpRequest.Headers.Add("OData-MaxVersion", "4.0");
             httpRequest.Headers.Add("OData-Version", "4.0");
             return httpRequest;
-        }
-
-        private async Task<HttpResponseMessage> SendRequestAsync(
-            HttpRequestMessage httpRequest,
-            CancellationToken cancellationToken
-        )
-        {
-            var httpResponse = await _httpClient.SendAsync(httpRequest, cancellationToken);
-            await ThrowIfUnsuccessfulAsync(httpResponse, cancellationToken);
-            return httpResponse;
-        }
-
-        private static async Task ThrowIfUnsuccessfulAsync(
-            HttpResponseMessage httpResponse,
-            CancellationToken cancellationToken
-        )
-        {
-            try
-            {
-                httpResponse.EnsureSuccessStatusCode();
-            }
-            catch (HttpRequestException exception)
-            {
-                var message = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
-                throw new HttpRequestException(message, exception, exception.StatusCode);
-            }
-        }
-
-        public void Dispose()
-        {
-            if (_disposeHttpClient)
-            {
-                _httpClient.Dispose();
-            }
         }
     }
 }
