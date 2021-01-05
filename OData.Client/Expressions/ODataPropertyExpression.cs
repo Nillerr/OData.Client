@@ -43,7 +43,7 @@ namespace OData.Client.Expressions
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"{nameof(Property)}: {Property}";
+            return $"{Property.Name}";
         }
     }
 }

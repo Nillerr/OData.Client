@@ -121,7 +121,7 @@ namespace OData.Client
         /// <param name="property">The property.</param>
         /// <param name="value">The value.</param>
         /// <returns>The filter.</returns>
-        public static ODataFilter<TEntity> operator ==(Optional<TEntity, TValue> property, TValue value) => 
+        public static ODataFilter<TEntity> operator ==(Optional<TEntity, TValue> property, TValue? value) => 
             property.EqualTo(value);
         
         /// <summary>
@@ -131,7 +131,7 @@ namespace OData.Client
         /// <param name="property">The property.</param>
         /// <param name="value">The value.</param>
         /// <returns>The filter.</returns>
-        public static ODataFilter<TEntity> operator !=(Optional<TEntity, TValue> property, TValue value) => 
+        public static ODataFilter<TEntity> operator !=(Optional<TEntity, TValue> property, TValue? value) => 
             property.NotEqualTo(value);
         
         /// <summary>
@@ -141,7 +141,7 @@ namespace OData.Client
         /// <param name="property">The property.</param>
         /// <param name="value">The value.</param>
         /// <returns>The filter.</returns>
-        public static ODataFilter<TEntity> operator >(Optional<TEntity, TValue> property, TValue value) => 
+        public static ODataFilter<TEntity> operator >(Optional<TEntity, TValue> property, TValue? value) => 
             property.GreaterThan(value);
         
         /// <summary>
@@ -151,7 +151,7 @@ namespace OData.Client
         /// <param name="property">The property.</param>
         /// <param name="value">The value.</param>
         /// <returns>The filter.</returns>
-        public static ODataFilter<TEntity> operator <(Optional<TEntity, TValue> property, TValue value) => 
+        public static ODataFilter<TEntity> operator <(Optional<TEntity, TValue> property, TValue? value) => 
             property.LessThan(value);
 
         /// <summary>
@@ -161,7 +161,7 @@ namespace OData.Client
         /// <param name="property">The property.</param>
         /// <param name="value">The value.</param>
         /// <returns>The filter.</returns>
-        public static ODataFilter<TEntity> operator >=(Optional<TEntity, TValue> property, TValue value) => 
+        public static ODataFilter<TEntity> operator >=(Optional<TEntity, TValue> property, TValue? value) => 
             property.GreaterThanOrEqualTo(value);
         
         /// <summary>
@@ -171,7 +171,7 @@ namespace OData.Client
         /// <param name="property">The property.</param>
         /// <param name="value">The value.</param>
         /// <returns>The filter.</returns>
-        public static ODataFilter<TEntity> operator <=(Optional<TEntity, TValue> property, TValue value) => 
+        public static ODataFilter<TEntity> operator <=(Optional<TEntity, TValue> property, TValue? value) => 
             property.LessThanOrEqualTo(value);
 
         /// <inheritdoc />

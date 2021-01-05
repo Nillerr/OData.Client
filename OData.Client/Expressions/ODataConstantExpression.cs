@@ -77,7 +77,7 @@ namespace OData.Client.Expressions
 
         public override string ToString()
         {
-            return $"{nameof(Value)}: {Value}";
+            return Value?.ToString() ?? "null";
         }
     }
 }

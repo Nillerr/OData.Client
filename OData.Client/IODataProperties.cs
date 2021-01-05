@@ -16,7 +16,8 @@ namespace OData.Client
         /// <param name="value">The value to set the property to.</param>
         /// <typeparam name="TValue">The type of value of the property.</typeparam>
         /// <returns>This instance, for fluent chaining.</returns>
-        IODataProperties<TEntity> Set<TValue>(IProperty<TEntity, TValue> property, TValue value);
+        IODataProperties<TEntity> Set<TValue>(IProperty<TEntity, TValue> property, TValue value)
+            where TValue : notnull;
 
         /// <summary>
         /// Binds an <paramref name="id"/> to a single-valued navigation <paramref name="property"/>.
@@ -26,6 +27,16 @@ namespace OData.Client
         /// <typeparam name="TOther">The type of entity to bind to the property.</typeparam>
         /// <returns>This instance, for fluent chaining.</returns>
         IODataProperties<TEntity> Bind<TOther>(IRef<TEntity, TOther> property, IEntityId<TOther> id)
+            where TOther : IEntity;
+
+        /// <summary>
+        /// Binds an <paramref name="id"/> to a single-valued navigation <paramref name="property"/>.
+        /// </summary>
+        /// <param name="property">The property to bind to.</param>
+        /// <param name="id">The id to bind to the property.</param>
+        /// <typeparam name="TOther">The type of entity to bind to the property.</typeparam>
+        /// <returns>This instance, for fluent chaining.</returns>
+        IODataProperties<TEntity> Bind<TOther>(IRef<TEntity, IEntity> property, IEntityId<TOther> id)
             where TOther : IEntity;
 
         /// <summary>

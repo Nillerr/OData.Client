@@ -52,7 +52,7 @@ namespace OData.Client.Expressions
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"{nameof(Operator)}: {Operator}, {nameof(Operand)}: {Operand}";
+            return $"{Operator} {Operand}";
         }
     }
 }

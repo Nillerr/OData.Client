@@ -24,5 +24,6 @@ namespace OData.Client
         public IODataHttpClient HttpClient { get; set; }
         
         public IValueFormatter ValueFormatter { get; set; } = new DefaultValueFormatter();
+        public IEntitySetNameResolver EntitySetNameResolver { get; set; } = new DefaultEntitySetNameResolver();
     }
 }

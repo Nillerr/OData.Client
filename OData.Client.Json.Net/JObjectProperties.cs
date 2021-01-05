@@ -13,14 +13,17 @@ namespace OData.Client.Json.Net
         private readonly JObject _root = new();
 
         private readonly JsonSerializer _serializer;
+        private readonly IEntitySetNameResolver _entitySetNameResolver;
 
-        public JObjectProperties(JsonSerializer serializer)
+        public JObjectProperties(JsonSerializer serializer, IEntitySetNameResolver entitySetNameResolver)
         {
             _serializer = serializer;
+            _entitySetNameResolver = entitySetNameResolver;
         }
 
         /// <inheritdoc />
         public IODataProperties<TEntity> Set<TValue>(IProperty<TEntity, TValue> property, TValue value)
+            where TValue : notnull
         {
             var token = Token(value);
             _root[property.SelectableName] = token;
@@ -33,7 +36,16 @@ namespace OData.Client.Json.Net
         {
             var reference = Reference(id);
             var token = JValue.CreateString(reference);
-            _root[property.SelectableName + "@odata.bind"] = token;
+            _root[$"{property.SelectableName}@odata.bind"] = token;
+            return this;
+        }
+
+        /// <inheritdoc />
+        public IODataProperties<TEntity> Bind<TOther>(IRef<TEntity, IEntity> property, IEntityId<TOther> id) where TOther : IEntity
+        {
+            var reference = Reference(id);
+            var token = JValue.CreateString(reference);
+            _root[$"{property.SelectableName}_{id.Type.Name}@odata.bind"] = token;
             return this;
         }
 
@@ -53,7 +65,7 @@ namespace OData.Client.Json.Net
                 array.Add(token);
             }
 
-            _root[property.SelectableName + "@odata.bind"] = array;
+            _root[$"{property.SelectableName}@odata.bind"] = array;
             return this;
         }
 
@@ -74,7 +86,8 @@ namespace OData.Client.Json.Net
         private string Reference<TOther>(IEntityId<TOther> id)
             where TOther : IEntity
         {
-            return $"/{id.Type.Name}({id.Id:D})";
+            var entitySetName = _entitySetNameResolver.EntitySetName(id.Type);
+            return $"/{entitySetName}({id.Id:D})";
         }
 
         private JToken Token<TValue>(TValue value) => value switch

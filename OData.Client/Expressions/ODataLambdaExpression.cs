@@ -48,7 +48,7 @@ namespace OData.Client.Expressions
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"{nameof(Target)}: {Target}, {nameof(Function)}: {Function}, {nameof(Body)}: {Body}";
+            return $"{Target.Name}.{Function}(arg => {Body})";
         }
     }
 }

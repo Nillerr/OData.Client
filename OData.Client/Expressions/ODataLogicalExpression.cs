@@ -65,7 +65,7 @@ namespace OData.Client.Expressions
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"{nameof(Left)}: {Left}, {nameof(Operator)}: {Operator}, {nameof(Right)}: {Right}";
+            return $"({Left} {Operator} {Right})";
         }
     }
 }

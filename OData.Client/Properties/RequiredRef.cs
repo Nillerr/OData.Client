@@ -12,22 +12,25 @@ namespace OData.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="RequiredRef{TEntity,TOther}"/> class.
         /// </summary>
-        /// <param name="prefix">The property prefix.</param>
         /// <param name="name">The property name.</param>
-        public RequiredRef(string prefix, string name)
+        /// <param name="valueName">The property value name.</param>
+        public RequiredRef(string name, string valueName)
         {
-            Name = prefix + name;
-            ValueName = $"{prefix}_{name}_value";
+            Name = name;
+            ValueName = valueName;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RequiredRef{TEntity,TOther}"/> class.
         /// </summary>
         /// <param name="name">The property name.</param>
-        public RequiredRef(string name)
+        public RequiredRef(string name) : this(name, $"_{name}_value")
         {
-            Name = name;
-            ValueName = $"_{name}_value";
+        }
+
+        public static RequiredRef<TEntity, TOther> Prefixed(string prefix, string name)
+        {
+            return new RequiredRef<TEntity, TOther>(prefix + name, $"{prefix}_{name}_value");
         }
 
         /// <inheritdoc />

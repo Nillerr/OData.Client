@@ -63,6 +63,8 @@ namespace OData.Client
         /// <returns>This query instance.</returns>
         IODataQuery<TEntity> Expand<TOther>(IRef<TEntity, TOther> property) where TOther : IEntity;
 
+        IODataQuery<TEntity> Expand(IRef<TEntity, IEntity> property);
+
         /// <summary>
         /// Specifies a collection-valued navigation property to expand.
         /// </summary>

@@ -19,6 +19,8 @@ namespace OData.Client.Demo
     
     public class Program
     {
+        private static readonly IEntityId<Incident> IncidentId = Incident.EntityType.ParseId("9c327cfd-4c67-4c76-8530-3657dd4c3853");
+
         public static async Task Main(string[] args)
         {
             var configuration = new ConfigurationBuilder()
@@ -45,7 +47,9 @@ namespace OData.Client.Demo
             
             var serializerSettings = new JsonSerializerSettings();
             var entitySerializer = new JsonNetEntitySerializer();
-            var propertiesFactory = new JsonNetPropertiesFactory(serializerSettings);
+            
+            var entitySetNameResolver = new DefaultEntitySetNameResolver();
+            var propertiesFactory = new JsonNetPropertiesFactory(entitySetNameResolver, serializerSettings);
             
             var oDataClientSettings = new ODataClientSettings(
                 organizationUri: organizationUri,
@@ -54,11 +58,30 @@ namespace OData.Client.Demo
                 httpClient: oDataHttpClient
             );
             
+            oDataClientSettings.EntitySetNameResolver = entitySetNameResolver;
+            
             var oDataClient = new ODataClient(oDataClientSettings);
             var incidents = oDataClient.Collection(Incident.EntityType);
 
-            await QueryIncidents(incidents);
+            var adxPortalComments = oDataClient.Collection(AdxPortalComment.EntityType);
+            await QueryPortalComments(adxPortalComments);
+            // await QueryIncidents(incidents);
             // await CreateCaseAsync(incidents);
+        }
+
+        private static async Task QueryPortalComments(IODataCollection<Activity> adxPortalComments)
+        {
+            var activities = await adxPortalComments
+                .Where(Activity.RegardingObjectId == IncidentId & Activity.ActivityTypeCode == AdxPortalComment.EntityType.Name)
+                .Select(Activity.ActivityId, Activity.ActivityTypeCode, Activity.RegardingObjectId)
+                .Expand(Activity.RegardingObjectId, Incident.EntityType)
+                .ToListAsync();
+
+            foreach (var activity in activities)
+            {
+                var activityId = activity.Id(Activity.ActivityId);
+                Console.WriteLine($"{activityId}: {activity.ToJson(Formatting.Indented)}");
+            }
         }
 
         private static async Task CreateCaseAsync(IODataCollection<Incident> incidents)
@@ -84,31 +107,18 @@ namespace OData.Client.Demo
             var accountId = Account.EntityType.ParseId("1f2a95a3-d251-e711-8107-5065f38bf3a1");
 
             var dateTime = DateTime.Parse("2020-05-18T01:26:32Z");
-            
+
+            string? caseNumber = null;
             var query = incidents
-                .Find()
-                .Where(
-                    Incident.CreatedOn > dateTime
-                    // (
-                    //     Incident.PrimaryContact.References(Contact.EntityType.ParseId("4ba16049-8453-42c0-b6d4-544103c3f454"))
-                    //     | Incident.PrimaryContact == Contact.EntityType.ParseId("4ba16049-8453-42c0-b6d4-544103c3f454")
-                    // )
-                    // Incident.CaseNumber.StartsWith("TS02") &
-                    // Incident.PrimaryContact.Where(Contact.ParentCustomer) != null &
-                    // Incident.PrimaryContact.Where(Contact.ParentCustomer) == accountId &
-                    // Incident.PrimaryContact.Where(Contact.EmailAddress) == "support.na@universal-robots.com" &
-                    // Incident.Activities.Any(Activity.Contact.Where(Contact.ParentCustomer) == accountId)
-                    // Incident.Activities.Any(Activity.Contacts.Any(Contact.ParentCustomer.Where(Account.AccountId) == accountId))
-                )
+                .Where(Incident.IncidentId == IncidentId)
                 .Select(Incident.CreatedOn, Incident.Title, Incident.CaseNumber, Incident.PrimaryContact)
-                // .Expand(Incident.PrimaryContact)
-                // .OrderBy(Incident.CaseNumber)
+                .Expand(Incident.PrimaryContact)
                 .Limit(1);
             
             Console.WriteLine(query);
 
             var pageNumber = 0;
-            await foreach (var page in query.FastPages(2))
+            await foreach (var page in query.FastPages(maxPageSize: 10))
             {
                 pageNumber++;
                 Console.WriteLine($"Fetched page #{pageNumber}");

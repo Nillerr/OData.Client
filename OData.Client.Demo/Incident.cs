@@ -6,7 +6,7 @@ namespace OData.Client.Demo
     {
         private Incident() => throw new InvalidOperationException();
 
-        public static readonly EntityType<Incident> EntityType = "incidents";
+        public static readonly EntityType<Incident> EntityType = "incident";
 
         public static readonly Required<Incident, string> ETag = "@odata.etag";
         

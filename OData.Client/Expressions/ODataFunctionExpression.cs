@@ -59,7 +59,7 @@ namespace OData.Client.Expressions
 
         public override string ToString()
         {
-            return $"{nameof(Function)}: {Function}, {nameof(Arguments)}: {string.Join(",", Arguments.Select(argument => argument.ToString()))}";
+            return $"{Function.Name}({string.Join(", ", Arguments.Select(argument => argument.ToString()))})";
         }
     }
 }

@@ -74,6 +74,13 @@ namespace OData.Client
         }
 
         /// <inheritdoc />
+        public IODataQuery<TEntity> Expand(IRef<TEntity, IEntity> property)
+        {
+            // Always throw an exception, tell users to use `Expand(query, property, type)` below.
+            throw new InvalidOperationException();
+        }
+
+        /// <inheritdoc />
         public IODataQuery<TEntity> Expand<TOther>(IRefs<TEntity, TOther> property) where TOther : IEntity
         {
             var expansion = ODataExpansion.Create(property);

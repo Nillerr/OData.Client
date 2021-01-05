@@ -19,6 +19,7 @@ namespace OData.Client
         private readonly IEntitySerializer _entitySerializer;
         private readonly IODataHttpClient _oDataHttpClient;
         private readonly IValueFormatter _valueFormatter;
+        private readonly IEntitySetNameResolver _entitySetNameResolver;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataClient"/> with the specified <paramref name="settings"/>.
@@ -31,13 +32,16 @@ namespace OData.Client
             _entitySerializer = settings.EntitySerializer;
             _oDataHttpClient = settings.HttpClient;
             _valueFormatter = settings.ValueFormatter;
+            _entitySetNameResolver = settings.EntitySetNameResolver;
         }
 
         private Uri BaseUri => new Uri(_organizationUri, "api/data/v9.1/");
 
-        private Uri CollectionUri<T>(IEntityType<T> type) where T : IEntity => new Uri(BaseUri, $"{type.Name}");
+        private Uri CollectionUri<T>(IEntityType<T> type) where T : IEntity => new Uri(BaseUri, EntitySetName(type));
 
-        private Uri EntityUri<T>(IEntityId<T> id) where T : IEntity => new Uri(BaseUri, $"{id.Type.Name}({id.Id:D})");
+        private string EntitySetName<T>(IEntityType<T> type) where T : IEntity => _entitySetNameResolver.EntitySetName(type);
+
+        private Uri EntityUri<T>(IEntityId<T> id) where T : IEntity => new Uri(BaseUri, $"{EntitySetName(id.Type)}({id.Id:D})");
 
         private Uri FindUri<TEntity>(IEntityType<TEntity> type, ODataFindRequest<TEntity> request)
             where TEntity : IEntity

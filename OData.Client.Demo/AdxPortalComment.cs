@@ -1,7 +1,7 @@
 namespace OData.Client.Demo
 {
-    public sealed class AdxPortalComment : Activity
+    public sealed class AdxPortalComment
     {
-        public new static readonly EntityType<AdxPortalComment> EntityType = "adx_portalcomments";
+        public static readonly EntityType<Activity> EntityType = "adx_portalcomment";
     }
 }

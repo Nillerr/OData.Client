@@ -78,8 +78,8 @@ namespace OData.Client
         ///         await ProcessEntityAsync(entity);
         ///     }
         ///     
-        ///     // All entities in the page have been processed, and the reference to the page will now contain the
-        ///     // results of the next page.
+        ///     // All entities in the page have been processed, and the reference to the page will now be re-used for
+        ///     // the results of the next page.
         /// }
         /// </code>
         /// </example>
@@ -211,6 +211,23 @@ namespace OData.Client
             where TEntity : IEntity
         {
             return query.Limit(count);
+        }
+
+        /// <summary>
+        /// Specifies a single-valued navigation property to expand.
+        /// </summary>
+        /// <param name="query">The query instance.</param>
+        /// <param name="property">The property to expand.</param>
+        /// <param name="type">The referenced entity type.</param>
+        /// <typeparam name="TEntity">The type of entity.</typeparam>
+        /// <typeparam name="TOther">The type of entity referenced by the navigation property.</typeparam>
+        /// <returns>This query instance.</returns>
+        public static IODataQuery<TEntity> Expand<TEntity, TOther>(this IODataQuery<TEntity> query, IRef<TEntity, IEntity> property, IEntityType<TOther> type)
+            where TEntity : IEntity
+            where TOther : IEntity
+        {
+            var objectRef = new OptionalRef<TEntity, TOther>($"{property.Name}_{type.Name}");
+            return query.Expand(objectRef);
         }
     }
 }

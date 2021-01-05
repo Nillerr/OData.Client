@@ -6,23 +6,26 @@ namespace OData.Client
     public readonly struct ODataFilter<TEntity> : IEquatable<ODataFilter<TEntity>>
         where TEntity : IEntity
     {
-        public IODataFilterExpression Expression { get; }
+        public IODataFilterExpression? Expression { get; }
 
         public ODataFilter(IODataFilterExpression expression) => Expression = expression;
 
         public bool Equals(ODataFilter<TEntity> other) => Expression == other.Expression;
         public override bool Equals(object? obj) => obj is ODataFilter<TEntity> other && Equals(other);
-        public override int GetHashCode() => Expression.GetHashCode();
+        public override int GetHashCode() => HashCode.Combine(Expression);
 
-        public override string? ToString() => Expression.ToString();
+        public override string? ToString() => Expression?.ToString();
         
         public static bool operator ==(ODataFilter<TEntity> left, ODataFilter<TEntity> right) => left.Equals(right);
         public static bool operator !=(ODataFilter<TEntity> left, ODataFilter<TEntity> right) => !left.Equals(right);
         
         public static ODataFilter<TEntity> operator &(ODataFilter<TEntity> left, ODataFilter<TEntity> right)
         {
-            var leftOperand = CheckOperand(left, nameof(left));
-            var rightOperand = CheckOperand(right, nameof(right));
+            if (left.Expression == null) return right;
+            if (right.Expression == null) return left;
+
+            var leftOperand = CheckOperand(left.Expression, nameof(left));
+            var rightOperand = CheckOperand(right.Expression, nameof(right));
 
             var expression = new ODataLogicalExpression(leftOperand, "and", rightOperand);
             return new ODataFilter<TEntity>(expression);
@@ -30,8 +33,11 @@ namespace OData.Client
 
         public static ODataFilter<TEntity> operator |(ODataFilter<TEntity> left, ODataFilter<TEntity> right)
         {
-            var leftOperand = CheckOperand(left, nameof(left));
-            var rightOperand = CheckOperand(right, nameof(right));
+            if (left.Expression == null) return right;
+            if (right.Expression == null) return left;
+
+            var leftOperand = CheckOperand(left.Expression, nameof(left));
+            var rightOperand = CheckOperand(right.Expression, nameof(right));
 
             var expression = new ODataLogicalExpression(leftOperand, "or", rightOperand);
             return new ODataFilter<TEntity>(expression);
@@ -39,13 +45,10 @@ namespace OData.Client
 
         public static ODataFilter<TEntity> operator !(ODataFilter<TEntity> filter)
         {
+            if (filter.Expression == null) return filter;
+
             var expression = new ODataUnaryExpression("not", filter.Expression);
             return new ODataFilter<TEntity>(expression);
-        }
-
-        private static IODataLogicalOperand CheckOperand(ODataFilter<TEntity> filter, string paramName)
-        {
-            return CheckOperand(filter.Expression, paramName);
         }
 
         private static IODataLogicalOperand CheckOperand(IODataFilterExpression expression, string paramName)

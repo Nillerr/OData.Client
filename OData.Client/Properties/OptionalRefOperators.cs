@@ -34,7 +34,7 @@ namespace OData.Client
             where TOther : IEntity
             where TValue : IEntity
         {
-            return new RequiredRef<TEntity, TValue>($"{property.Name}/", other.Name);
+            return RequiredRef<TEntity, TValue>.Prefixed($"{property.Name}/", other.Name);
         }
 
         public static OptionalRef<TEntity, TValue> Where<TEntity, TOther, TValue>(
@@ -45,7 +45,7 @@ namespace OData.Client
             where TOther : IEntity
             where TValue : IEntity
         {
-            return new OptionalRef<TEntity, TValue>($"{property.Name}/", other.Name);
+            return OptionalRef<TEntity, TValue>.Prefixed($"{property.Name}/", other.Name);
         }
 
         /// <summary>

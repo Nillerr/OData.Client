@@ -27,6 +27,8 @@ namespace OData.Client.Expressions.Formatting
                 double value => Unquoted(value),
                 decimal value => Unquoted(value),
                 
+                bool value => Unquoted(value),
+                
                 Enum value => Unquoted(Convert.ToInt32(value)),
                 
                 DateTime value => Quoted(value.ToUniversalTime().ToString(utcDateTimeFormat)),
