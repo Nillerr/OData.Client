@@ -85,5 +85,10 @@ namespace OData.Client
 
             return property.Name;
         }
+
+        internal static string ValueName(this IRefProperty property)
+        {
+            return $"_{property.Name}_value";
+        }
     }
 }

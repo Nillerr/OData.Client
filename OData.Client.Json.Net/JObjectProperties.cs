@@ -19,6 +19,7 @@ namespace OData.Client.Json.Net
             _serializer = serializer;
         }
 
+        /// <inheritdoc />
         public IODataProperties<TEntity> Set<TValue>(IProperty<TEntity, TValue> property, TValue value)
         {
             var token = Token(value);
@@ -26,6 +27,7 @@ namespace OData.Client.Json.Net
             return this;
         }
 
+        /// <inheritdoc />
         public IODataProperties<TEntity> Bind<TOther>(IRef<TEntity, TOther> property, IEntityId<TOther> id)
             where TOther : IEntity
         {
@@ -35,6 +37,7 @@ namespace OData.Client.Json.Net
             return this;
         }
 
+        /// <inheritdoc />
         public IODataProperties<TEntity> BindAll<TOther>(
             IRefs<TEntity, TOther> property,
             IEnumerable<IEntityId<TOther>> ids
@@ -54,6 +57,7 @@ namespace OData.Client.Json.Net
             return this;
         }
 
+        /// <inheritdoc />
         public void WriteTo(Stream stream)
         {
             using var streamWriter = new StreamWriter(stream, Encoding.UTF8);

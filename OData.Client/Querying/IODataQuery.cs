@@ -103,7 +103,7 @@ namespace OData.Client
         /// <summary>
         /// Skips the specified number of results returned by the query.
         /// </summary>
-        /// <param name="count">The number of results to return.</param>
+        /// <param name="count">The number of results to skip.</param>
         /// <returns>This query instance.</returns>
         /// <remarks>
         /// Regardless of the number of results to skip, the same number of requests will be made, as the skipping

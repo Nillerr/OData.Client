@@ -57,13 +57,32 @@ namespace OData.Client
         }
 
         /// <summary>
-        /// Applies pagination to the query and returns a list of entities matching the query.
+        /// Applies pagination to the query and returns a list of entities matching the query. This method is different
+        /// to <see cref="Pages{TEntity}"/>, please see the remarks section.
         /// </summary>
         /// <param name="query">The query.</param>
         /// <param name="maxPageSize">The maximum page size.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <typeparam name="TEntity">The type of entity.</typeparam>
         /// <returns>An async enumerable of pages returned by the query.</returns>
+        /// <remarks>
+        /// The pages returned by this method share a buffer, and thus must be processed before advancing the async
+        /// enumerator (see the example section).
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// await foreach (var page in query.FastPages(2))
+        /// {
+        ///     foreach (var entity in page)
+        ///     {
+        ///         await ProcessEntityAsync(entity);
+        ///     }
+        ///     
+        ///     // All entities in the page have been processed, and the reference to the page will now contain the
+        ///     // results of the next page.
+        /// }
+        /// </code>
+        /// </example>
         public static async IAsyncEnumerable<IList<IEntity<TEntity>>> FastPages<TEntity>(
             this IODataQuery<TEntity> query,
             int maxPageSize,
@@ -151,17 +170,47 @@ namespace OData.Client
         /// <summary>
         /// Specifies a filter, appending it to any existing filters.
         /// </summary>
-        /// <remarks>
-        /// Subsequent calls to filter will AND the new filter with the existing filter.
-        /// </remarks>
         /// <param name="query">The query instance.</param>
         /// <param name="filter">The filter.</param>
         /// <typeparam name="TEntity">The type of entity.</typeparam>
         /// <returns>The query instance.</returns>
+        /// <remarks>
+        /// Subsequent calls to filter will AND the new filter with the existing filter.
+        /// </remarks>
         public static IODataQuery<TEntity> Where<TEntity>(this IODataQuery<TEntity> query, ODataFilter<TEntity> filter)
             where TEntity : IEntity
         {
             return query.Filter(filter);
+        }
+
+        /// <summary>
+        /// Skips the specified number of results returned by the query.
+        /// </summary>
+        /// <param name="query">The query instance.</param>
+        /// <param name="count">The number of results to skip.</param>
+        /// <typeparam name="TEntity">The type of entity.</typeparam>
+        /// <returns>The query instance.</returns>
+        /// <remarks>
+        /// Regardless of the number of results to skip, the same number of requests will be made, as the skipping
+        /// occurs in the process.
+        /// </remarks>
+        public static IODataQuery<TEntity> Skip<TEntity>(this IODataQuery<TEntity> query, int count)
+            where TEntity : IEntity
+        {
+            return query.Offset(count);
+        }
+
+        /// <summary>
+        /// Limits the number of results returned by the query.
+        /// </summary>
+        /// <param name="query">The query instance.</param>
+        /// <param name="count">The number of results to return.</param>
+        /// <typeparam name="TEntity">The type of entity.</typeparam>
+        /// <returns>This query instance.</returns>
+        public static IODataQuery<TEntity> Take<TEntity>(this IODataQuery<TEntity> query, int count)
+            where TEntity : IEntity
+        {
+            return query.Limit(count);
         }
     }
 }
