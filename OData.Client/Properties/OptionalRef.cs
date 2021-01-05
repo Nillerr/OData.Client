@@ -12,20 +12,35 @@ namespace OData.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="OptionalRef{TEntity,TOther}"/> class.
         /// </summary>
+        /// <param name="prefix">The property prefix.</param>
         /// <param name="name">The property name.</param>
-        public OptionalRef(string name) => ReferenceName = name;
+        public OptionalRef(string prefix, string name)
+        {
+            Name = prefix + name;
+            ValueName = $"{prefix}_{name}_value";
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OptionalRef{TEntity,TOther}"/> class.
+        /// </summary>
+        /// <param name="name">The property name.</param>
+        public OptionalRef(string name)
+        {
+            Name = name;
+            ValueName = $"_{name}_value";
+        }
 
         /// <inheritdoc />
-        public string ReferenceName { get; }
+        public string Name { get; }
 
         /// <inheritdoc />
-        public string ValueName => $"_{ReferenceName}_value";
+        public string ValueName { get; }
 
         /// <inheritdoc />
         public string SelectableName => ValueName;
 
         /// <inheritdoc />
-        public string ExpandableName => ReferenceName;
+        public string ExpandableName => Name;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OptionalRef{TEntity,TOther}"/> class using the string as the
@@ -40,7 +55,7 @@ namespace OData.Client
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return SelectableName == other.SelectableName;
+            return Name == other.Name;
         }
 
         /// <inheritdoc />
@@ -59,8 +74,8 @@ namespace OData.Client
         /// <param name="property">The property.</param>
         /// <param name="other">The value.</param>
         /// <returns>The filter.</returns>
-        public static ODataFilter<TEntity> operator ==(OptionalRef<TEntity, TOther> property, IEntityId<TOther> other) => 
-            property.References(other);
+        public static ODataFilter<TEntity> operator ==(OptionalRef<TEntity, TOther> property, IEntityId<TOther>? other) => 
+            other == null ? property.HasNoReference() : property.References(other);
 
         /// <summary>
         /// Creates a filter that checks whether the <paramref name="property"/> does not reference the
@@ -69,8 +84,8 @@ namespace OData.Client
         /// <param name="property">The property.</param>
         /// <param name="other">The value.</param>
         /// <returns>The filter.</returns>
-        public static ODataFilter<TEntity> operator !=(OptionalRef<TEntity, TOther> property, IEntityId<TOther> other) => 
-            property.DoesNotReference(other);
+        public static ODataFilter<TEntity> operator !=(OptionalRef<TEntity, TOther> property, IEntityId<TOther>? other) => 
+            other == null ? property.HasReference() : property.DoesNotReference(other);
 
         /// <inheritdoc />
         public override string ToString() => $"{nameof(SelectableName)}: {SelectableName}";

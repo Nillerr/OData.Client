@@ -1,12 +1,9 @@
 namespace OData.Client.Expressions.Functions
 {
-    public sealed class ODataStringStartsWithFunction : ODataFunction
+    public sealed class ODataStringStartsWithFunction : IODataFunction
     {
         public static readonly ODataStringStartsWithFunction Instance = new();
 
-        private ODataStringStartsWithFunction()
-            : base("startswith")
-        {
-        }
+        public string Name => "startswith";
     }
 }

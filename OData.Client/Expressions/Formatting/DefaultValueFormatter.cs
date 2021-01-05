@@ -8,6 +8,8 @@ namespace OData.Client.Expressions.Formatting
         public string ToString(ODataConstantExpression expression)
         {
             var expressionValue = expression.Value;
+
+            const string utcDateTimeFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'";
             
             return expressionValue switch
             {
@@ -27,6 +29,9 @@ namespace OData.Client.Expressions.Formatting
                 
                 Enum value => Unquoted(Convert.ToInt32(value)),
                 
+                DateTime value => Quoted(value.ToUniversalTime().ToString(utcDateTimeFormat)),
+                DateTimeOffset value => Quoted(value.UtcDateTime.ToString(utcDateTimeFormat)),
+
                 IConvertible value => Quoted(value),
                 IFormattable value => Quoted(value),
                 

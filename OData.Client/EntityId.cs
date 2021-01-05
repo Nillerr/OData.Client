@@ -57,9 +57,6 @@ namespace OData.Client
         public static bool operator !=(EntityId<TEntity>? left, EntityId<TEntity>? right) => !Equals(left, right);
 
         /// <inheritdoc />
-        public string ToString(string? format, IFormatProvider? formatProvider) => Id.ToString("D");
-
-        /// <inheritdoc />
-        public override string ToString() => $"/{Type}({Id:D})";
+        public override string ToString() => $"/{Type.Name}({Id:D})";
     }
 }

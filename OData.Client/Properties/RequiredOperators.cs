@@ -129,7 +129,7 @@ namespace OData.Client
             where TValue : notnull
         {
             var left = new ODataPropertyExpression(property);
-            var right = new ODataConstantExpression(value, typeof(TValue));
+            var right = ODataConstantExpression.Create(property, value);
             var expression = new ODataBinaryExpression(left, @operator, right);
             return new ODataFilter<TEntity>(expression);
         }
@@ -297,7 +297,7 @@ namespace OData.Client
             where TValue : notnull
         {
             var target = new ODataPropertyExpression(property);
-            var argument = new ODataConstantExpression(value, typeof(TValue));
+            var argument = ODataConstantExpression.Create(property, value);
             var expression = new ODataFunctionExpression(function, target, argument);
             return new ODataFilter<TEntity>(expression);
         }

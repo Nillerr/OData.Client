@@ -11,7 +11,7 @@ namespace OData.Client.Expressions.Formatting
             PropertyPrefix = propertyPrefix;
         }
 
-        public string PropertyPrefix { get; }
+        private string PropertyPrefix { get; }
         
         public void Visit(ODataPropertyExpression expression)
         {

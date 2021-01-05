@@ -40,6 +40,7 @@ namespace OData.Client
     /// <typeparam name="TValue">The type of value.</typeparam>
     public interface IProperty<out TEntity, [UsedImplicitly] out TValue> : IProperty<TEntity>, ISortableProperty<TEntity, TValue>
         where TEntity : IEntity
+        where TValue : notnull
     {
     }
 }

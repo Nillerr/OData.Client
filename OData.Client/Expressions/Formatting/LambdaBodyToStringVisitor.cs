@@ -10,61 +10,37 @@ namespace OData.Client.Expressions.Formatting
         public LambdaBodyToStringVisitor(string parameterName, IValueFormatter valueFormatter)
         {
             ParameterName = parameterName;
+            PropertyPrefix = ParameterName + "/";
+            
             _valueFormatter = valueFormatter;
         }
 
         public string ParameterName { get; }
 
+        public string PropertyPrefix { get; }
+
         public void Visit(ODataBinaryExpression expression)
         {
-            var leftVisitor = new BinaryLeftOperandToStringVisitor($"{ParameterName}:");
-            expression.Left.Visit(leftVisitor);
-
-            var rightVisitor = new BinaryRightOperandToStringVisitor($"{ParameterName}:", _valueFormatter);
-            expression.Right.Visit(rightVisitor);
-
-            var left = leftVisitor.ToString();
-            var right = rightVisitor.ToString();
-
-            _stringBuilder.Append($"({left} {expression.Operator} {right})");
+            var filterString = expression.ToFilterString(PropertyPrefix, _valueFormatter);
+            _stringBuilder.Append(filterString);
         }
 
         public void Visit(ODataFunctionExpression expression)
         {
-            var targetVisitor = new FunctionTargetToStringVisitor(ParameterName + "/");
-            expression.Target.Visit(targetVisitor);
-            
-            var argumentVisitor = new FunctionArgumentToStringVisitor(_valueFormatter);
-            expression.Argument.Visit(argumentVisitor);
-
-            var target = targetVisitor.ToString();
-            var function = expression.Function.Name;
-            var argument = argumentVisitor.ToString();
-
-            _stringBuilder.Append($"{function}({target},{argument})");
+            var filterString = expression.ToFilterString(PropertyPrefix, _valueFormatter);
+            _stringBuilder.Append(filterString);
         }
 
         public void Visit(ODataLogicalExpression expression)
         {
-            var leftVisitor = new LogicalOperandToStringVisitor(ParameterName + "/", _valueFormatter);
-            expression.Left.Visit(leftVisitor);
-            
-            var rightVisitor = new LogicalOperandToStringVisitor(ParameterName + "/", _valueFormatter);
-            expression.Right.Visit(rightVisitor);
-
-            var left = leftVisitor.ToString();
-            var right = rightVisitor.ToString();
-
-            _stringBuilder.Append($"({left} {expression.Operator} {right})");
+            var filterString = expression.ToFilterString(PropertyPrefix, _valueFormatter);
+            _stringBuilder.Append(filterString);
         }
 
         public void Visit(ODataUnaryExpression expression)
         {
-            var operandVisitor = new FilterExpressionToStringVisitor(ParameterName + "/", _valueFormatter);
-            expression.Operand.Visit(operandVisitor);
-
-            var operand = operandVisitor.ToString();
-            _stringBuilder.Append($"{expression.Operator} {operand}");
+            var filterString = expression.ToFilterString(PropertyPrefix, _valueFormatter);
+            _stringBuilder.Append(filterString);
         }
 
         public override string ToString()

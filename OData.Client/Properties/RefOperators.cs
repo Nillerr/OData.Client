@@ -1,3 +1,4 @@
+using System;
 using OData.Client.Expressions;
 
 namespace OData.Client
@@ -48,9 +49,9 @@ namespace OData.Client
             where TEntity : IEntity
             where TOther : IEntity
         {
-            var valueProperty = new Optional<TEntity, TOther>(property.ValueName);
+            var valueProperty = new Optional<TEntity, Guid>(property.ValueName);
             var left = new ODataPropertyExpression(valueProperty);
-            var right = new ODataConstantExpression(other, typeof(IEntityId<TOther>));
+            var right = ODataConstantExpression.Create(valueProperty, other.Id);
             var expression = new ODataBinaryExpression(left, @operator, right);
             return new ODataFilter<TEntity>(expression);
         }

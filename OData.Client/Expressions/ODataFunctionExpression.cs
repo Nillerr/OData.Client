@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace OData.Client.Expressions
 {
     /// <summary>
@@ -16,23 +18,29 @@ namespace OData.Client.Expressions
     /// </example>
     public class ODataFunctionExpression : IODataLogicalOperand, IODataFilterExpression, IODataLambdaBody
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ODataFunctionExpression"/> class.
+        /// </summary>
+        /// <param name="function">The function to apply.</param>
+        /// <param name="arguments">The arguments of the function invocation.</param>
         public ODataFunctionExpression(
             IODataFunction function,
-            IODataFunctionTarget target,
-            IODataFunctionArgument argument
+            params IODataFunctionArgument[] arguments
         )
         {
             Function = function;
-            Target = target;
-            Argument = argument;
+            Arguments = arguments;
         }
 
         /// <summary>
         /// The name of the function.
         /// </summary>
         public IODataFunction Function { get; }
-        public IODataFunctionTarget Target { get; }
-        public IODataFunctionArgument Argument { get; }
+        
+        /// <summary>
+        /// The arguments of the function invocation.
+        /// </summary>
+        public IODataFunctionArgument[] Arguments { get; }
 
         public void Visit(IODataLambdaBodyVisitor visitor)
         {
@@ -51,7 +59,7 @@ namespace OData.Client.Expressions
 
         public override string ToString()
         {
-            return $"{nameof(Function)}: {Function}, {nameof(Target)}: {Target}, {nameof(Argument)}: {Argument}";
+            return $"{nameof(Function)}: {Function}, {nameof(Arguments)}: {string.Join(",", Arguments.Select(argument => argument.ToString()))}";
         }
     }
 }

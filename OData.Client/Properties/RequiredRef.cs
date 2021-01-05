@@ -12,20 +12,35 @@ namespace OData.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="RequiredRef{TEntity,TOther}"/> class.
         /// </summary>
+        /// <param name="prefix">The property prefix.</param>
         /// <param name="name">The property name.</param>
-        public RequiredRef(string name) => ReferenceName = name;
+        public RequiredRef(string prefix, string name)
+        {
+            Name = prefix + name;
+            ValueName = $"{prefix}_{name}_value";
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RequiredRef{TEntity,TOther}"/> class.
+        /// </summary>
+        /// <param name="name">The property name.</param>
+        public RequiredRef(string name)
+        {
+            Name = name;
+            ValueName = $"_{name}_value";
+        }
 
         /// <inheritdoc />
-        public string ReferenceName { get; }
+        public string Name { get; }
 
         /// <inheritdoc />
-        public string ValueName => $"_{ReferenceName}_value";
+        public string ValueName { get; }
 
         /// <inheritdoc />
         public string SelectableName => ValueName;
 
         /// <inheritdoc />
-        public string ExpandableName => ReferenceName;
+        public string ExpandableName => Name;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RequiredRef{TEntity,TOther}"/> class using the string as the
@@ -40,7 +55,7 @@ namespace OData.Client
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return SelectableName == other.SelectableName;
+            return Name == other.Name;
         }
 
         /// <inheritdoc />

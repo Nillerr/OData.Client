@@ -5,32 +5,50 @@ namespace OData.Client.Expressions
     /// </summary>
     public class ODataLambdaExpression : IODataFilterExpression, IODataLogicalOperand
     {
-        public ODataLambdaExpression(IRefs property, string function, IODataLambdaBody body)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ODataLambdaExpression"/> class.
+        /// </summary>
+        /// <param name="target">The target of the function.</param>
+        /// <param name="function">The name of the function.</param>
+        /// <param name="body">The body of the lambda expression.</param>
+        public ODataLambdaExpression(IRefs target, string function, IODataLambdaBody body)
         {
             Function = function;
             Body = body;
-            Property = property;
+            Target = target;
         }
 
-        public IRefs Property;
+        /// <summary>
+        /// The target of the function.
+        /// </summary>
+        public IRefs Target;
 
+        /// <summary>
+        /// The name of the function.
+        /// </summary>
         public string Function { get; }
 
+        /// <summary>
+        /// The body of the lambda expression.
+        /// </summary>
         public IODataLambdaBody Body { get; }
 
+        /// <inheritdoc />
         public void Visit(IODataLogicalOperandVisitor visitor)
         {
             visitor.Visit(this);
         }
 
+        /// <inheritdoc />
         public void Visit(IODataFilterExpressionVisitor visitor)
         {
             visitor.Visit(this);
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
-            return $"{nameof(Property)}: {Property}, {nameof(Function)}: {Function}, {nameof(Body)}: {Body}";
+            return $"{nameof(Target)}: {Target}, {nameof(Function)}: {Function}, {nameof(Body)}: {Body}";
         }
     }
 }

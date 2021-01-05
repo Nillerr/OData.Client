@@ -6,7 +6,7 @@ namespace OData.Client
     /// A typed id of an entity.
     /// </summary>
     /// <typeparam name="TEntity">The type of entity this id is for.</typeparam>
-    public interface IEntityId<out TEntity> : IFormattable
+    public interface IEntityId<out TEntity>
         where TEntity : IEntity
     {
         /// <summary>

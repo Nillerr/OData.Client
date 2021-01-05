@@ -1,12 +1,9 @@
 namespace OData.Client.Expressions.Functions
 {
-    public sealed class ODataStringContainsFunction : ODataFunction
+    public sealed class ODataStringContainsFunction : IODataFunction
     {
         public static readonly ODataStringContainsFunction Instance = new();
 
-        private ODataStringContainsFunction()
-            : base("contains")
-        {
-        }
+        public string Name => "contains";
     }
 }

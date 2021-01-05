@@ -1,29 +1,51 @@
+using System;
 using OData.Client.Expressions;
 
 namespace OData.Client
 {
     public static class OptionalRefOperators
     {
-        public static Optional<TEntity, TValue> Where<TEntity, TOther, TValue>(
+        public static Required<TEntity, TValue> Where<TEntity, TOther, TValue>(
             this OptionalRef<TEntity, TOther> property,
-            IProperty<TOther, TValue> other
+            IRequired<TOther, TValue> other
         )
             where TEntity : IEntity
             where TOther : IEntity
             where TValue : notnull
         {
-            return $"{property.SelectableName}/{other.SelectableName}";
+            return $"{property.Name}/{other.Name}";
+        }
+        public static Optional<TEntity, TValue> Where<TEntity, TOther, TValue>(
+            this OptionalRef<TEntity, TOther> property,
+            IOptional<TOther, TValue> other
+        )
+            where TEntity : IEntity
+            where TOther : IEntity
+            where TValue : notnull
+        {
+            return $"{property.Name}/{other.Name}";
         }
         
-        public static Optional<TEntity, IEntityId<TValue>> Where<TEntity, TOther, TValue>(
+        public static RequiredRef<TEntity, TValue> Where<TEntity, TOther, TValue>(
             this OptionalRef<TEntity, TOther> property,
-            IRef<TOther, TValue> other
+            IRequiredRef<TOther, TValue> other
         )
             where TEntity : IEntity
             where TOther : IEntity
             where TValue : IEntity
         {
-            return $"{property.SelectableName}/{other.ValueName}";
+            return new RequiredRef<TEntity, TValue>($"{property.Name}/", other.Name);
+        }
+
+        public static OptionalRef<TEntity, TValue> Where<TEntity, TOther, TValue>(
+            this OptionalRef<TEntity, TOther> property,
+            IOptionalRef<TOther, TValue> other
+        )
+            where TEntity : IEntity
+            where TOther : IEntity
+            where TValue : IEntity
+        {
+            return new OptionalRef<TEntity, TValue>($"{property.Name}/", other.Name);
         }
 
         /// <summary>
@@ -35,11 +57,7 @@ namespace OData.Client
             where TEntity : IEntity
             where TOther : IEntity
         {
-            var valueProperty = new Optional<TEntity, TOther>(property.ValueName);
-            var left = new ODataPropertyExpression(valueProperty);
-            var right = new ODataConstantExpression(null, typeof(object));
-            var expression = new ODataBinaryExpression(left, "eq", right);
-            return new ODataFilter<TEntity>(expression);
+            return BinaryNull(property, "eq");
         }
 
         /// <summary>
@@ -51,10 +69,17 @@ namespace OData.Client
             where TEntity : IEntity
             where TOther : IEntity
         {
-            var valueProperty = new Optional<TEntity, TOther>(property.ValueName);
+            return BinaryNull(property, "ne");
+        }
+
+        private static ODataFilter<TEntity> BinaryNull<TEntity, TOther>(IOptionalRef<TEntity, TOther> property, string @operator)
+            where TEntity : IEntity
+            where TOther : IEntity
+        {
+            var valueProperty = new Optional<TEntity, Guid>(property.ValueName);
             var left = new ODataPropertyExpression(valueProperty);
-            var right = new ODataConstantExpression(null, typeof(object));
-            var expression = new ODataBinaryExpression(left, "ne", right);
+            var right = ODataConstantExpression.Null;
+            var expression = new ODataBinaryExpression(left, @operator, right);
             return new ODataFilter<TEntity>(expression);
         }
     }

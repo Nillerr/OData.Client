@@ -1,12 +1,9 @@
 namespace OData.Client.Expressions.Functions
 {
-    public sealed class ODataStringEndsWithFunction : ODataFunction
+    public sealed class ODataStringEndsWithFunction : IODataFunction
     {
         public static readonly ODataStringEndsWithFunction Instance = new();
 
-        private ODataStringEndsWithFunction()
-            : base("endswith")
-        {
-        }
+        public string Name => "endswith";
     }
 }

@@ -13,7 +13,7 @@ namespace OData.Client.Expressions.Formatting
             _valueFormatter = valueFormatter;
         }
 
-        public string PropertyPrefix { get; }
+        private string PropertyPrefix { get; }
 
         public void Visit(ODataConstantExpression expression)
         {

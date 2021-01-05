@@ -47,7 +47,7 @@ namespace OData.Client
             if (filter.Expression is not IODataLambdaBody body)
             {
                 throw new ArgumentException(
-                    $"The filter must be a valid lambda body expression, was: {filter.Expression} ({filter.Expression.GetType()})",
+                    $"The filter must be a valid lambda body expression, was: {filter.Expression.GetType()}, {filter.Expression}",
                     paramName
                 );
             }

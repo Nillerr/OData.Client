@@ -15,7 +15,7 @@ namespace OData.Client
         /// <param name="property">The property to create a copy of.</param>
         public SerializableRefProperty(IRefProperty property)
         {
-            ReferenceName = property.ReferenceName;
+            Name = property.Name;
         }
 
         /// <summary>
@@ -23,21 +23,21 @@ namespace OData.Client
         /// </summary>
         protected SerializableRefProperty(SerializationInfo info, StreamingContext context)
         {
-            ReferenceName = info.GetNonNullableString("ReferenceName");
+            Name = info.GetNonNullableString("ReferenceName");
         }
 
         /// <inheritdoc />
-        public string ReferenceName { get; }
+        public string Name { get; }
 
         /// <inheritdoc />
-        public string SelectableName => $"_{ReferenceName}_value";
+        public string SelectableName => $"_{Name}_value";
 
-        public string ExpandableName => ReferenceName;
+        public string ExpandableName => Name;
 
         /// <inheritdoc />
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue("ReferenceName", ReferenceName);
+            info.AddValue("ReferenceName", Name);
         }
     }
 }

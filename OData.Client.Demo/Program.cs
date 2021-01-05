@@ -83,17 +83,27 @@ namespace OData.Client.Demo
         {
             var accountId = Account.EntityType.ParseId("1f2a95a3-d251-e711-8107-5065f38bf3a1");
 
+            var dateTime = DateTime.Parse("2020-05-18T01:26:32Z");
+            
             var query = incidents
+                .Find()
                 .Where(
-                    Incident.CaseNumber.StartsWith("TS02")
-                    & Incident.PrimaryContact.Where(Contact.ParentCustomer).IsNotNull()
-                    & Incident.PrimaryContact.Where(Contact.ParentCustomer) == accountId
-                    & Incident.PrimaryContact.Where(Contact.EmailAddress) == "support.na@universal-robots.com"
+                    Incident.CreatedOn > dateTime
+                    // (
+                    //     Incident.PrimaryContact.References(Contact.EntityType.ParseId("4ba16049-8453-42c0-b6d4-544103c3f454"))
+                    //     | Incident.PrimaryContact == Contact.EntityType.ParseId("4ba16049-8453-42c0-b6d4-544103c3f454")
+                    // )
+                    // Incident.CaseNumber.StartsWith("TS02") &
+                    // Incident.PrimaryContact.Where(Contact.ParentCustomer) != null &
+                    // Incident.PrimaryContact.Where(Contact.ParentCustomer) == accountId &
+                    // Incident.PrimaryContact.Where(Contact.EmailAddress) == "support.na@universal-robots.com" &
+                    // Incident.Activities.Any(Activity.Contact.Where(Contact.ParentCustomer) == accountId)
+                    // Incident.Activities.Any(Activity.Contacts.Any(Contact.ParentCustomer.Where(Account.AccountId) == accountId))
                 )
-                .Select(Incident.IncidentId, Incident.Title, Incident.CaseNumber, Incident.PrimaryContact)
+                .Select(Incident.CreatedOn, Incident.Title, Incident.CaseNumber, Incident.PrimaryContact)
                 // .Expand(Incident.PrimaryContact)
-                .OrderBy(Incident.CaseNumber)
-                .Limit(3);
+                // .OrderBy(Incident.CaseNumber)
+                .Limit(1);
             
             Console.WriteLine(query);
 
@@ -106,7 +116,7 @@ namespace OData.Client.Demo
                 foreach (var incident in page)
                 {
                     var incidentId = incident.Id(Incident.IncidentId);
-                    Console.WriteLine($"[{incidentId}]: {incident.ToJson(Formatting.Indented)}");
+                    Console.WriteLine($"{incidentId}: {incident.ToJson(Formatting.Indented)}");
                 }
                 
                 Console.WriteLine();

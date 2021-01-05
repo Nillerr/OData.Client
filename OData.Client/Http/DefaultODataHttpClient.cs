@@ -44,12 +44,16 @@ namespace OData.Client
             {
                 return httpResponse;
             }
-
-            httpResponse.EnsureSuccessStatusCode();
+            
             var stringContent = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
 
             // Not 429 Too Many Requests status code
-            var message = $"The request returned an unsuccessful status code {httpResponse.StatusCode:D} {httpResponse.ReasonPhrase ?? (httpResponse.StatusCode.ToString("G"))}: {stringContent}";
+            var statusCode = httpResponse.StatusCode.ToString("D");
+            var reason = httpResponse.ReasonPhrase ?? (httpResponse.StatusCode.ToString("G"));
+            
+            var message = $"Response status does not indicate success: {statusCode} {reason}.{Environment.NewLine}" +
+                          $"{stringContent}";
+            
             throw new HttpRequestException(message, null, httpResponse.StatusCode);
         }
     }

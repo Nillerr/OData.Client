@@ -12,17 +12,32 @@ namespace OData.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="Refs{TEntity,TOther}"/> class.
         /// </summary>
+        /// <param name="prefix">The property prefix.</param>
         /// <param name="name">The property name.</param>
-        public Refs(string name) => ReferenceName = name;
+        public Refs(string prefix, string name)
+        {
+            Name = prefix + name;
+            SelectableName = $"{prefix}_{name}_value";
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Refs{TEntity,TOther}"/> class.
+        /// </summary>
+        /// <param name="name">The property name.</param>
+        public Refs(string name)
+        {
+            Name = name;
+            SelectableName = $"_{name}_value";
+        }
 
         /// <inheritdoc />
-        public string ReferenceName { get; }
+        public string Name { get; }
 
         /// <inheritdoc />
-        public string SelectableName => $"_{ReferenceName}_value";
+        public string SelectableName { get; }
 
         /// <inheritdoc />
-        public string ExpandableName => ReferenceName;
+        public string ExpandableName => Name;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Refs{TEntity,TOther}"/> class using the string as the property

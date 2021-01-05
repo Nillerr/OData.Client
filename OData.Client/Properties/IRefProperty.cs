@@ -8,9 +8,9 @@ namespace OData.Client
     public interface IRefProperty : ISelectableProperty, IExpandableProperty
     {
         /// <summary>
-        /// Name of the expandable name.
+        /// Name of the property.
         /// </summary>
-        string ReferenceName { get; }
+        string Name { get; }
     }
     
     /// <summary>

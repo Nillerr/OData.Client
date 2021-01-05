@@ -11,6 +11,7 @@ namespace OData.Client.Demo
         public static readonly Required<Incident, string> ETag = "@odata.etag";
         
         public static readonly Required<Incident, IEntityId<Incident>> IncidentId = "incidentid";
+        public static readonly Required<Incident, DateTime> CreatedOn = "createdon";
         public static readonly Required<Incident, string> Title = "title";
         public static readonly Optional<Incident, string> CaseNumber = "c2rur_urcasenumber";
         public static readonly Required<Incident, double> DoubleValue = "dbler";

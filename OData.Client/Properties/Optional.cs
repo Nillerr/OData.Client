@@ -43,7 +43,7 @@ namespace OData.Client
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return SelectableName == other.SelectableName;
+            return Name == other.Name;
         }
 
         /// <inheritdoc />
