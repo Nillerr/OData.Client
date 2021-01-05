@@ -9,6 +9,11 @@ namespace OData.Client
         where TEntity : IEntity
         where TOther : IEntity
     {
-        IProperty<TEntity, IEntityId<TOther>> Value();
+        /// <summary>
+        /// Returns the name of the single-value navigation property as is is used in <c>$select=</c> expressions,
+        /// meaning it will be reformatted as: <c>"_{property.Name}_value"</c>.
+        /// </summary>
+        /// <returns>The value-name of the property.</returns>
+        string ValueName { get; }
     }
 }

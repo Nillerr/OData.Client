@@ -23,7 +23,7 @@ namespace OData.Client
             where TOther : IEntity
             where TValue : IEntity
         {
-            return $"{property.SelectableName}/{other.ValueName()}";
+            return $"{property.SelectableName}/{other.ValueName}";
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace OData.Client
             where TEntity : IEntity
             where TOther : IEntity
         {
-            var valueProperty = property.Value();
+            var valueProperty = new Optional<TEntity, TOther>(property.ValueName);
             var left = new ODataPropertyExpression(valueProperty);
             var right = new ODataConstantExpression(null, typeof(object));
             var expression = new ODataBinaryExpression(left, "eq", right);
@@ -51,7 +51,7 @@ namespace OData.Client
             where TEntity : IEntity
             where TOther : IEntity
         {
-            var valueProperty = property.Value();
+            var valueProperty = new Optional<TEntity, TOther>(property.ValueName);
             var left = new ODataPropertyExpression(valueProperty);
             var right = new ODataConstantExpression(null, typeof(object));
             var expression = new ODataBinaryExpression(left, "ne", right);

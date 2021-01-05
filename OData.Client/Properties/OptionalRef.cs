@@ -19,7 +19,10 @@ namespace OData.Client
         public string ReferenceName { get; }
 
         /// <inheritdoc />
-        public string SelectableName => $"_{ReferenceName}_value";
+        public string ValueName => $"_{ReferenceName}_value";
+
+        /// <inheritdoc />
+        public string SelectableName => ValueName;
 
         /// <inheritdoc />
         public string ExpandableName => ReferenceName;
@@ -39,9 +42,6 @@ namespace OData.Client
             if (ReferenceEquals(this, other)) return true;
             return SelectableName == other.SelectableName;
         }
-
-        /// <inheritdoc />
-        public IProperty<TEntity, IEntityId<TOther>> Value() => new Optional<TEntity, IEntityId<TOther>>(SelectableName);
 
         /// <inheritdoc />
         public override bool Equals(object? obj) => obj is IRef<TEntity, TOther> other && Equals(other);

@@ -145,7 +145,7 @@ namespace OData.Client.Json.Net
         /// <inheritdoc />
         public bool ContainsReference<TOther>(IRef<TEntity, TOther> property) where TOther : IEntity
         {
-            var propertyName = property.ValueName();
+            var propertyName = property.ValueName;
             return _root[propertyName] != null;
         }
 
@@ -156,7 +156,7 @@ namespace OData.Client.Json.Net
             out IEntityId<TOther> id
         ) where TOther : IEntity
         {
-            var propertyName = property.ValueName();
+            var propertyName = property.ValueName;
             if (_root.TryGetValue(propertyName, out var token))
             {
                 var value = token.Value<string>();
