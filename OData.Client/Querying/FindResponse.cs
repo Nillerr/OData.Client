@@ -17,20 +17,17 @@ namespace OData.Client
         /// <param name="context">The context as it is returned by the API.</param>
         /// <param name="nextLink">The link for fetching the next page, or <see langword="null"/> if no more pages are available.</param>
         /// <param name="value">The entities matching the query.</param>
-        /// <param name="request">The original request.</param>
         public FindResponse(
             IEntityType<TEntity> entityType,
             Uri context,
             Uri? nextLink,
-            IReadOnlyList<IEntity<TEntity>> value,
-            IODataFindRequest<TEntity> request
+            IReadOnlyList<IEntity<TEntity>> value
         )
         {
             EntityType = entityType;
             Context = context;
             NextLink = nextLink;
             Value = value;
-            Request = request;
         }
 
         /// <inheritdoc />
@@ -44,8 +41,5 @@ namespace OData.Client
 
         /// <inheritdoc />
         public IReadOnlyList<IEntity<TEntity>> Value { get; }
-
-        /// <inheritdoc />
-        public IODataFindRequest<TEntity> Request { get; }
     }
 }

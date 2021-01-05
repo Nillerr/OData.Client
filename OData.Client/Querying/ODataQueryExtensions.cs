@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,6 +11,92 @@ namespace OData.Client
     /// </summary>
     public static class ODataQueryExtensions
     {
+        /// <summary>
+        /// Applies pagination to the query and returns a list of entities matching the query.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="maxPageSize">The maximum page size.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <typeparam name="TEntity">The type of entity.</typeparam>
+        /// <returns>An async enumerable of pages returned by the query.</returns>
+        public static async IAsyncEnumerable<IList<IEntity<TEntity>>> Pages<TEntity>(
+            this IODataQuery<TEntity> query,
+            int maxPageSize,
+            [EnumeratorCancellation] CancellationToken cancellationToken = default
+        )
+            where TEntity : IEntity
+        {
+            var buffer = new IEntity<TEntity>[maxPageSize];
+
+            var index = 0;
+            await foreach (var entity in query.MaxPageSize(maxPageSize).WithCancellation(cancellationToken))
+            {
+                buffer[index] = entity;
+                index++;
+
+                if (index == maxPageSize)
+                {
+                    var page = new IEntity<TEntity>[maxPageSize];
+                    Array.Copy(buffer, 0, page, 0, maxPageSize);
+                    
+                    yield return page;
+                    
+                    index = 0;
+                }
+            }
+
+            if (index == maxPageSize)
+            {
+                yield return buffer;
+            }
+            else if (index > 0)
+            {
+                var lastPage = new ArraySegment<IEntity<TEntity>>(buffer, 0, index);
+                yield return lastPage;
+            }
+        }
+
+        /// <summary>
+        /// Applies pagination to the query and returns a list of entities matching the query.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="maxPageSize">The maximum page size.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <typeparam name="TEntity">The type of entity.</typeparam>
+        /// <returns>An async enumerable of pages returned by the query.</returns>
+        public static async IAsyncEnumerable<IList<IEntity<TEntity>>> FastPages<TEntity>(
+            this IODataQuery<TEntity> query,
+            int maxPageSize,
+            [EnumeratorCancellation] CancellationToken cancellationToken = default
+        )
+            where TEntity : IEntity
+        {
+            var page = new IEntity<TEntity>[maxPageSize];
+
+            var index = 0;
+            await foreach (var entity in query.MaxPageSize(maxPageSize).WithCancellation(cancellationToken))
+            {
+                page[index] = entity;
+                index++;
+
+                if (index == maxPageSize)
+                {
+                    yield return page;
+                    index = 0;
+                }
+            }
+
+            if (index == maxPageSize)
+            {
+                yield return page;
+            }
+            else if (index > 0)
+            {
+                var lastPage = new ArraySegment<IEntity<TEntity>>(page, 0, index);
+                yield return lastPage;
+            }
+        }
+
         /// <summary>
         /// Returns an array of all entities matching the query.
         /// </summary>

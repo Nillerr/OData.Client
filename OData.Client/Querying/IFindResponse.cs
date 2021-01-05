@@ -29,10 +29,5 @@ namespace OData.Client
         /// The entities returned by this find request.
         /// </summary>
         IReadOnlyList<IEntity<TEntity>> Value { get; }
-        
-        /// <summary>
-        /// The original request.
-        /// </summary>
-        IODataFindRequest<TEntity> Request { get; }
     }
 }

@@ -93,14 +93,23 @@ namespace OData.Client.Demo
                 .Select(Incident.IncidentId, Incident.Title, Incident.CaseNumber, Incident.PrimaryContact.Value())
                 // .Expand(Incident.PrimaryContact)
                 .OrderBy(Incident.CaseNumber)
-                .MaxPageSize(2);
-
+                .Limit(3);
+            
             Console.WriteLine(query);
 
-            await foreach (var incident in query.Take(2))
+            var pageNumber = 0;
+            await foreach (var page in query.FastPages(2))
             {
-                var incidentId = incident.Id(Incident.IncidentId);
-                Console.WriteLine($"[{incidentId}]: {incident.ToJson(Formatting.Indented)}");
+                pageNumber++;
+                Console.WriteLine($"Fetched page #{pageNumber}");
+                
+                foreach (var incident in page)
+                {
+                    var incidentId = incident.Id(Incident.IncidentId);
+                    Console.WriteLine($"[{incidentId}]: {incident.ToJson(Formatting.Indented)}");
+                }
+                
+                Console.WriteLine();
             }
         }
     }

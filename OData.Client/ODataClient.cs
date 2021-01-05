@@ -102,13 +102,14 @@ namespace OData.Client
             
             await using var stream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
 
-            var response = await _entitySerializer.DeserializeFindResponseAsync(stream, request, type);
+            var response = await _entitySerializer.DeserializeFindResponseAsync(stream, type);
             return response;
         }
 
         /// <inheritdoc />
         public async Task<IFindResponse<TEntity>?> FindNextAsync<TEntity>(
             IFindResponse<TEntity> current,
+            ODataFindNextRequest<TEntity> request,
             CancellationToken cancellationToken = default
         ) where TEntity : IEntity
         {
@@ -117,8 +118,6 @@ namespace OData.Client
             {
                 return null;
             }
-            
-            var request = current.Request;
             
             ValueTask<HttpRequestMessage> CreateRequest()
             {
@@ -131,22 +130,22 @@ namespace OData.Client
             
             await using var stream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
 
-            var response = await _entitySerializer.DeserializeFindResponseAsync(stream, request, current.EntityType);
+            var response = await _entitySerializer.DeserializeFindResponseAsync(stream, current.EntityType);
             return response;
         }
 
         private static HttpRequestMessage CreateFindRequest<TEntity>(
             HttpMethod method,
             Uri requestUri,
-            IODataFindRequest<TEntity> request
+            IODataFindRequestHeaders<TEntity> headers
         )
             where TEntity : IEntity
         {
             var httpRequest = CreateDefaultRequest(method, requestUri);
             
-            if (request.MaxPageSize.HasValue)
+            if (headers.MaxPageSize.HasValue)
             {
-                httpRequest.Headers.Add("Prefer", $"odata.maxpagesize={request.MaxPageSize.Value}");
+                httpRequest.Headers.Add("Prefer", $"odata.maxpagesize={headers.MaxPageSize.Value}");
             }
             
             return httpRequest;

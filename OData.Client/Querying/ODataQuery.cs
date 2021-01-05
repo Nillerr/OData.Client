@@ -16,6 +16,8 @@ namespace OData.Client
         private ODataFilter<TEntity>? _filter;
 
         private int? _maxPageSize;
+        private int? _limit;
+        private int? _offset;
         
         private readonly IEntityType<TEntity> _entityType;
         private readonly IODataClient _oDataClient;
@@ -122,28 +124,69 @@ namespace OData.Client
         }
 
         /// <inheritdoc />
+        public IODataQuery<TEntity> Offset(int? count)
+        {
+            _offset = count;
+            return this;
+        }
+
+        /// <inheritdoc />
+        public IODataQuery<TEntity> Limit(int? count)
+        {
+            _limit = count;
+            return this;
+        }
+
+        /// <inheritdoc />
         public async IAsyncEnumerator<IEntity<TEntity>> GetAsyncEnumerator(
             CancellationToken cancellationToken = default
         )
         {
             var request = CreateFindRequest();
 
-            IFindResponse<TEntity>? response = await _oDataClient.FindAsync(_entityType, request, cancellationToken);
-            while (response != null)
+            var currentCount = 0;
+            
+            IFindResponse<TEntity>? currentResponse = await _oDataClient.FindAsync(_entityType, request, cancellationToken);
+            while (currentResponse != null)
             {
-                foreach (var entity in response.Value)
+                if (currentCount < _offset)
                 {
-                    yield return entity;
+                    continue;
                 }
                 
-                response = await _oDataClient.FindNextAsync(response, cancellationToken);
+                foreach (var entity in currentResponse.Value)
+                {
+                    yield return entity;
+                    currentCount++;
+
+                    if (currentCount == _limit)
+                    {
+                        yield break;
+                    }
+                }
+
+                var nextRequest = CreateFindNextRequest(currentCount);
+                currentResponse = await _oDataClient.FindNextAsync(currentResponse, nextRequest, cancellationToken);
             }
         }
 
         private ODataFindRequest<TEntity> CreateFindRequest()
         {
-            var request = new ODataFindRequest<TEntity>(_filter, _selection, _expansions, _sorting, _maxPageSize);
+            var maxPageSize = MinimumMaxPageSize(0);
+            var request = new ODataFindRequest<TEntity>(_filter, _selection, _expansions, _sorting, maxPageSize);
             return request;
+        }
+
+        private ODataFindNextRequest<TEntity> CreateFindNextRequest(int currentCount)
+        {
+            var maxPageSize = MinimumMaxPageSize(currentCount);
+            var request = new ODataFindNextRequest<TEntity>(maxPageSize);
+            return request;
+        }
+
+        private int? MinimumMaxPageSize(int currentCount)
+        {
+            return _limit - currentCount < _maxPageSize ? _limit - currentCount : _maxPageSize;
         }
 
         /// <inheritdoc />
@@ -152,7 +195,12 @@ namespace OData.Client
             var request = CreateFindRequest();
             var queryString = request.ToQueryString(_valueFormatter, QueryStringFormatting.None);
 
-            return $"{Environment.NewLine}Expression: {queryString}{Environment.NewLine}MaxPageSize: {_maxPageSize}";
+            var expression = (queryString == string.Empty ? "<empty>" : queryString);
+            var maxPageSize = _maxPageSize?.ToString() ?? "<empty>";
+            
+            return $"Expression: {expression}" +
+                   $"{Environment.NewLine}" +
+                   $"MaxPageSize: {maxPageSize}";
         }
     }
 }

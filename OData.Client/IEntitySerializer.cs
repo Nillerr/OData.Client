@@ -13,13 +13,11 @@ namespace OData.Client
         /// <see cref="IFindResponse{TEntity}"/>.
         /// </summary>
         /// <param name="stream">The UTF-8 encoded stream.</param>
-        /// <param name="request">The request that resulted in the response.</param>
         /// <param name="entityType">The entity type.</param>
         /// <typeparam name="TEntity">The type of entity.</typeparam>
         /// <returns>The deserialized find response.</returns>
         ValueTask<IFindResponse<TEntity>> DeserializeFindResponseAsync<TEntity>(
             Stream stream,
-            IODataFindRequest<TEntity> request,
             IEntityType<TEntity> entityType
         ) where TEntity : IEntity;
 

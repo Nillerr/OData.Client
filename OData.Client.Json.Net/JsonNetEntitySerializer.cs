@@ -42,7 +42,6 @@ namespace OData.Client.Json.Net
         /// <inheritdoc />
         public ValueTask<IFindResponse<TEntity>> DeserializeFindResponseAsync<TEntity>(
             Stream stream,
-            IODataFindRequest<TEntity> request,
             IEntityType<TEntity> entityType
         )
             where TEntity : IEntity
@@ -62,7 +61,7 @@ namespace OData.Client.Json.Net
             var values = root.GetValue<JArray>("value", _serializer);
             var value = ToEntities(values, entityType);
             
-            var response = new FindResponse<TEntity>(entityType, context, nextLink, value, request);
+            var response = new FindResponse<TEntity>(entityType, context, nextLink, value);
             return ValueTask.FromResult<IFindResponse<TEntity>>(response);
         }
         

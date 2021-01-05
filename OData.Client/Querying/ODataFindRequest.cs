@@ -2,8 +2,25 @@ using System.Collections.Generic;
 
 namespace OData.Client
 {
+    public interface IODataFindRequestHeaders<TEntity>
+        where TEntity : IEntity
+    {
+        int? MaxPageSize { get; }
+    }
+    public sealed class ODataFindNextRequest<TEntity> : IODataFindRequestHeaders<TEntity>
+        where TEntity : IEntity
+    {
+        public ODataFindNextRequest(int? maxPageSize)
+        {
+            MaxPageSize = maxPageSize;
+        }
+
+        public int? MaxPageSize { get; }
+    }
+    
     /// <inheritdoc />
-    public sealed class ODataFindRequest<TEntity> : IODataFindRequest<TEntity> where TEntity : IEntity
+    public sealed class ODataFindRequest<TEntity> : IODataFindRequest<TEntity>, IODataFindRequestHeaders<TEntity>
+        where TEntity : IEntity
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataFindRequest{TEntity}"/> class.
@@ -43,6 +60,4 @@ namespace OData.Client
         /// <inheritdoc />
         public int? MaxPageSize { get; }
     }
-    
-    
 }

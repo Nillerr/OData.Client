@@ -99,5 +99,23 @@ namespace OData.Client
         /// <param name="maxPageSize">The maximum page size.</param>
         /// <returns>This query instance.</returns>
         IODataQuery<TEntity> MaxPageSize(int? maxPageSize);
+
+        /// <summary>
+        /// Skips the specified number of results returned by the query.
+        /// </summary>
+        /// <param name="count">The number of results to return.</param>
+        /// <returns>This query instance.</returns>
+        /// <remarks>
+        /// Regardless of the number of results to skip, the same number of requests will be made, as the skipping
+        /// occurs in the process.
+        /// </remarks>
+        IODataQuery<TEntity> Offset(int? count);
+
+        /// <summary>
+        /// Limits the number of results returned by the query.
+        /// </summary>
+        /// <param name="count">The number of results to return.</param>
+        /// <returns>This query instance.</returns>
+        IODataQuery<TEntity> Limit(int? count);
     }
 }

@@ -39,11 +39,13 @@ namespace OData.Client
         /// Returns the next page of entities from a previous call to <see cref="FindAsync{TEntity}"/>.
         /// </summary>
         /// <param name="current">The previous returned page.</param>
+        /// <param name="request">The request.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <typeparam name="TEntity">The type of entity.</typeparam>
         /// <returns>The next page of entities.</returns>
         Task<IFindResponse<TEntity>?> FindNextAsync<TEntity>(
             IFindResponse<TEntity> current,
+            ODataFindNextRequest<TEntity> request,
             CancellationToken cancellationToken = default
         )
             where TEntity : IEntity;
