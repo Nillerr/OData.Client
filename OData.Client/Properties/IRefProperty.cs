@@ -5,15 +5,19 @@ namespace OData.Client
     /// <summary>
     /// A navigation property of an entity.
     /// </summary>
-    public interface IRefProperty : IProperty
+    public interface IRefProperty : ISelectableProperty, IExpandableProperty
     {
+        /// <summary>
+        /// Name of the expandable name.
+        /// </summary>
+        string ReferenceName { get; }
     }
     
     /// <summary>
     /// A navigation property of a specific entity.
     /// </summary>
     /// <typeparam name="TEntity">The type of entity.</typeparam>
-    public interface IRefProperty<out TEntity> : IRefProperty, IProperty<TEntity>
+    public interface IRefProperty<[UsedImplicitly] out TEntity> : IRefProperty, ISelectableProperty<TEntity>, IExpandableProperty<TEntity>
         where TEntity : IEntity
     {
     }

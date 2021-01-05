@@ -116,7 +116,7 @@ namespace OData.Client
         /// Tries to get the id of the referenced entity with the specified navigation <paramref name="property"/>.
         /// </summary>
         /// <param name="property">The navigation property.</param>
-        /// <param name="other"></param>
+        /// <param name="other">The referenced entity type.</param>
         /// <param name="id">The referenced entity id.</param>
         /// <typeparam name="TOther">The referenced entity type.</typeparam>
         /// <returns><see langword="true"/> if a value was successfully retrieved; otherwise, <see langword="false"/>.</returns>
@@ -131,6 +131,7 @@ namespace OData.Client
         /// Gets the id of the entity using the specified <paramref name="property"/>.
         /// </summary>
         /// <param name="property">The property.</param>
+        /// <param name="other">The referenced entity type.</param>
         /// <returns>The converted value.</returns>
         IEntityId<TOther>? Reference<TOther>(IOptionalRef<TEntity, TOther> property, IEntityType<TOther> other)
             where TOther : IEntity;

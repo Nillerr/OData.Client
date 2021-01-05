@@ -34,6 +34,12 @@ namespace OData.Client
         public string Name { get; }
 
         /// <inheritdoc />
+        public string SortableName => Name;
+
+        /// <inheritdoc />
+        public string SelectableName => Name;
+
+        /// <inheritdoc />
         public Type ValueType { get; }
 
         /// <inheritdoc />

@@ -5,6 +5,16 @@ namespace OData.Client
 {
     internal static class SerializationInfoExtensions
     {
+        public static void AddRefProperty(this SerializationInfo info, string name, IRefProperty property)
+        {
+            info.AddValue(name, new SerializableRefProperty(property));
+        }
+
+        public static IRefProperty GetNonNullableRefProperty(this SerializationInfo info, string name)
+        {
+            return info.GetNonNullableValue<SerializableRefProperty>(name);
+        }
+        
         public static void AddProperty(this SerializationInfo info, string name, IProperty property)
         {
             info.AddValue(name, new SerializableProperty(property));

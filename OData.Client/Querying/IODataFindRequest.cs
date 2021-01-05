@@ -6,7 +6,7 @@ namespace OData.Client
     /// A request object to use when querying for entities.
     /// </summary>
     /// <typeparam name="TEntity">The type of entity to query.</typeparam>
-    public interface IODataFindRequest<TEntity>
+    public interface IODataFindRequest<TEntity> : IODataFindRequestHeaders<TEntity>
         where TEntity : IEntity
     {
         /// <summary>
@@ -17,7 +17,7 @@ namespace OData.Client
         /// <summary>
         /// The selection to apply.
         /// </summary>
-        IEnumerable<IProperty<TEntity>> Selection { get; }
+        IEnumerable<ISelectableProperty<TEntity>> Selection { get; }
         
         /// <summary>
         /// The expansions to apply.
@@ -28,10 +28,5 @@ namespace OData.Client
         /// The sorting to apply.
         /// </summary>
         IEnumerable<Sorting<TEntity>> Sorting { get; }
-        
-        /// <summary>
-        /// The maximum number of results per page.
-        /// </summary>
-        int? MaxPageSize { get; }
     }
 }

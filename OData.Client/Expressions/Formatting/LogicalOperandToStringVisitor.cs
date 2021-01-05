@@ -49,7 +49,7 @@ namespace OData.Client.Expressions.Formatting
             var visitor = new LambdaBodyToStringVisitor("o", _valueFormatter);
             expression.Body.Visit(visitor);
             
-            _stringBuilder.Append($"{expression.Property.Name}/{expression.Function}(o:{visitor})");
+            _stringBuilder.Append($"{expression.Property.ReferenceName}/{expression.Function}(o:{visitor})");
         }
 
         public void Visit(ODataLogicalExpression expression)

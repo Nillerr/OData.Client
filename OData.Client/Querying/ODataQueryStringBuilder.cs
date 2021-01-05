@@ -38,7 +38,7 @@ namespace OData.Client
         )
             where TEntity : IEntity
         {
-            var expandedProperties = expansions.Select(expand => expand.Property.Name).Distinct();
+            var expandedProperties = expansions.Select(expand => expand.Property.ExpandableName).Distinct();
             var expandString = string.Join(",", expandedProperties);
             if (expandString != string.Empty)
             {
@@ -49,12 +49,12 @@ namespace OData.Client
 
         public static void AddSelection<TEntity>(
             this List<string> queryStringParts,
-            IEnumerable<IProperty<TEntity>> selection,
+            IEnumerable<ISelectableProperty<TEntity>> selection,
             QueryStringFormatting formatting
         )
             where TEntity : IEntity
         {
-            var selectedProperties = selection.Select(select => select.SelectableName()).Distinct();
+            var selectedProperties = selection.Select(select => select.SelectableName).Distinct();
             var selectionString = string.Join(",", selectedProperties);
             if (selectionString != string.Empty)
             {
@@ -71,7 +71,7 @@ namespace OData.Client
             where TEntity : IEntity
         {
             var selectedSorting = sorting
-                .Select(sort => $"{sort.Property.SelectableName()} {sort.Direction.ToQueryPart()}");
+                .Select(sort => $"{sort.Property.SortableName} {sort.Direction.ToQueryPart()}");
             
             var orderByString = string.Join(",", selectedSorting);
             if (orderByString != string.Empty)

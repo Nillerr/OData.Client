@@ -5,14 +5,14 @@ namespace OData.Client.Expressions
     /// </summary>
     public class ODataLambdaExpression : IODataFilterExpression, IODataLogicalOperand
     {
-        public ODataLambdaExpression(IProperty property, string function, IODataLambdaBody body)
+        public ODataLambdaExpression(IRefs property, string function, IODataLambdaBody body)
         {
             Function = function;
             Body = body;
             Property = property;
         }
 
-        public IProperty Property;
+        public IRefs Property;
 
         public string Function { get; }
 

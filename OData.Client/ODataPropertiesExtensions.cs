@@ -44,7 +44,7 @@ namespace OData.Client
             where TEntity : IEntity
             where TOther : IEntity
         {
-            return $"_{property.Name}_value";
+            return $"_{property.SelectableName}_value";
         }
 
         internal static HttpContent ToHttpContent<TEntity>(this IODataProperties<TEntity> properties) where TEntity : IEntity
@@ -63,32 +63,6 @@ namespace OData.Client
             content.Headers.ContentType = mediaType;
             
             return content;
-        }
-
-        /// <summary>
-        /// Returns the name of the property as it is used in <c>$filter=</c> and <c>$select=</c> expressions, meaning
-        /// if the property is a single-value navigation property, it will be reformatted as: <c>"_{property.Name}_value"</c>. 
-        /// </summary>
-        /// <param name="property">The property.</param>
-        /// <returns>The usable name of the property.</returns>
-        internal static string SelectableName(this IProperty property)
-        {
-            if (property.ValueType.IsAssignableTo(typeof(IEntity)))
-            {
-                return $"_{property.Name}_value";
-            }
-
-            // if (property.ValueType.IsEnumerableType(out var valueType))
-            // {
-            //     return property.Name;
-            // }
-
-            return property.Name;
-        }
-
-        internal static string ValueName(this IRefProperty property)
-        {
-            return $"_{property.Name}_value";
         }
     }
 }

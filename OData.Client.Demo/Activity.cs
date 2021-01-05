@@ -5,6 +5,6 @@ namespace OData.Client.Demo
         public static readonly EntityType<Activity> EntityType = "activities";
 
         public static readonly Required<Activity, IEntityId<Activity>> ActivityId = "activityid";
-        public static readonly Required<Activity, Contact> Contact = "contact";
+        public static readonly RequiredRef<Activity, Contact> Contact = "contact";
     }
 }

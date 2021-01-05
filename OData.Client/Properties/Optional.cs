@@ -19,6 +19,12 @@ namespace OData.Client
         public string Name { get; }
 
         /// <inheritdoc />
+        public string SelectableName => Name;
+
+        /// <inheritdoc />
+        public string SortableName => Name;
+
+        /// <inheritdoc />
         public Type ValueType => typeof(TValue);
 
         /// <inheritdoc />
@@ -37,7 +43,7 @@ namespace OData.Client
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Name == other.Name;
+            return SelectableName == other.SelectableName;
         }
 
         /// <inheritdoc />
@@ -47,7 +53,7 @@ namespace OData.Client
         /// Returns a hash code for this instance.
         /// </summary>
         /// <returns>The hash code for this instance.</returns>
-        public override int GetHashCode() => Name.GetHashCode();
+        public override int GetHashCode() => SelectableName.GetHashCode();
 
         /// <summary>
         /// Creates a filter that checks whether the <paramref name="property"/> is equal to the
@@ -169,6 +175,6 @@ namespace OData.Client
             property.LessThanOrEqualTo(value);
 
         /// <inheritdoc />
-        public override string ToString() => $"{nameof(Name)}: {Name}";
+        public override string ToString() => $"{nameof(SelectableName)}: {SelectableName}";
     }
 }

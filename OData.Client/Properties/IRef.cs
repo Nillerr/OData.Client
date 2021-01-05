@@ -9,5 +9,6 @@ namespace OData.Client
         where TEntity : IEntity
         where TOther : IEntity
     {
+        IProperty<TEntity, IEntityId<TOther>> Value();
     }
 }

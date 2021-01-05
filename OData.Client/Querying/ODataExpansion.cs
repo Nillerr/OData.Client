@@ -6,7 +6,7 @@ namespace OData.Client
     /// <typeparam name="TEntity"></typeparam>
     public readonly struct ODataExpansion<TEntity> where TEntity : IEntity
     {
-        internal ODataExpansion(IRefProperty<TEntity> property)
+        internal ODataExpansion(IExpandableProperty<TEntity> property)
         {
             Property = property;
         }
@@ -14,12 +14,12 @@ namespace OData.Client
         /// <summary>
         /// The navigation property to expand.
         /// </summary>
-        public IRefProperty<TEntity> Property { get; }
+        public IExpandableProperty<TEntity> Property { get; }
     }
 
     public static class ODataExpansion
     {
-        public static ODataExpansion<TEntity> Create<TEntity>(IRefProperty<TEntity> property)
+        public static ODataExpansion<TEntity> Create<TEntity>(IExpandableProperty<TEntity> property)
             where TEntity : IEntity
         {
             return new ODataExpansion<TEntity>(property);

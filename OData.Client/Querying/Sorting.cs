@@ -12,7 +12,7 @@ namespace OData.Client
         /// </summary>
         /// <param name="property">The property to sort by.</param>
         /// <param name="direction">The direction to sort in.</param>
-        public Sorting(IProperty<TEntity> property, SortDirection direction)
+        public Sorting(ISortableProperty<TEntity> property, SortDirection direction)
         {
             Property = property;
             Direction = direction;
@@ -21,7 +21,7 @@ namespace OData.Client
         /// <summary>
         /// The property to sort by.
         /// </summary>
-        public IProperty<TEntity> Property { get; }
+        public ISortableProperty<TEntity> Property { get; }
         
         /// <summary>
         /// The direction to sort in.

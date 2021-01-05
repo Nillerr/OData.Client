@@ -33,7 +33,7 @@ namespace OData.Client.Json.Net
         /// <inheritdoc />
         public IEntityId<TEntity> Id(IRequired<TEntity, IEntityId<TEntity>> property)
         {
-            var propertyAsGuid = new Required<TEntity, Guid>(property.Name);
+            var propertyAsGuid = new Required<TEntity, Guid>(property.SelectableName);
             var value = this.Value(propertyAsGuid);
             var entityId = _entityType.Id(value);
             return entityId;
@@ -42,7 +42,7 @@ namespace OData.Client.Json.Net
         /// <inheritdoc />
         public bool Contains(IProperty<TEntity> property)
         {
-            return _root[property.Name] != null;
+            return _root[property.SelectableName] != null;
         }
 
         /// <inheritdoc />
@@ -50,10 +50,10 @@ namespace OData.Client.Json.Net
         {
             if (property.ValueType.IsEntityId())
             {
-                throw new ArgumentException($"The property '{property.Name}' is an entity id, and as such must use the '{nameof(JObjectEntity<TEntity>)}.{nameof(Id)}' method to retrieve the value.", nameof(property));
+                throw new ArgumentException($"The property '{property.SelectableName}' is an entity id, and as such must use the '{nameof(JObjectEntity<TEntity>)}.{nameof(Id)}' method to retrieve the value.", nameof(property));
             }
             
-            if (_root.TryGetValue(property.Name, out var token))
+            if (_root.TryGetValue(property.SelectableName, out var token))
             {
                 var reader = new JTokenReader(token);
                 value = _serializer.Deserialize<TValue>(reader);
@@ -72,13 +72,13 @@ namespace OData.Client.Json.Net
                 return value;
             }
             
-            throw new JsonSerializationException($"A property '{property.Name}' could not be found.");
+            throw new JsonSerializationException($"A property '{property.SelectableName}' could not be found.");
         }
 
         /// <inheritdoc />
         public bool TryGetEntity<TOther>(IOptionalRef<TEntity, TOther> property, IEntityType<TOther> other, out IEntity<TOther> entity) where TOther : IEntity
         {
-            if (_root.TryGetValue(property.Name, out var token))
+            if (_root.TryGetValue(property.SelectableName, out var token))
             {
                 var otherRoot = token.Value<JObject>();
                 entity = new JObjectEntity<TOther>(other, otherRoot, _serializer);
@@ -97,7 +97,7 @@ namespace OData.Client.Json.Net
                 return entity;
             }
             
-            throw new JsonSerializationException($"A property '{property.Name}' could not be found.");
+            throw new JsonSerializationException($"A property '{property.SelectableName}' could not be found.");
         }
 
         /// <inheritdoc />
@@ -108,7 +108,7 @@ namespace OData.Client.Json.Net
         ) 
             where TOther : IEntity
         {
-            if (_root.TryGetValue(property.Name, out var token))
+            if (_root.TryGetValue(property.SelectableName, out var token))
             {
                 var roots = _root.Value<JArray>(token);
                 entities = EntitiesFrom<TOther>(roots, other);
@@ -130,7 +130,7 @@ namespace OData.Client.Json.Net
                 return entities;
             }
 
-            throw new JsonSerializationException($"A property '{property.Name}' could not be found.");
+            throw new JsonSerializationException($"A property '{property.SelectableName}' could not be found.");
         }
 
         private IEnumerable<IEntity<TOther>> EntitiesFrom<TOther>(JArray roots, IEntityType<TOther> other)
@@ -177,7 +177,7 @@ namespace OData.Client.Json.Net
                 return reference;
             }
             
-            throw new JsonSerializationException($"A property '{property.Name}' could not be found.");
+            throw new JsonSerializationException($"A property '{property.SelectableName}' could not be found.");
         }
 
         /// <inheritdoc />

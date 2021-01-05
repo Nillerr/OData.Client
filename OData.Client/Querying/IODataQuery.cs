@@ -26,7 +26,8 @@ namespace OData.Client
     /// 
     /// </code>
     /// </example>
-    public interface IODataQuery<TEntity> : IAsyncEnumerable<IEntity<TEntity>> where TEntity : IEntity
+    public interface IODataQuery<TEntity> : IAsyncEnumerable<IEntity<TEntity>>
+        where TEntity : IEntity
     {
         /// <summary>
         /// Specifies a filter, appending it to any existing filters.
@@ -43,16 +44,16 @@ namespace OData.Client
         /// </summary>
         /// <param name="property">The property to select.</param>
         /// <returns>This query instance.</returns>
-        /// <seealso cref="Select(OData.Client.IProperty{TEntity}[])"/>
-        IODataQuery<TEntity> Select(IProperty<TEntity> property);
+        /// <seealso cref="Select(OData.Client.ISelectableProperty{TEntity}[])"/>
+        IODataQuery<TEntity> Select(ISelectableProperty<TEntity> property);
         
         /// <summary>
         /// Specifies properties to select.
         /// </summary>
         /// <param name="properties">The properties to select.</param>
         /// <returns>This query instance.</returns>
-        /// <seealso cref="Select(OData.Client.IProperty{TEntity})"/>
-        IODataQuery<TEntity> Select(params IProperty<TEntity>[] properties);
+        /// <seealso cref="Select(OData.Client.ISelectableProperty{TEntity})"/>
+        IODataQuery<TEntity> Select(params ISelectableProperty<TEntity>[] properties);
 
         /// <summary>
         /// Specifies a single-valued navigation property to expand.
@@ -82,7 +83,7 @@ namespace OData.Client
         /// <param name="property">The property to sort by.</param>
         /// <typeparam name="TValue">The type of value of the property.</typeparam>
         /// <returns>This query instance.</returns>
-        IODataOrderedQuery<TEntity> OrderBy<TValue>(IProperty<TEntity, TValue?> property) where TValue : IComparable;
+        IODataOrderedQuery<TEntity> OrderBy<TValue>(ISortableProperty<TEntity, TValue> property) where TValue : IComparable;
 
         /// <summary>
         /// Specifies a property to sort by in descending order.
@@ -90,7 +91,7 @@ namespace OData.Client
         /// <param name="property">The property to sort by.</param>
         /// <typeparam name="TValue">The type of value of the property.</typeparam>
         /// <returns>This query instance.</returns>
-        IODataOrderedQuery<TEntity> OrderByDescending<TValue>(IProperty<TEntity, TValue?> property) where TValue : IComparable;
+        IODataOrderedQuery<TEntity> OrderByDescending<TValue>(ISortableProperty<TEntity, TValue> property) where TValue : IComparable;
 
         /// <summary>
         /// Specifies the maximum page size for each page in the request, or <see langword="null"/> for the default

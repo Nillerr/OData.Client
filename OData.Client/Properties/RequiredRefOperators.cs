@@ -10,7 +10,7 @@ namespace OData.Client
             where TOther : IEntity
             where TValue : notnull
         {
-            return $"{property.Name}/{other.Name}";
+            return $"{property.SelectableName}/{other.SelectableName}";
         }
 
         public static Optional<TEntity, TValue> Where<TEntity, TOther, TValue>(
@@ -21,7 +21,7 @@ namespace OData.Client
             where TOther : IEntity
             where TValue : notnull
         {
-            return $"{property.Name}/{other.Name}";
+            return $"{property.SelectableName}/{other.SelectableName}";
         }
     }
 }

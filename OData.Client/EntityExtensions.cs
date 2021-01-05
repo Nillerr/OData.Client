@@ -26,7 +26,7 @@ namespace OData.Client
             where TEntity : IEntity
             where TValue : notnull
         {
-            var optional = new Optional<TEntity, TValue>(property.Name);
+            var optional = new Optional<TEntity, TValue>(property.SelectableName);
             if (source.TryGetValue(optional, out var nullable))
             {
                 value = CheckNotNull(nullable, property);
@@ -50,7 +50,7 @@ namespace OData.Client
             where TEntity : IEntity
             where TValue : notnull
         {
-            var optional = new Optional<TEntity, TValue>(property.Name);
+            var optional = new Optional<TEntity, TValue>(property.SelectableName);
             var nullable = source.Value(optional);
             return CheckNotNull(nullable, property);
         }
@@ -75,7 +75,7 @@ namespace OData.Client
             where TEntity : IEntity
             where TOther : IEntity
         {
-            var optional = new OptionalRef<TEntity, TOther>(property.Name);
+            var optional = new OptionalRef<TEntity, TOther>(property.SelectableName);
             if (source.TryGetEntity(optional, other, out var nullable))
             {
                 entity = CheckNotNull(nullable, property);
@@ -104,7 +104,7 @@ namespace OData.Client
             where TEntity : IEntity
             where TOther : IEntity
         {
-            var optional = new OptionalRef<TEntity, TOther>(property.Name);
+            var optional = new OptionalRef<TEntity, TOther>(property.SelectableName);
             var nullable = source.Entity(optional, other);
             return CheckNotNull(nullable, property);
         }
@@ -129,7 +129,7 @@ namespace OData.Client
             where TEntity : IEntity
             where TOther : IEntity
         {
-            var optional = new OptionalRef<TEntity, TOther>(property.Name);
+            var optional = new OptionalRef<TEntity, TOther>(property.SelectableName);
             if (source.TryGetReference(optional, other, out var nullable))
             {
                 id = CheckNotNull(nullable, property);
@@ -158,7 +158,7 @@ namespace OData.Client
             where TEntity : IEntity
             where TOther : IEntity
         {
-            var optional = new OptionalRef<TEntity, TOther>(property.Name);
+            var optional = new OptionalRef<TEntity, TOther>(property.SelectableName);
             var nullable = source.Reference(optional, other);
             return CheckNotNull(nullable, property);
         }
@@ -176,7 +176,26 @@ namespace OData.Client
         {
             if (value == null)
             {
-                throw new ODataNullValueException($"The value in the entity for required property '{property.Name}' was null.", property);
+                throw new ODataNullValueException($"The value in the entity for required property '{property.SelectableName}' was null.", property);
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Checks if <paramref name="value"/> is <see langword="null"/>, and if so, throws an exception.
+        /// </summary>
+        /// <param name="value">The value to check.</param>
+        /// <param name="property">The property containing the value.</param>
+        /// <typeparam name="TValue">The type of value.</typeparam>
+        /// <returns>The value.</returns>
+        /// <exception cref="ODataNullValueException"><paramref name="value"/> was <see langword="null"/>.</exception>
+        private static TValue CheckNotNull<TValue>(TValue? value, IRefProperty property)
+            where TValue : notnull
+        {
+            if (value == null)
+            {
+                throw new ODataNullRefException($"The value in the entity for required property '{property.SelectableName}' was null.", property);
             }
 
             return value;

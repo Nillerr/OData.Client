@@ -23,7 +23,7 @@ namespace OData.Client.Json.Net
         public IODataProperties<TEntity> Set<TValue>(IProperty<TEntity, TValue> property, TValue value)
         {
             var token = Token(value);
-            _root[property.Name] = token;
+            _root[property.SelectableName] = token;
             return this;
         }
 
@@ -33,7 +33,7 @@ namespace OData.Client.Json.Net
         {
             var reference = Reference(id);
             var token = JValue.CreateString(reference);
-            _root[property.Name + "@odata.bind"] = token;
+            _root[property.SelectableName + "@odata.bind"] = token;
             return this;
         }
 
@@ -53,7 +53,7 @@ namespace OData.Client.Json.Net
                 array.Add(token);
             }
 
-            _root[property.Name + "@odata.bind"] = array;
+            _root[property.SelectableName + "@odata.bind"] = array;
             return this;
         }
 

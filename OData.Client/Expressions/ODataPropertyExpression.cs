@@ -3,8 +3,8 @@ namespace OData.Client.Expressions
     /// <summary>
     /// Represents a property
     /// </summary>
-    /// <typeparam name="TEntity"></typeparam>
-    public class ODataPropertyExpression : IODataBinaryLeftOperand,
+    public class ODataPropertyExpression :
+        IODataBinaryLeftOperand,
         IODataBinaryRightOperand,
         IODataFunctionTarget 
     {

@@ -90,7 +90,7 @@ namespace OData.Client.Demo
                     & Incident.PrimaryContact.Where(Contact.ParentCustomer) == accountId
                     & Incident.PrimaryContact.Where(Contact.EmailAddress) == "support.na@universal-robots.com"
                 )
-                .Select(Incident.IncidentId, Incident.Title, Incident.CaseNumber, Incident.PrimaryContact.Value())
+                .Select(Incident.IncidentId, Incident.Title, Incident.CaseNumber, Incident.PrimaryContact)
                 // .Expand(Incident.PrimaryContact)
                 .OrderBy(Incident.CaseNumber)
                 .Limit(3);

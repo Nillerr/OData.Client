@@ -33,7 +33,8 @@ namespace OData.Client
         /// <param name="property">The property to sort by.</param>
         /// <typeparam name="TValue">The type of value of the property.</typeparam>
         /// <returns>This query instance.</returns>
-        IODataOrderedQuery<TEntity> ThenBy<TValue>(IProperty<TEntity, TValue?> property) where TValue : IComparable;
+        IODataOrderedQuery<TEntity> ThenBy<TValue>(ISortableProperty<TEntity, TValue> property)
+            where TValue : IComparable;
 
         /// <summary>
         /// Specifies another property to sort by in descending order.
@@ -41,6 +42,7 @@ namespace OData.Client
         /// <param name="property">The property to sort by.</param>
         /// <typeparam name="TValue">The type of value of the property.</typeparam>
         /// <returns>This query instance.</returns>
-        IODataOrderedQuery<TEntity> ThenByDescending<TValue>(IProperty<TEntity, TValue?> property) where TValue : IComparable;
+        IODataOrderedQuery<TEntity> ThenByDescending<TValue>(ISortableProperty<TEntity, TValue> property)
+            where TValue : IComparable;
     }
 }

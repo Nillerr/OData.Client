@@ -9,7 +9,7 @@ namespace OData.Client
     public sealed class ODataQuery<TEntity> : IODataQuery<TEntity>, IODataOrderedQuery<TEntity>
         where TEntity : IEntity
     {
-        private readonly List<IProperty<TEntity>> _selection = new();
+        private readonly List<ISelectableProperty<TEntity>> _selection = new();
         private readonly List<ODataExpansion<TEntity>> _expansions = new();
         private readonly List<Sorting<TEntity>> _sorting = new();
         
@@ -52,14 +52,14 @@ namespace OData.Client
         }
 
         /// <inheritdoc />
-        public IODataQuery<TEntity> Select(IProperty<TEntity> property)
+        public IODataQuery<TEntity> Select(ISelectableProperty<TEntity> property)
         {
             _selection.Add(property);
             return this;
         }
 
         /// <inheritdoc />
-        public IODataQuery<TEntity> Select(params IProperty<TEntity>[] properties)
+        public IODataQuery<TEntity> Select(params ISelectableProperty<TEntity>[] properties)
         {
             _selection.AddRange(properties);
             return this;
@@ -82,7 +82,7 @@ namespace OData.Client
         }
 
         /// <inheritdoc />
-        public IODataOrderedQuery<TEntity> OrderBy<TValue>(IProperty<TEntity, TValue?> property) where TValue : IComparable
+        public IODataOrderedQuery<TEntity> OrderBy<TValue>(ISortableProperty<TEntity, TValue> property) where TValue : IComparable
         {
             _sorting.Clear();
             SortBy(property, SortDirection.Ascending);
@@ -90,7 +90,7 @@ namespace OData.Client
         }
 
         /// <inheritdoc />
-        public IODataOrderedQuery<TEntity> OrderByDescending<TValue>(IProperty<TEntity, TValue?> property) where TValue : IComparable
+        public IODataOrderedQuery<TEntity> OrderByDescending<TValue>(ISortableProperty<TEntity, TValue> property) where TValue : IComparable
         {
             _sorting.Clear();
             SortBy(property, SortDirection.Descending);
@@ -98,20 +98,20 @@ namespace OData.Client
         }
 
         /// <inheritdoc />
-        public IODataOrderedQuery<TEntity> ThenBy<TValue>(IProperty<TEntity, TValue?> property) where TValue : IComparable
+        public IODataOrderedQuery<TEntity> ThenBy<TValue>(ISortableProperty<TEntity, TValue> property) where TValue : IComparable
         {
             SortBy(property, SortDirection.Ascending);
             return this;
         }
 
         /// <inheritdoc />
-        public IODataOrderedQuery<TEntity> ThenByDescending<TValue>(IProperty<TEntity, TValue?> property) where TValue : IComparable
+        public IODataOrderedQuery<TEntity> ThenByDescending<TValue>(ISortableProperty<TEntity, TValue> property) where TValue : IComparable
         {
             SortBy(property, SortDirection.Descending);
             return this;
         }
 
-        private void SortBy(IProperty<TEntity> property, SortDirection direction)
+        private void SortBy(ISortableProperty<TEntity> property, SortDirection direction)
         {
             _sorting.Add(new Sorting<TEntity>(property, direction));
         }

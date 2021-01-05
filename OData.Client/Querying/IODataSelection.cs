@@ -11,13 +11,13 @@ namespace OData.Client
         /// </summary>
         /// <param name="property">The property to select.</param>
         /// <returns>This selection builder.</returns>
-        IODataSelection<TEntity> Select(IProperty<TEntity> property);
+        IODataSelection<TEntity> Select(ISelectableProperty<TEntity> property);
 
         /// <summary>
         /// Specifies a property to expand.
         /// </summary>
         /// <param name="property">The properties to expand.</param>
         /// <returns>This selection builder.</returns>
-        IODataSelection<TEntity> Expand(IRefProperty<TEntity> property);
+        IODataSelection<TEntity> Expand(IExpandableProperty<TEntity> property);
     }
 }

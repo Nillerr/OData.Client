@@ -70,7 +70,7 @@ namespace OData.Client
             var entityUri = EntityUri(id);
 
             var requestUriBuilder = new UriBuilder(entityUri);
-            requestUriBuilder.Path += $"/{property.Name}/$ref";
+            requestUriBuilder.Path += $"/{property.SelectableName}/$ref";
 
             var requestUri = requestUriBuilder.Uri;
             return requestUri;

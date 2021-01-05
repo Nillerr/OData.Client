@@ -1,4 +1,3 @@
-using System;
 using OData.Client.Expressions;
 
 namespace OData.Client
@@ -49,29 +48,13 @@ namespace OData.Client
             where TEntity : IEntity
             where TOther : IEntity
         {
-            var refValueProperty = new RefValue<TEntity, TOther>(property);
-            var left = new ODataPropertyExpression(refValueProperty);
+            var valueProperty = property.Value();
+            var left = new ODataPropertyExpression(valueProperty);
             var right = new ODataConstantExpression(other, typeof(IEntityId<TOther>));
             var expression = new ODataBinaryExpression(left, @operator, right);
             return new ODataFilter<TEntity>(expression);
         }
 
         #endregion
-
-        private sealed class RefValue<TEntity, TValue> : IRef<TEntity, TValue>
-            where TEntity : IEntity
-            where TValue : IEntity
-        {
-            private readonly IRef<TEntity, TValue> _reference;
-
-            public RefValue(IRef<TEntity, TValue> reference)
-            {
-                _reference = reference;
-            }
-
-            public string Name => _reference.ValueName();
-            public Type ValueType => _reference.ValueType;
-            public Type EntityType => _reference.EntityType;
-        }
     }
 }

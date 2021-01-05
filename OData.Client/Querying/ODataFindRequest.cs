@@ -2,24 +2,8 @@ using System.Collections.Generic;
 
 namespace OData.Client
 {
-    public interface IODataFindRequestHeaders<TEntity>
-        where TEntity : IEntity
-    {
-        int? MaxPageSize { get; }
-    }
-    public sealed class ODataFindNextRequest<TEntity> : IODataFindRequestHeaders<TEntity>
-        where TEntity : IEntity
-    {
-        public ODataFindNextRequest(int? maxPageSize)
-        {
-            MaxPageSize = maxPageSize;
-        }
-
-        public int? MaxPageSize { get; }
-    }
-    
     /// <inheritdoc />
-    public sealed class ODataFindRequest<TEntity> : IODataFindRequest<TEntity>, IODataFindRequestHeaders<TEntity>
+    public sealed class ODataFindRequest<TEntity> : IODataFindRequest<TEntity>
         where TEntity : IEntity
     {
         /// <summary>
@@ -32,7 +16,7 @@ namespace OData.Client
         /// <param name="maxPageSize">The maximum number of results per page.</param>
         public ODataFindRequest(
             ODataFilter<TEntity>? filter,
-            IEnumerable<IProperty<TEntity>> selection,
+            IEnumerable<ISelectableProperty<TEntity>> selection,
             IEnumerable<ODataExpansion<TEntity>> expansions,
             IEnumerable<Sorting<TEntity>> sorting,
             int? maxPageSize
@@ -49,7 +33,7 @@ namespace OData.Client
         public ODataFilter<TEntity>? Filter { get; }
 
         /// <inheritdoc />
-        public IEnumerable<IProperty<TEntity>> Selection { get; }
+        public IEnumerable<ISelectableProperty<TEntity>> Selection { get; }
 
         /// <inheritdoc />
         public IEnumerable<ODataExpansion<TEntity>> Expansions { get; }

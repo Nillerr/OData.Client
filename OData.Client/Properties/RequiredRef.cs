@@ -13,16 +13,16 @@ namespace OData.Client
         /// Initializes a new instance of the <see cref="RequiredRef{TEntity,TOther}"/> class.
         /// </summary>
         /// <param name="name">The property name.</param>
-        public RequiredRef(string name) => Name = name;
+        public RequiredRef(string name) => ReferenceName = name;
 
         /// <inheritdoc />
-        public string Name { get; }
+        public string ReferenceName { get; }
 
         /// <inheritdoc />
-        public Type ValueType => typeof(TOther);
+        public string SelectableName => $"_{ReferenceName}_value";
 
         /// <inheritdoc />
-        public Type EntityType => typeof(TEntity);
+        public string ExpandableName => ReferenceName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RequiredRef{TEntity,TOther}"/> class using the string as the
@@ -37,8 +37,11 @@ namespace OData.Client
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Name == other.Name;
+            return SelectableName == other.SelectableName;
         }
+
+        /// <inheritdoc />
+        public IProperty<TEntity, IEntityId<TOther>> Value() => new Required<TEntity, IEntityId<TOther>>(this.ValueName());
 
         /// <inheritdoc />
         public override bool Equals(object? obj) => obj is IRef<TEntity, TOther> other && Equals(other);
@@ -47,7 +50,7 @@ namespace OData.Client
         /// Returns a hash code for this instance.
         /// </summary>
         /// <returns>The hash code for this instance.</returns>
-        public override int GetHashCode() => Name.GetHashCode();
+        public override int GetHashCode() => SelectableName.GetHashCode();
         
         /// <summary>
         /// Creates a filter that checks whether the <paramref name="property"/> references the
@@ -70,6 +73,6 @@ namespace OData.Client
             property.DoesNotReference(other);
 
         /// <inheritdoc />
-        public override string ToString() => $"{nameof(Name)}: {Name}";
+        public override string ToString() => $"{nameof(SelectableName)}: {SelectableName}";
     }
 }
