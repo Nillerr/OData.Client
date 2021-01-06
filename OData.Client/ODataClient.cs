@@ -462,7 +462,6 @@ namespace OData.Client
             Task<HttpRequestMessage> CreateRequest()
             {
                 var requestUri = FunctionUri(request);
-                // TODO @nije: Add $select (and $filter?)
                 var httpRequest = CreateDefaultRequest(HttpMethod.Get, requestUri);
                 return Task.FromResult(httpRequest);
             }
