@@ -1,14 +1,21 @@
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Nito.AsyncEx;
 
 namespace OData.Client
 {
-    public sealed class DefaultEntitySetNameResolver : IEntitySetNameResolver
+    public sealed class CRMEntitySetNameResolver : IEntitySetNameResolver
     {
         private readonly ConcurrentDictionary<string, AsyncLazy<IEntity<ODataEntityDefinition>>> _cache = new();
+
+        private readonly ILogger<CRMEntitySetNameResolver> _logger;
+
+        public CRMEntitySetNameResolver(ILogger<CRMEntitySetNameResolver> logger)
+        {
+            _logger = logger;
+        }
 
         /// <inheritdoc />
         public async Task<string> EntitySetNameAsync<TEntity>(
@@ -39,14 +46,20 @@ namespace OData.Client
         )
             where TEntity : IEntity
         {
+            _logger.LogDebug("Fetching entity definition for '{entityType}'...", context.EntityType.Name);
             var entityType = ODataEntityDefinition.EntityType;
             
-            var arguments = new Dictionary<string, ODataFunctionRequestArgument>();
-            arguments.Add("LogicalName", new ODataFunctionRequestArgument(context.EntityType.Name));
-            
-            var request = new ODataFunctionRequest<ODataEntityDefinition>(entityType, "EntityDefinitions", arguments);
+            var request = new ODataFunctionRequest<ODataEntityDefinition>(entityType, "EntityDefinitions");
+            request["LogicalName"] = context.EntityType.Name;
+            request.Select(ODataEntityDefinition.EntitySetName);
             
             var entityDefinition = await context.ODataClient.InvokeAsync(request, cancellationToken);
+            
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("Fetched entity definition for '{entityType}': {entityDefinition}", context.EntityType.Name, entityDefinition.ToJson(Formatting.None));
+            }
+            
             return entityDefinition;
         }
     }

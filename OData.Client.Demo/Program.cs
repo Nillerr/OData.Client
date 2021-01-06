@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using OData.Client.Json.Net;
@@ -29,6 +30,10 @@ namespace OData.Client.Demo
 
             var services = new ServiceCollection();
             services.Configure<ODataAuthenticatorSettings>(configuration.GetSection("OData").GetSection("Authenticator"));
+            services.AddLogging(options => options
+                .SetMinimumLevel(LogLevel.Trace)
+                .AddConsole()
+            );
 
             await using var serviceProvider = services.BuildServiceProvider();
 
@@ -48,23 +53,22 @@ namespace OData.Client.Demo
             var serializerSettings = new JsonSerializerSettings();
             var entitySerializer = new JsonNetEntitySerializer();
             
-            var entitySetNameResolver = new DefaultEntitySetNameResolver();
             var propertiesFactory = new JsonNetPropertiesFactory(serializerSettings);
             
             var oDataClientSettings = new ODataClientSettings(
                 organizationUri: organizationUri,
                 propertiesFactory: propertiesFactory,
                 entitySerializer: entitySerializer,
-                httpClient: oDataHttpClient
+                httpClient: oDataHttpClient,
+                loggerFactory: serviceProvider.GetRequiredService<ILoggerFactory>()
             );
-            
-            oDataClientSettings.EntitySetNameResolver = entitySetNameResolver;
             
             var oDataClient = new ODataClient(oDataClientSettings);
             var incidents = oDataClient.Collection(Incident.EntityType);
 
             // var adxPortalComments = oDataClient.Collection(AdxPortalComment.EntityType);
             // await QueryPortalComments(adxPortalComments);
+            await QueryIncidents(incidents);
             await QueryIncidents(incidents);
             // await CreateCaseAsync(incidents);
         }

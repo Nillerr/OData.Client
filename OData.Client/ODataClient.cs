@@ -6,6 +6,7 @@ using System.Net.Mime;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using OData.Client.Expressions.Formatting;
 
 namespace OData.Client
@@ -21,6 +22,7 @@ namespace OData.Client
         private readonly IODataHttpClient _oDataHttpClient;
         private readonly IValueFormatter _valueFormatter;
         private readonly IEntitySetNameResolver _entitySetNameResolver;
+        private readonly ILogger<ODataClient> _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataClient"/> with the specified <paramref name="settings"/>.
@@ -34,6 +36,7 @@ namespace OData.Client
             _oDataHttpClient = settings.HttpClient;
             _valueFormatter = settings.ValueFormatter;
             _entitySetNameResolver = settings.EntitySetNameResolver;
+            _logger = settings.LoggerFactory.CreateLogger<ODataClient>();
         }
 
         private Uri BaseUri => new Uri(_organizationUri, "api/data/v9.1/");
@@ -97,12 +100,17 @@ namespace OData.Client
             return requestUri;
         }
 
-        private Uri FunctionUri<TResult>(IODataFunctionRequest<TResult> request)
+        private Uri FunctionUri<TResult>(ODataFunctionRequest<TResult> request)
             where TResult : IEntity
         {
             var argumentPairs = request.Arguments.Select(parameter => $"{parameter.Key}={_valueFormatter.ToString(parameter.Value)}");
             var argumentsPart = string.Join(",", argumentPairs);
-            var requestUri = new Uri(BaseUri, $"{request.FunctionName}({argumentsPart})");
+            var functionUri = new Uri(BaseUri, $"{request.FunctionName}({argumentsPart})");
+            
+            var requestUriBuilder = new UriBuilder(functionUri);
+            requestUriBuilder.Query = request.ToQueryString(QueryStringFormatting.UrlEscaped);
+
+            var requestUri = requestUriBuilder.Uri;
             return requestUri;
         }
 
@@ -120,6 +128,12 @@ namespace OData.Client
         )
             where TEntity : IEntity
         {
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                var queryString = request.ToQueryString(_valueFormatter, QueryStringFormatting.None);
+                _logger.LogDebug("Querying entities of type '{entityType}' using request \"{request}\"...", type.Name, queryString);
+            }
+            
             async Task<HttpRequestMessage> CreateRequest()
             {
                 var requestUri = await FindUriAsync(type, request);
@@ -133,6 +147,14 @@ namespace OData.Client
             await using var stream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
 
             var response = await _entitySerializer.DeserializeFindResponseAsync(stream, type);
+            
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                // TODO @nije: Add ToJson() for response
+                var queryString = request.ToQueryString(_valueFormatter, QueryStringFormatting.None);
+                _logger.LogDebug("Query for entities of type '{entityType}' using request \"{request}\" returned {count} results.", type.Name, queryString, response.Value.Count);
+            }
+            
             return response;
         }
 
@@ -150,6 +172,11 @@ namespace OData.Client
                 return null;
             }
             
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("Querying the next page of entities of type '{entityType}' using request \"{requestUri}\"...", current.EntityType.Name, requestUri);
+            }
+            
             Task<HttpRequestMessage> CreateRequest()
             {
                 var httpRequest = CreateFindRequest(HttpMethod.Get, requestUri, request);
@@ -162,6 +189,12 @@ namespace OData.Client
             await using var stream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
 
             var response = await _entitySerializer.DeserializeFindResponseAsync(stream, current.EntityType);
+            
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("Query for the next page of entities of type '{entityType}' using request \"{requestUri}\" returned {count} results.", current.EntityType.Name, requestUri, response.Value.Count);
+            }
+            
             return response;
         }
 
@@ -415,11 +448,17 @@ namespace OData.Client
 
         /// <inheritdoc />
         public async Task<IEntity<TResult>> InvokeAsync<TResult>(
-            IODataFunctionRequest<TResult> request,
+            ODataFunctionRequest<TResult> request,
             CancellationToken cancellationToken = default
         )
             where TResult : IEntity
         {
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                var arguments = string.Join(",", request.Arguments.Select(kvp => $"{kvp.Key}={_valueFormatter.ToString(kvp.Value)}"));
+                _logger.LogDebug("Invoking function '{function}' with arguments ({arguments})...", request.FunctionName, arguments);
+            }
+            
             Task<HttpRequestMessage> CreateRequest()
             {
                 var requestUri = FunctionUri(request);
@@ -432,6 +471,13 @@ namespace OData.Client
                 .SendAsync(CreateRequest, cancellationToken: cancellationToken);
 
             var entity = await httpResponse.Content.ReadEntityAsync(request.EntityType, _entitySerializer, cancellationToken);
+            
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                var arguments = string.Join(",", request.Arguments.Select(kvp => $"{kvp.Key}={_valueFormatter.ToString(kvp.Value)}"));
+                _logger.LogDebug("Invocation of function '{function}' with arguments ({arguments}) returned: {result}", request.FunctionName, arguments, entity.ToJson(Formatting.None));
+            }
+            
             return entity;
         }
 
