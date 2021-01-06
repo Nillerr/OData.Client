@@ -23,7 +23,7 @@ namespace OData.Client
         }
 
         public async Task<HttpResponseMessage> SendAsync(
-            Func<ValueTask<HttpRequestMessage>> requestFactory,
+            Func<Task<HttpRequestMessage>> requestFactory,
             ODataHttpRequestOptions? options = null,
             CancellationToken cancellationToken = default
         )

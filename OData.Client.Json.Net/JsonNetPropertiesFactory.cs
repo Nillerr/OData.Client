@@ -9,37 +9,30 @@ namespace OData.Client.Json.Net
     public sealed class JsonNetPropertiesFactory : IODataPropertiesFactory
     {
         private readonly JsonSerializer _serializer;
-        private readonly IEntitySetNameResolver _entitySetNameResolver;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonNetPropertiesFactory"/> class.
         /// </summary>
-        /// <param name="entitySetNameResolver">The entity set name resolver.</param>
-        public JsonNetPropertiesFactory(IEntitySetNameResolver entitySetNameResolver)
+        public JsonNetPropertiesFactory()
         {
-            _entitySetNameResolver = entitySetNameResolver;
             _serializer = JsonSerializer.Create();
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonNetPropertiesFactory"/> class.
         /// </summary>
-        /// <param name="entitySetNameResolver">The entity set name resolver.</param>
         /// <param name="settings">The settings to be applied to the resulting <see cref="JsonSerializer"/>.</param>
-        public JsonNetPropertiesFactory(IEntitySetNameResolver entitySetNameResolver, JsonSerializerSettings settings)
+        public JsonNetPropertiesFactory(JsonSerializerSettings settings)
         {
-            _entitySetNameResolver = entitySetNameResolver;
             _serializer = JsonSerializer.Create(settings);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonNetPropertiesFactory"/> class.
         /// </summary>
-        /// <param name="entitySetNameResolver">The entity set name resolver.</param>
         /// <param name="serializer">The serializer to use.</param>
-        public JsonNetPropertiesFactory(IEntitySetNameResolver entitySetNameResolver, JsonSerializer serializer)
+        public JsonNetPropertiesFactory(JsonSerializer serializer)
         {
-            _entitySetNameResolver = entitySetNameResolver;
             _serializer = serializer;
         }
 
@@ -47,11 +40,13 @@ namespace OData.Client.Json.Net
         /// Creates a new instance of <see cref="IODataProperties{TEntity}"/> using an underlying
         /// <see cref="JObjectProperties{TEntity}"/>.
         /// </summary>
+        /// <param name="context"></param>
         /// <typeparam name="TEntity">The type of entity.</typeparam>
         /// <returns>The properties.</returns>
-        public IODataProperties<TEntity> Create<TEntity>() where TEntity : IEntity
+        public IODataProperties<TEntity> Create<TEntity>(ODataPropertiesFactoryContext<TEntity> context)
+            where TEntity : IEntity
         {
-            return new JObjectProperties<TEntity>(_serializer, _entitySetNameResolver);
+            return new JObjectProperties<TEntity>(context.ODataClient, _serializer, context.EntitySetNameResolver);
         }
     }
 }

@@ -5,6 +5,7 @@ namespace OData.Client.Expressions.Formatting
     internal class FilterExpressionToStringVisitor : IODataFilterExpressionVisitor
     {
         private readonly StringBuilder _stringBuilder = new();
+        
         private readonly IValueFormatter _valueFormatter;
 
         public FilterExpressionToStringVisitor(string propertyPrefix, IValueFormatter valueFormatter)

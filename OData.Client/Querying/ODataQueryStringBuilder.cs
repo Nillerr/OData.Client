@@ -21,9 +21,15 @@ namespace OData.Client
             }
 
             var oDataFilter = filter.Value;
+            
+            var filterExpression = oDataFilter.Expression;
+            if (filterExpression == null)
+            {
+                return;
+            }
 
             var filterVisitor = new FilterExpressionToStringVisitor(string.Empty, valueFormatter);
-            oDataFilter.Expression.Visit(filterVisitor);
+            filterExpression.Visit(filterVisitor);
 
             var filterString = filterVisitor.ToString();
             

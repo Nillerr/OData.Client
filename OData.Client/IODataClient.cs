@@ -229,5 +229,11 @@ namespace OData.Client
         )
             where TEntity : IEntity
             where TOther : IEntity;
+
+        Task<IEntity<TResult>> InvokeAsync<TResult>(
+            IODataFunctionRequest<TResult> request,
+            CancellationToken cancellationToken = default
+        )
+            where TResult : IEntity;
     }
 }

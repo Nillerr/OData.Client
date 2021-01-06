@@ -49,7 +49,7 @@ namespace OData.Client.Demo
             var entitySerializer = new JsonNetEntitySerializer();
             
             var entitySetNameResolver = new DefaultEntitySetNameResolver();
-            var propertiesFactory = new JsonNetPropertiesFactory(entitySetNameResolver, serializerSettings);
+            var propertiesFactory = new JsonNetPropertiesFactory(serializerSettings);
             
             var oDataClientSettings = new ODataClientSettings(
                 organizationUri: organizationUri,
@@ -63,9 +63,9 @@ namespace OData.Client.Demo
             var oDataClient = new ODataClient(oDataClientSettings);
             var incidents = oDataClient.Collection(Incident.EntityType);
 
-            var adxPortalComments = oDataClient.Collection(AdxPortalComment.EntityType);
-            await QueryPortalComments(adxPortalComments);
-            // await QueryIncidents(incidents);
+            // var adxPortalComments = oDataClient.Collection(AdxPortalComment.EntityType);
+            // await QueryPortalComments(adxPortalComments);
+            await QueryIncidents(incidents);
             // await CreateCaseAsync(incidents);
         }
 

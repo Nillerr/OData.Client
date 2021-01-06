@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace OData.Client
 {
@@ -32,10 +33,11 @@ namespace OData.Client
             return properties.BindAll(property, ids.AsEnumerable());
         }
 
-        internal static HttpContent ToHttpContent<TEntity>(this IODataProperties<TEntity> properties) where TEntity : IEntity
+        internal static async Task<HttpContent> ToHttpContentAsync<TEntity>(this IODataProperties<TEntity> properties)
+            where TEntity : IEntity
         {
             var propertiesStream = new MemoryStream();
-            properties.WriteTo(propertiesStream);
+            await properties.WriteToAsync(propertiesStream);
 
             var propertiesBuffer = propertiesStream.GetBuffer();
             var contentStream = new MemoryStream(propertiesBuffer, false);

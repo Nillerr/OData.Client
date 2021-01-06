@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace OData.Client
 {
@@ -56,6 +57,6 @@ namespace OData.Client
         /// Writes the properties as JSON to the specified <paramref name="stream"/>.
         /// </summary>
         /// <param name="stream">The stream</param>
-        void WriteTo(Stream stream);
+        Task WriteToAsync(Stream stream);
     }
 }

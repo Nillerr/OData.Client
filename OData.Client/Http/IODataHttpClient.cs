@@ -22,7 +22,7 @@ namespace OData.Client
         /// connectivity, DNS failure, server certificate validation or timeout, or the HTTP response message if the
         /// call is successful.</exception>
         Task<HttpResponseMessage> SendAsync(
-            [InstantHandle] Func<ValueTask<HttpRequestMessage>> requestFactory,
+            [InstantHandle] Func<Task<HttpRequestMessage>> requestFactory,
             ODataHttpRequestOptions? options = null,
             CancellationToken cancellationToken = default
         );

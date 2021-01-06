@@ -38,6 +38,7 @@ namespace OData.Client.Expressions
             visitor.Visit(this);
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return $"({Left} {Operator} {Right})";

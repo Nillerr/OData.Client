@@ -3,20 +3,26 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace OData.Client.Json.Net
 {
-    public sealed class JObjectProperties<TEntity> : IODataProperties<TEntity> where TEntity : IEntity
+    public sealed class JObjectProperties<TEntity> : IODataProperties<TEntity>
+        where TEntity : IEntity
     {
         private readonly JObject _root = new();
 
+        private readonly IODataClient _oDataClient;
         private readonly JsonSerializer _serializer;
         private readonly IEntitySetNameResolver _entitySetNameResolver;
 
-        public JObjectProperties(JsonSerializer serializer, IEntitySetNameResolver entitySetNameResolver)
+        private readonly List<Func<Task>> _asyncBinds = new();
+
+        public JObjectProperties(IODataClient oDataClient, JsonSerializer serializer, IEntitySetNameResolver entitySetNameResolver)
         {
+            _oDataClient = oDataClient;
             _serializer = serializer;
             _entitySetNameResolver = entitySetNameResolver;
         }
@@ -34,19 +40,36 @@ namespace OData.Client.Json.Net
         public IODataProperties<TEntity> Bind<TOther>(IRef<TEntity, TOther> property, IEntityId<TOther> id)
             where TOther : IEntity
         {
-            var reference = Reference(id);
-            var token = JValue.CreateString(reference);
-            _root[$"{property.SelectableName}@odata.bind"] = token;
+            _asyncBinds.Add(async () =>
+            {
+                var reference = await ReferenceAsync(id);
+                var token = JValue.CreateString(reference);
+                _root[$"{property.Name}@odata.bind"] = token;
+            });
+            
             return this;
         }
 
         /// <inheritdoc />
-        public IODataProperties<TEntity> Bind<TOther>(IRef<TEntity, IEntity> property, IEntityId<TOther> id) where TOther : IEntity
+        public IODataProperties<TEntity> Bind<TOther>(IRef<TEntity, IEntity> property, IEntityId<TOther> id)
+            where TOther : IEntity
         {
-            var reference = Reference(id);
-            var token = JValue.CreateString(reference);
-            _root[$"{property.SelectableName}_{id.Type.Name}@odata.bind"] = token;
+            _asyncBinds.Add(async () =>
+            {
+                var reference = await ReferenceAsync(id);
+                var token = JValue.CreateString(reference);
+                _root[$"{property.SelectableName}_{id.Type.Name}@odata.bind"] = token; 
+            });
+            
             return this;
+        }
+
+        private async Task<string> ReferenceAsync<TOther>(IEntityId<TOther> id) where TOther : IEntity
+        {
+            var context = ODataMetadataContext.Create(_oDataClient, id.Type);
+            var entitySetName = await _entitySetNameResolver.EntitySetNameAsync(context);
+            var reference = $"/{entitySetName}({id.Id:D})";
+            return reference;
         }
 
         /// <inheritdoc />
@@ -56,23 +79,34 @@ namespace OData.Client.Json.Net
         )
             where TOther : IEntity
         {
-            var array = new JArray();
-
-            foreach (var id in ids)
+            _asyncBinds.Add(async () =>
             {
-                var reference = Reference(id);
-                var token = JValue.CreateString(reference);
-                array.Add(token);
-            }
+                var array = new JArray();
 
-            _root[$"{property.SelectableName}@odata.bind"] = array;
+                foreach (var id in ids)
+                {
+                    var reference = await ReferenceAsync(id);
+                    var token = JValue.CreateString(reference);
+                    array.Add(token);
+                }
+
+                _root[$"{property.SelectableName}@odata.bind"] = array;
+            });
+            
             return this;
         }
 
         /// <inheritdoc />
-        public void WriteTo(Stream stream)
+        public async Task WriteToAsync(Stream stream)
         {
-            using var streamWriter = new StreamWriter(stream, Encoding.UTF8);
+            // Wait for the async references to be set
+            foreach (var asyncBind in _asyncBinds)
+            {
+                await asyncBind();
+            }
+
+            // Write to stream
+            await using var streamWriter = new StreamWriter(stream, Encoding.UTF8);
             using var jsonWriter = new JsonTextWriter(streamWriter);
 
             // TODO @nije: Remove formatting
@@ -80,14 +114,7 @@ namespace OData.Client.Json.Net
 
             _serializer.Serialize(jsonWriter, _root);
 
-            jsonWriter.Flush();
-        }
-
-        private string Reference<TOther>(IEntityId<TOther> id)
-            where TOther : IEntity
-        {
-            var entitySetName = _entitySetNameResolver.EntitySetName(id.Type);
-            return $"/{entitySetName}({id.Id:D})";
+            await jsonWriter.FlushAsync();
         }
 
         private JToken Token<TValue>(TValue value) => value switch

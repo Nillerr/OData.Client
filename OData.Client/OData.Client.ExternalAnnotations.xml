@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <assembly name="OData.Client">
-  <member name="M:OData.Client.IODataHttpClient.SendAsync(System.Func{System.Threading.Tasks.ValueTask{System.Net.Http.HttpRequestMessage}},OData.Client.ODataHttpRequestOptions,System.Threading.CancellationToken)">
+  <member name="M:OData.Client.IODataHttpClient.SendAsync(System.Func{System.Threading.Tasks.Task{System.Net.Http.HttpRequestMessage}},OData.Client.ODataHttpRequestOptions,System.Threading.CancellationToken)">
     <parameter name="requestFactory">
       <attribute ctor="M:JetBrains.Annotations.InstantHandleAttribute.#ctor" />
     </parameter>

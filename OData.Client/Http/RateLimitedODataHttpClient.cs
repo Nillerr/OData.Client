@@ -31,7 +31,7 @@ namespace OData.Client
         public DateTime RetryAt { get; private set; }
 
         public async Task<HttpResponseMessage> SendAsync(
-            Func<ValueTask<HttpRequestMessage>> requestFactory,
+            Func<Task<HttpRequestMessage>> requestFactory,
             ODataHttpRequestOptions? options = null,
             CancellationToken cancellationToken = default
         )

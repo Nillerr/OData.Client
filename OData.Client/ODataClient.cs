@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Mime;
@@ -37,16 +38,32 @@ namespace OData.Client
 
         private Uri BaseUri => new Uri(_organizationUri, "api/data/v9.1/");
 
-        private Uri CollectionUri<T>(IEntityType<T> type) where T : IEntity => new Uri(BaseUri, EntitySetName(type));
-
-        private string EntitySetName<T>(IEntityType<T> type) where T : IEntity => _entitySetNameResolver.EntitySetName(type);
-
-        private Uri EntityUri<T>(IEntityId<T> id) where T : IEntity => new Uri(BaseUri, $"{EntitySetName(id.Type)}({id.Id:D})");
-
-        private Uri FindUri<TEntity>(IEntityType<TEntity> type, ODataFindRequest<TEntity> request)
+        private async Task<Uri> CollectionUriASync<TEntity>(IEntityType<TEntity> type)
             where TEntity : IEntity
         {
-            var collectionUri = CollectionUri(type);
+            var entitySetName = await EntitySetNameAsync(type);
+            return new Uri(BaseUri, entitySetName);
+        }
+
+        private async Task<string> EntitySetNameAsync<TEntity>(IEntityType<TEntity> type)
+            where TEntity : IEntity
+        {
+            var context = new ODataMetadataContext<TEntity>(this, type);
+            var entitySetName = await _entitySetNameResolver.EntitySetNameAsync(context);
+            return entitySetName;
+        }
+
+        private async Task<Uri> EntityUriAsync<TEntity>(IEntityId<TEntity> id)
+            where TEntity : IEntity
+        {
+            var entitySetName = await EntitySetNameAsync(id.Type);
+            return new Uri(BaseUri, $"{entitySetName}({id.Id:D})");
+        }
+
+        private async Task<Uri> FindUriAsync<TEntity>(IEntityType<TEntity> type, ODataFindRequest<TEntity> request)
+            where TEntity : IEntity
+        {
+            var collectionUri = await CollectionUriASync(type);
 
             var requestUriBuilder = new UriBuilder(collectionUri);
             requestUriBuilder.Query = request.ToQueryString(_valueFormatter, QueryStringFormatting.UrlEscaped);
@@ -55,10 +72,10 @@ namespace OData.Client
             return requestUri;
         }
 
-        private Uri RetrieveUri<TEntity>(IEntityId<TEntity> id, ODataRetrieveRequest<TEntity> request)
+        private async Task<Uri> RetrieveUriAsync<TEntity>(IEntityId<TEntity> id, ODataRetrieveRequest<TEntity> request)
             where TEntity : IEntity
         {
-            var entityUri = EntityUri(id);
+            var entityUri = await EntityUriAsync(id);
 
             var requestUriBuilder = new UriBuilder(entityUri);
             requestUriBuilder.Query = request.ToQueryString(QueryStringFormatting.UrlEscaped);
@@ -67,16 +84,25 @@ namespace OData.Client
             return requestUri;
         }
 
-        private Uri PropertyRefUri<TEntity, TOther>(IEntityId<TEntity> id, IRefProperty<TEntity, TOther> property)
+        private async Task<Uri> PropertyRefUriAsync<TEntity, TOther>(IEntityId<TEntity> id, IRefProperty<TEntity, TOther> property)
             where TEntity : IEntity
             where TOther : IEntity
         {
-            var entityUri = EntityUri(id);
+            var entityUri = await EntityUriAsync(id);
 
             var requestUriBuilder = new UriBuilder(entityUri);
             requestUriBuilder.Path += $"/{property.SelectableName}/$ref";
 
             var requestUri = requestUriBuilder.Uri;
+            return requestUri;
+        }
+
+        private Uri FunctionUri<TResult>(IODataFunctionRequest<TResult> request)
+            where TResult : IEntity
+        {
+            var argumentPairs = request.Arguments.Select(parameter => $"{parameter.Key}={_valueFormatter.ToString(parameter.Value)}");
+            var argumentsPart = string.Join(",", argumentPairs);
+            var requestUri = new Uri(BaseUri, $"{request.FunctionName}({argumentsPart})");
             return requestUri;
         }
 
@@ -94,11 +120,11 @@ namespace OData.Client
         )
             where TEntity : IEntity
         {
-            ValueTask<HttpRequestMessage> CreateRequest()
+            async Task<HttpRequestMessage> CreateRequest()
             {
-                var requestUri = FindUri(type, request);
+                var requestUri = await FindUriAsync(type, request);
                 var httpRequest = CreateFindRequest(HttpMethod.Get, requestUri, request);
-                return ValueTask.FromResult(httpRequest);
+                return httpRequest;
             }
             
             using var httpResponse = await _oDataHttpClient
@@ -115,7 +141,8 @@ namespace OData.Client
             IFindResponse<TEntity> current,
             ODataFindNextRequest<TEntity> request,
             CancellationToken cancellationToken = default
-        ) where TEntity : IEntity
+        )
+            where TEntity : IEntity
         {
             var requestUri = current.NextLink;
             if (requestUri == null)
@@ -123,10 +150,10 @@ namespace OData.Client
                 return null;
             }
             
-            ValueTask<HttpRequestMessage> CreateRequest()
+            Task<HttpRequestMessage> CreateRequest()
             {
                 var httpRequest = CreateFindRequest(HttpMethod.Get, requestUri, request);
-                return ValueTask.FromResult(httpRequest);
+                return Task.FromResult(httpRequest);
             }
 
             using var httpResponse = await _oDataHttpClient
@@ -163,11 +190,11 @@ namespace OData.Client
         ) 
             where TEntity : IEntity
         {
-            ValueTask<HttpRequestMessage> CreateRequest()
+            async Task<HttpRequestMessage> CreateRequest()
             {
-                var requestUri = RetrieveUri(id, request);
+                var requestUri = await RetrieveUriAsync(id, request);
                 var httpRequest = CreateDefaultRequest(HttpMethod.Get, requestUri);
-                return ValueTask.FromResult(httpRequest);
+                return httpRequest;
             }
 
             var httpRequestOptions = new ODataHttpRequestOptions();
@@ -193,11 +220,11 @@ namespace OData.Client
         )
             where TEntity : IEntity
         {
-            ValueTask<HttpRequestMessage> CreateRequest()
+            async Task<HttpRequestMessage> CreateRequest()
             {
-                var requestUri = CollectionUri(type);
-                var httpRequest = CreatePropsRequest(HttpMethod.Post, requestUri, props);
-                return ValueTask.FromResult(httpRequest);
+                var requestUri = await CollectionUriASync(type);
+                var httpRequest = await CreatePropsRequestAsync(type, HttpMethod.Post, requestUri, props);
+                return httpRequest;
             }
 
             using var httpResponse = await _oDataHttpClient
@@ -215,11 +242,11 @@ namespace OData.Client
         )
             where TEntity : IEntity
         {
-            ValueTask<HttpRequestMessage> CreateRequest()
+            async Task<HttpRequestMessage> CreateRequest()
             {
-                var requestUri = CollectionUri(type);
-                var httpRequest = CreatePropsRepresentationRequest(HttpMethod.Post, requestUri, props);
-                return ValueTask.FromResult(httpRequest);
+                var requestUri = await CollectionUriASync(type);
+                var httpRequest = await CreatePropsRepresentationRequestAsync(type, HttpMethod.Post, requestUri, props);
+                return httpRequest;
             }
 
             using var httpResponse = await _oDataHttpClient
@@ -237,11 +264,11 @@ namespace OData.Client
         )
             where TEntity : IEntity
         {
-            ValueTask<HttpRequestMessage> CreateRequest()
+            async Task<HttpRequestMessage> CreateRequest()
             {
-                var requestUri = EntityUri(id);
-                var httpRequest = CreatePropsRequest(HttpMethod.Patch, requestUri, props);
-                return ValueTask.FromResult(httpRequest);
+                var requestUri = await EntityUriAsync(id);
+                var httpRequest = await CreatePropsRequestAsync(id.Type, HttpMethod.Patch, requestUri, props);
+                return httpRequest;
             }
 
             using var httpResponse = await _oDataHttpClient
@@ -256,11 +283,11 @@ namespace OData.Client
         )
             where TEntity : IEntity
         {
-            ValueTask<HttpRequestMessage> CreateRequest()
+            async Task<HttpRequestMessage> CreateRequest()
             {
-                var requestUri = EntityUri(id);
-                var httpRequest = CreatePropsRepresentationRequest(HttpMethod.Patch, requestUri, props);
-                return ValueTask.FromResult(httpRequest);
+                var requestUri = await EntityUriAsync(id);
+                var httpRequest = await CreatePropsRepresentationRequestAsync(id.Type, HttpMethod.Patch, requestUri, props);
+                return httpRequest;
             }
 
             using var httpResponse = await _oDataHttpClient
@@ -274,10 +301,11 @@ namespace OData.Client
         public async Task DeleteAsync<TEntity>(IEntityId<TEntity> id, CancellationToken cancellationToken = default)
             where TEntity : IEntity
         {
-            ValueTask<HttpRequestMessage> CreateRequest()
+            async Task<HttpRequestMessage> CreateRequest()
             {
-                var httpRequest = CreateEmptyRequest(HttpMethod.Delete, EntityUri(id));
-                return ValueTask.FromResult(httpRequest);
+                var requestUri = await EntityUriAsync(id);
+                var httpRequest = CreateEmptyRequest(HttpMethod.Delete, requestUri);
+                return httpRequest;
             }
 
             using var httpResponse = await _oDataHttpClient
@@ -294,14 +322,17 @@ namespace OData.Client
             where TEntity : IEntity
             where TOther : IEntity
         {
-            ValueTask<HttpRequestMessage> CreateRequest()
+            async Task<HttpRequestMessage> CreateRequest()
             {
-                var httpRequest = CreatePropsRequest<Ref>(HttpMethod.Put, PropertyRefUri(id, property), props =>
+                var requestUri = await PropertyRefUriAsync(id, property);
+                var entityUri = await EntityUriAsync(otherId);
+                
+                var httpRequest = await CreatePropsRequestAsync(Ref.EntityType, HttpMethod.Put, requestUri, props =>
                 {
-                    props.Set(Ref.Id, EntityUri(otherId));
+                    props.Set(Ref.Id, entityUri);
                 });
                 
-                return ValueTask.FromResult(httpRequest);
+                return httpRequest;
             }
 
             using var httpResponse = await _oDataHttpClient
@@ -318,14 +349,17 @@ namespace OData.Client
             where TEntity : IEntity
             where TOther : IEntity
         {
-            ValueTask<HttpRequestMessage> CreateRequest()
+            async Task<HttpRequestMessage> CreateRequest()
             {
-                var httpRequest = CreatePropsRequest<Ref>(HttpMethod.Put, PropertyRefUri(id, property), props =>
+                var requestUri = await PropertyRefUriAsync(id, property);
+                var entityUri = await EntityUriAsync(otherId);
+                
+                var httpRequest = await CreatePropsRequestAsync(Ref.EntityType, HttpMethod.Put, requestUri, props =>
                 {
-                    props.Set(Ref.Id, EntityUri(otherId));
+                    props.Set(Ref.Id, entityUri);
                 });
                 
-                return ValueTask.FromResult(httpRequest);
+                return httpRequest;
             }
 
             using var httpResponse = await _oDataHttpClient
@@ -341,11 +375,11 @@ namespace OData.Client
             where TEntity : IEntity
             where TOther : IEntity
         {
-            ValueTask<HttpRequestMessage> CreateRequest()
+            async Task<HttpRequestMessage> CreateRequest()
             {
-                var requestUri = PropertyRefUri(id, property);
+                var requestUri = await PropertyRefUriAsync(id, property);
                 var httpRequest = CreateDefaultRequest(HttpMethod.Delete, requestUri);
-                return ValueTask.FromResult(httpRequest);
+                return httpRequest;
             }
 
             using var httpResponse = await _oDataHttpClient
@@ -362,45 +396,70 @@ namespace OData.Client
             where TEntity : IEntity
             where TOther : IEntity
         {
-            ValueTask<HttpRequestMessage> CreateRequest()
+            async Task<HttpRequestMessage> CreateRequest()
             {
-                var propertyRefUri = PropertyRefUri(id, property);
-                var otherEntityUri = EntityUri(otherId);
+                var propertyRefUri = await PropertyRefUriAsync(id, property);
+                var otherEntityUri = await EntityUriAsync(otherId);
 
                 var requestUriBuilder = new UriBuilder(propertyRefUri);
                 requestUriBuilder.Query = $"$id={otherEntityUri}";
 
                 var requestUri = requestUriBuilder.Uri;
                 var httpRequest = CreateDefaultRequest(HttpMethod.Delete, requestUri);
-                return ValueTask.FromResult(httpRequest);
+                return httpRequest;
             }
 
             using var httpResponse = await _oDataHttpClient
                 .SendAsync(CreateRequest, cancellationToken: cancellationToken);
         }
 
-        private HttpRequestMessage CreatePropsRequest<T>(
+        /// <inheritdoc />
+        public async Task<IEntity<TResult>> InvokeAsync<TResult>(
+            IODataFunctionRequest<TResult> request,
+            CancellationToken cancellationToken = default
+        )
+            where TResult : IEntity
+        {
+            Task<HttpRequestMessage> CreateRequest()
+            {
+                var requestUri = FunctionUri(request);
+                // TODO @nije: Add $select (and $filter?)
+                var httpRequest = CreateDefaultRequest(HttpMethod.Get, requestUri);
+                return Task.FromResult(httpRequest);
+            }
+
+            using var httpResponse = await _oDataHttpClient
+                .SendAsync(CreateRequest, cancellationToken: cancellationToken);
+
+            var entity = await httpResponse.Content.ReadEntityAsync(request.EntityType, _entitySerializer, cancellationToken);
+            return entity;
+        }
+
+        private async Task<HttpRequestMessage> CreatePropsRequestAsync<TEntity>(
+            IEntityType<TEntity> type,
             HttpMethod method,
             Uri requestUri,
-            Action<IODataProperties<T>> props
+            Action<IODataProperties<TEntity>> props
         )
-            where T : IEntity
+            where TEntity : IEntity
         {
-            var properties = _propertiesFactory.Create<T>();
+            var context = ODataPropertiesFactoryContext.Create(this, _entitySetNameResolver, type);
+            var properties = _propertiesFactory.Create(context);
             props(properties);
 
-            var httpContent = properties.ToHttpContent();
+            var httpContent = await properties.ToHttpContentAsync();
             return CreateMutationRequest(method, requestUri, httpContent);
         }
 
-        private HttpRequestMessage CreatePropsRepresentationRequest<T>(
+        private async Task<HttpRequestMessage> CreatePropsRepresentationRequestAsync<TEntity>(
+            IEntityType<TEntity> type,
             HttpMethod method,
             Uri requestUri,
-            Action<IODataProperties<T>> props
+            Action<IODataProperties<TEntity>> props
         )
-            where T : IEntity
+            where TEntity : IEntity
         {
-            var httpRequest = CreatePropsRequest(method, requestUri, props);
+            var httpRequest = await CreatePropsRequestAsync(type, method, requestUri, props);
             httpRequest.Headers.Add("Prefer", "return=representation");
             return httpRequest;
         }

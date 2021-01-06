@@ -7,36 +7,45 @@ namespace OData.Client.Expressions.Formatting
     {
         public string ToString(ODataConstantExpression expression)
         {
-            var expressionValue = expression.Value;
+            return ToString(expression.Value);
+        }
 
+        public string ToString(ODataFunctionRequestArgument argument)
+        {
+            return ToString(argument.Value);
+        }
+
+        private static string ToString(object? expressionValue)
+        {
             const string utcDateTimeFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'";
-            
+
             return expressionValue switch
             {
                 null => "null",
-                
+
                 string value => Quoted(value),
                 Guid value => Quoted(value, "D"),
-                
+                IEntityId value => Quoted(value.Id, "D"),
+
                 byte value => Unquoted(value),
                 short value => Unquoted(value),
                 int value => Unquoted(value),
                 long value => Unquoted(value),
-                
+
                 float value => Unquoted(value),
                 double value => Unquoted(value),
                 decimal value => Unquoted(value),
-                
+
                 bool value => Unquoted(value),
-                
+
                 Enum value => Unquoted(Convert.ToInt32(value)),
-                
+
                 DateTime value => Quoted(value.ToUniversalTime().ToString(utcDateTimeFormat)),
                 DateTimeOffset value => Quoted(value.UtcDateTime.ToString(utcDateTimeFormat)),
 
                 IConvertible value => Quoted(value),
                 IFormattable value => Quoted(value),
-                
+
                 _ => $"'{expressionValue}'"
             };
         }
