@@ -20,7 +20,11 @@ namespace OData.Client.Json.Net
 
         private readonly List<Func<Task>> _asyncBinds = new();
 
-        public JObjectProperties(IODataClient oDataClient, JsonSerializer serializer, IEntitySetNameResolver entitySetNameResolver)
+        public JObjectProperties(
+            IODataClient oDataClient,
+            JsonSerializer serializer,
+            IEntitySetNameResolver entitySetNameResolver
+        )
         {
             _oDataClient = oDataClient;
             _serializer = serializer;
@@ -64,14 +68,6 @@ namespace OData.Client.Json.Net
             return this;
         }
 
-        private async Task<string> ReferenceAsync<TOther>(IEntityId<TOther> id) where TOther : IEntity
-        {
-            var context = ODataMetadataContext.Create(_oDataClient, id.Type);
-            var entitySetName = await _entitySetNameResolver.EntitySetNameAsync(context);
-            var reference = $"/{entitySetName}({id.Id:D})";
-            return reference;
-        }
-
         /// <inheritdoc />
         public IODataProperties<TEntity> BindAll<TOther>(
             IRefs<TEntity, TOther> property,
@@ -96,6 +92,14 @@ namespace OData.Client.Json.Net
             return this;
         }
 
+        private async Task<string> ReferenceAsync<TOther>(IEntityId<TOther> id) where TOther : IEntity
+        {
+            var context = ODataMetadataContext.Create(_oDataClient, id.Type);
+            var entitySetName = await _entitySetNameResolver.EntitySetNameAsync(context);
+            var reference = $"/{entitySetName}({id.Id:D})";
+            return reference;
+        }
+
         /// <inheritdoc />
         public async Task WriteToAsync(Stream stream)
         {
@@ -106,8 +110,8 @@ namespace OData.Client.Json.Net
             }
 
             // Write to stream
-            await using var streamWriter = new StreamWriter(stream, Encoding.UTF8);
-            using var jsonWriter = new JsonTextWriter(streamWriter);
+            var streamWriter = new StreamWriter(stream, Encoding.UTF8);
+            var jsonWriter = new JsonTextWriter(streamWriter);
 
             // TODO @nije: Remove formatting
             jsonWriter.Formatting = Newtonsoft.Json.Formatting.Indented;

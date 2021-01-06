@@ -36,7 +36,7 @@ namespace OData.Client
         internal static async Task<HttpContent> ToHttpContentAsync<TEntity>(this IODataProperties<TEntity> properties)
             where TEntity : IEntity
         {
-            var propertiesStream = new MemoryStream();
+            await using var propertiesStream = new MemoryStream();
             await properties.WriteToAsync(propertiesStream);
 
             var propertiesBuffer = propertiesStream.GetBuffer();
