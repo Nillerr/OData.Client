@@ -1,4 +1,4 @@
-namespace OData.Client
+namespace OData.Client.Authentication.Microsoft
 {
     public sealed class ODataAuthenticatorSettings
     {

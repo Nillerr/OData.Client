@@ -7,7 +7,7 @@ namespace OData.Client
     /// A serializable type of <see cref="IRefProperty"/>.
     /// </summary>
     [Serializable]
-    public sealed class SerializableRefProperty : IRefProperty, ISerializable
+    public class SerializableRefProperty : IRefProperty, ISerializable
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="SerializableRefProperty"/> class.

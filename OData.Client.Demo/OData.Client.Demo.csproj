@@ -8,6 +8,7 @@
   </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\OData.Client.Authentication.Microsoft\OData.Client.Authentication.Microsoft.csproj" />
       <ProjectReference Include="..\OData.Client.Json.Net\OData.Client.Json.Net.csproj" />
       <ProjectReference Include="..\OData.Client\OData.Client.csproj" />
     </ItemGroup>

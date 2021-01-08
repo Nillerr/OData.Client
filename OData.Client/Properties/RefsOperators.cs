@@ -44,6 +44,11 @@ namespace OData.Client
         private static IODataLambdaBody CheckLambdaBody<TOther>(ODataFilter<TOther> filter, string paramName)
             where TOther : IEntity
         {
+            if (filter.Expression is null)
+            {
+                throw new ArgumentException($"Expected a filter as the body of the lambda expression, was 'null'.", paramName);
+            }
+            
             if (filter.Expression is not IODataLambdaBody body)
             {
                 throw new ArgumentException(

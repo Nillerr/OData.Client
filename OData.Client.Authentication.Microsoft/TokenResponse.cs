@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 
-namespace OData.Client
+namespace OData.Client.Authentication.Microsoft
 {
-    public sealed class TokenResponse
+    internal sealed class TokenResponse
     {
         public TokenResponse(
             string tokenType,

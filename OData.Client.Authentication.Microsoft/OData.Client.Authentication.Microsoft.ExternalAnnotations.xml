@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<assembly name="OData.Client.Authentication.Microsoft">
+  <member name="T:OData.Client.Authentication.Microsoft.ODataAuthenticator">
+    <attribute ctor="M:JetBrains.Annotations.PublicAPIAttribute.#ctor" />
+  </member>
+</assembly>

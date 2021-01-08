@@ -5,12 +5,17 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 using Nito.AsyncEx;
 
-namespace OData.Client
+namespace OData.Client.Authentication.Microsoft
 {
-    public sealed class ODataAuthenticator : IODataAuthenticator
+    /// <summary>
+    /// Authenticates requests using OAuth 2.0 with <c>login.microsoftonline.com</c>.
+    /// </summary>
+    [PublicAPI]
+    public sealed class ODataMicrosoftAuthenticator : IODataAuthenticator
     {
         private readonly AsyncLock _lock = new AsyncLock();
         
@@ -19,7 +24,13 @@ namespace OData.Client
         
         private readonly IOptions<ODataAuthenticatorSettings> _options;
 
-        public ODataAuthenticator(
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ODataMicrosoftAuthenticator"/> class.
+        /// </summary>
+        /// <param name="clock"></param>
+        /// <param name="httpClientProvider"></param>
+        /// <param name="options"></param>
+        public ODataMicrosoftAuthenticator(
             IClock clock,
             IHttpClientProvider httpClientProvider,
             IOptions<ODataAuthenticatorSettings> options
@@ -32,9 +43,10 @@ namespace OData.Client
 
         private ODataAuthenticatorSettings Options => _options.Value;
 
-        public AuthorizationToken? AuthorizationToken { get; set; }
+        private AuthorizationToken? AuthorizationToken { get; set; }
 
-        public async Task AddAuthenticationAsync(
+        /// <inheritdoc />
+        public async Task AuthorizeAsync(
             HttpRequestMessage request,
             CancellationToken cancellationToken = default
         )

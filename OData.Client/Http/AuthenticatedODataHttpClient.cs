@@ -29,7 +29,7 @@ namespace OData.Client
             var httpResponse = await _oDataHttpClient.SendAsync(async () =>
             {
                 var httpRequest = await requestFactory();
-                await _oDataAuthenticator.AddAuthenticationAsync(httpRequest, cancellationToken);
+                await _oDataAuthenticator.AuthorizeAsync(httpRequest, cancellationToken);
                 return httpRequest;
             }, options, cancellationToken);
 

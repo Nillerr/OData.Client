@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using OData.Client.Authentication.Microsoft;
 using OData.Client.Json.Net;
 
 namespace OData.Client.Demo
@@ -41,7 +42,7 @@ namespace OData.Client.Demo
             var httpClientProvider = new DefaultHttpClientProvider();
 
             var authenticatorOptions = serviceProvider.GetRequiredService<IOptions<ODataAuthenticatorSettings>>();
-            var authenticator = new ODataAuthenticator(clock, httpClientProvider, authenticatorOptions);
+            var authenticator = new ODataMicrosoftAuthenticator(clock, httpClientProvider, authenticatorOptions);
 
             var defaultODataHttpClient = new DefaultODataHttpClient(httpClientProvider);
             var authenticatedODataHttpClient = new AuthenticatedODataHttpClient(authenticator, defaultODataHttpClient);

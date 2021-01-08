@@ -6,10 +6,14 @@ namespace OData.Client
     /// A clock that wraps another clock, and verifies the <see cref="DateTime.Kind"/> value of every value returned by
     /// the wrapped clocks <see cref="IClock.UtcNow"/> property, throwing an exception if the value is not of UTC kind. 
     /// </summary>
-    internal sealed class UtcClock : IClock
+    public sealed class UtcClock : IClock
     {
         private readonly IClock _clock;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UtcClock"/> class.
+        /// </summary>
+        /// <param name="clock">The wrapped clock.</param>
         public UtcClock(IClock clock)
         {
             _clock = clock;
