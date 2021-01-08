@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace OData.Client
 {
-    public interface IODataFunctionRequest<[UsedImplicitly] out TResult>
+    public interface IODataFunctionRequest<out TResult>
         where TResult : IEntity
     {
         public IEntityType<TResult> EntityType { get; }

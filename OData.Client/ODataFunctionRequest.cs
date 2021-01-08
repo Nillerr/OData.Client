@@ -1,11 +1,9 @@
 using System.Collections.Generic;
-using JetBrains.Annotations;
 
 namespace OData.Client
 {
-    public sealed class ODataFunctionRequest<[UsedImplicitly] TResult> :
-        IODataFunctionRequest<TResult>,
-        IODataSelection<TResult>
+    public sealed class ODataFunctionRequest<TResult> :
+        IODataFunctionRequest<TResult>
         where TResult : IEntity
     {
         private readonly List<ISelectableProperty<TResult>> _selection = new();
@@ -37,15 +35,21 @@ namespace OData.Client
         /// </summary>
         public IEnumerable<ODataExpansion<TResult>> Expansions => _expansions;
 
+        public ODataFunctionRequest<TResult> Pass(string parameterName, object? value)
+        {
+            Arguments[parameterName] = new ODataFunctionRequestArgument(value);
+            return this;
+        }
+
         /// <inheritdoc />
-        public IODataSelection<TResult> Select(ISelectableProperty<TResult> property)
+        public ODataFunctionRequest<TResult> Select(ISelectableProperty<TResult> property)
         {
             _selection.Add(property);
             return this;
         }
 
         /// <inheritdoc />
-        public IODataSelection<TResult> Expand(IExpandableProperty<TResult> property)
+        public ODataFunctionRequest<TResult> Expand(IExpandableProperty<TResult> property)
         {
             var expansion = ODataExpansion.Create(property);
             _expansions.Add(expansion);
@@ -66,6 +70,15 @@ namespace OData.Client
 
             var queryString = string.Join("&", parts);
             return queryString;
+        }
+    }
+
+    public static class ODataFunctionRequest
+    {
+        public static ODataFunctionRequest<TEntity> For<TEntity>(IEntityType<TEntity> entityType, string functionName)
+            where TEntity : IEntity
+        {
+            return new ODataFunctionRequest<TEntity>(entityType, functionName);
         }
     }
 }

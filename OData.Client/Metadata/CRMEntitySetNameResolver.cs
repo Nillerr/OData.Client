@@ -49,9 +49,9 @@ namespace OData.Client
             _logger.LogDebug("Fetching entity definition for '{entityType}'...", context.EntityType.Name);
             var entityType = ODataEntityDefinition.EntityType;
             
-            var request = new ODataFunctionRequest<ODataEntityDefinition>(entityType, "EntityDefinitions");
-            request["LogicalName"] = context.EntityType.Name;
-            request.Select(ODataEntityDefinition.EntitySetName);
+            var request = ODataFunctionRequest.For(entityType, "EntityDefinitions")
+                .Pass("LogicalName", context.EntityType.Name)
+                .Select(ODataEntityDefinition.EntitySetName);
             
             var entityDefinition = await context.ODataClient.InvokeAsync(request, cancellationToken);
             
