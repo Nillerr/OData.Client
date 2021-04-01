@@ -12,6 +12,7 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Authors>nillerr</Authors>
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+        <RepositoryUrl>https://github.com/Nillerr/OData.Client</RepositoryUrl>
     </PropertyGroup>
 
     <ItemGroup>
