@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace OData.Client
 {
-    /// <inheritdoc />
-    public sealed class ODataFindRequest<TEntity> : IODataFindRequest<TEntity>
+    /// <inheritdoc cref="IODataFindRequest{TEntity}" />
+    public sealed class ODataFindRequest<TEntity> : IODataFindRequest<TEntity>, IEquatable<ODataFindRequest<TEntity>>
         where TEntity : IEntity
     {
         /// <summary>
@@ -16,11 +18,10 @@ namespace OData.Client
         /// <param name="maxPageSize">The maximum number of results per page.</param>
         public ODataFindRequest(
             ODataFilter<TEntity>? filter,
-            IEnumerable<ISelectableProperty<TEntity>> selection,
-            IEnumerable<ODataExpansion<TEntity>> expansions,
-            IEnumerable<Sorting<TEntity>> sorting,
-            int? maxPageSize
-        )
+            IReadOnlyCollection<ISelectableProperty<TEntity>> selection,
+            IReadOnlyCollection<ODataExpansion<TEntity>> expansions,
+            IReadOnlyList<Sorting<TEntity>> sorting,
+            int? maxPageSize)
         {
             Filter = filter;
             Selection = selection;
@@ -33,15 +34,65 @@ namespace OData.Client
         public ODataFilter<TEntity>? Filter { get; }
 
         /// <inheritdoc />
-        public IEnumerable<ISelectableProperty<TEntity>> Selection { get; }
+        public IReadOnlyCollection<ISelectableProperty<TEntity>> Selection { get; }
 
         /// <inheritdoc />
-        public IEnumerable<ODataExpansion<TEntity>> Expansions { get; }
+        public IReadOnlyCollection<ODataExpansion<TEntity>> Expansions { get; }
 
         /// <inheritdoc />
-        public IEnumerable<Sorting<TEntity>> Sorting { get; }
+        public IReadOnlyList<Sorting<TEntity>> Sorting { get; }
 
         /// <inheritdoc />
         public int? MaxPageSize { get; }
+
+        /// <inheritdoc />
+        public bool Equals(ODataFindRequest<TEntity>? other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Nullable.Equals(Filter, other.Filter) &&
+                   MaxPageSize == other.MaxPageSize &&
+                   Selection.Count == other.Selection.Count && Selection.All(other.Selection.Contains) &&
+                   Expansions.Count == other.Expansions.Count && Expansions.All(other.Expansions.Contains) &&
+                   Sorting.Count == other.Sorting.Count && Sorting.SequenceEqual(other.Sorting);
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is ODataFindRequest<TEntity> other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = new HashCode();
+            hashCode.Add(Filter);
+            hashCode.Add(MaxPageSize);
+            
+            foreach (var selection in Selection)
+            {
+                hashCode.Add(selection);
+            }
+
+            foreach (var expansion in Expansions)
+            {
+                hashCode.Add(expansion);
+            }
+
+            foreach (var sorting in Sorting)
+            {
+                hashCode.Add(sorting);
+            }
+
+            return hashCode.ToHashCode();
+        }
+
+        public static bool operator ==(ODataFindRequest<TEntity>? left, ODataFindRequest<TEntity>? right) => Equals(left, right);
+        public static bool operator !=(ODataFindRequest<TEntity>? left, ODataFindRequest<TEntity>? right) => !Equals(left, right);
+
+        public override string ToString()
+        {
+            return $"{nameof(Filter)}: {Filter}, {nameof(Selection)}: {Selection}, {nameof(Expansions)}: {Expansions}, {nameof(Sorting)}: {Sorting}, {nameof(MaxPageSize)}: {MaxPageSize}";
+        }
     }
 }

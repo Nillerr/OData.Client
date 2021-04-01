@@ -3,6 +3,7 @@ namespace OData.Client.Expressions
     /// <summary>
     /// A property expression.
     /// </summary>
+    [Equals]
     public class ODataPropertyExpression :
         IODataBinaryLeftOperand,
         IODataBinaryRightOperand,

@@ -5,6 +5,7 @@ namespace OData.Client.Expressions
     /// <summary>
     /// A constant value expression, e.g. <c>"foo@email.com"</c> or <c>5</c>.
     /// </summary>
+    [Equals]
     public class ODataConstantExpression : IODataBinaryRightOperand, IODataFunctionArgument
     {
         /// <summary>

@@ -16,6 +16,7 @@ namespace OData.Client.Expressions
     /// }
     /// </code>
     /// </example>
+    [Equals]
     public class ODataFunctionExpression : IODataLogicalOperand, IODataFilterExpression, IODataLambdaBody
     {
         /// <summary>

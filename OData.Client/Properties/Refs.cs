@@ -52,7 +52,7 @@ namespace OData.Client
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return SelectableName == other.SelectableName;
+            return Name == other.Name && SelectableName == other.SelectableName;
         }
 
         /// <inheritdoc />
@@ -81,6 +81,6 @@ namespace OData.Client
         public static bool operator !=(Refs<TEntity, TOther>? left, Refs<TEntity, TOther>? right) => !Equals(left, right);
 
         /// <inheritdoc />
-        public override string ToString() => $"{nameof(SelectableName)}: {SelectableName}";
+        public override string ToString() => $"{nameof(Name)}: {Name}, {nameof(SelectableName)}: {SelectableName}";
     }
 }

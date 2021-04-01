@@ -53,7 +53,7 @@ namespace OData.Client
         /// Returns a hash code for this instance.
         /// </summary>
         /// <returns>The hash code for this instance.</returns>
-        public override int GetHashCode() => SelectableName.GetHashCode();
+        public override int GetHashCode() => Name.GetHashCode();
 
         /// <summary>
         /// Creates a filter that checks whether the <paramref name="property"/> is equal to the
@@ -175,6 +175,6 @@ namespace OData.Client
             property.LessThanOrEqualTo(value);
 
         /// <inheritdoc />
-        public override string ToString() => $"{nameof(SelectableName)}: {SelectableName}";
+        public override string ToString() => $"{nameof(Name)}: {Name}";
     }
 }

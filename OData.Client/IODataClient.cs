@@ -30,7 +30,7 @@ namespace OData.Client
         /// <returns>The entities matching the request.</returns>
         Task<IFindResponse<TEntity>> FindAsync<TEntity>(
             IEntityType<TEntity> type,
-            ODataFindRequest<TEntity> request,
+            IODataFindRequest<TEntity> request,
             CancellationToken cancellationToken = default
         )
             where TEntity : IEntity;
@@ -45,7 +45,7 @@ namespace OData.Client
         /// <returns>The next page of entities.</returns>
         Task<IFindResponse<TEntity>?> FindNextAsync<TEntity>(
             IFindResponse<TEntity> current,
-            ODataFindNextRequest<TEntity> request,
+            IODataFindRequestHeaders<TEntity> request,
             CancellationToken cancellationToken = default
         )
             where TEntity : IEntity;

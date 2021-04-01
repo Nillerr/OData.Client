@@ -3,6 +3,7 @@ namespace OData.Client.Expressions
     /// <summary>
     /// Represents a lambda expression, used for `{field}/{function}(o:{body})`
     /// </summary>
+    [Equals]
     public class ODataLambdaExpression : IODataFilterExpression, IODataLogicalOperand
     {
         /// <summary>

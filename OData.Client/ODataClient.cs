@@ -63,7 +63,7 @@ namespace OData.Client
             return new Uri(BaseUri, $"{entitySetName}({id.Id:D})");
         }
 
-        private async Task<Uri> FindUriAsync<TEntity>(IEntityType<TEntity> type, ODataFindRequest<TEntity> request)
+        private async Task<Uri> FindUriAsync<TEntity>(IEntityType<TEntity> type, IODataFindRequest<TEntity> request)
             where TEntity : IEntity
         {
             var collectionUri = await CollectionUriASync(type);
@@ -123,7 +123,7 @@ namespace OData.Client
         /// <inheritdoc />
         public async Task<IFindResponse<TEntity>> FindAsync<TEntity>(
             IEntityType<TEntity> type,
-            ODataFindRequest<TEntity> request,
+            IODataFindRequest<TEntity> request,
             CancellationToken cancellationToken = default
         )
             where TEntity : IEntity
@@ -161,7 +161,7 @@ namespace OData.Client
         /// <inheritdoc />
         public async Task<IFindResponse<TEntity>?> FindNextAsync<TEntity>(
             IFindResponse<TEntity> current,
-            ODataFindNextRequest<TEntity> request,
+            IODataFindRequestHeaders<TEntity> request,
             CancellationToken cancellationToken = default
         )
             where TEntity : IEntity

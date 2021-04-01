@@ -17,16 +17,16 @@ namespace OData.Client
         /// <summary>
         /// The selection to apply.
         /// </summary>
-        IEnumerable<ISelectableProperty<TEntity>> Selection { get; }
+        IReadOnlyCollection<ISelectableProperty<TEntity>> Selection { get; }
         
         /// <summary>
         /// The expansions to apply.
         /// </summary>
-        IEnumerable<ODataExpansion<TEntity>> Expansions { get; }
+        IReadOnlyCollection<ODataExpansion<TEntity>> Expansions { get; }
         
         /// <summary>
         /// The sorting to apply.
         /// </summary>
-        IEnumerable<Sorting<TEntity>> Sorting { get; }
+        IReadOnlyList<Sorting<TEntity>> Sorting { get; }
     }
 }

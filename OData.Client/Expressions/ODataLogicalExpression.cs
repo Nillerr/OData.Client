@@ -10,6 +10,7 @@ namespace OData.Client.Expressions
     ///     Used for <c>{left} and {right}</c> and <c>{left} or {right}</c>.
     /// </para>
     /// </summary>
+    [Equals]
     public class ODataLogicalExpression : IODataLogicalOperand, IODataFilterExpression, IODataLambdaBody
     {
         /// <summary>

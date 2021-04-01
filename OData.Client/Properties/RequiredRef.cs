@@ -58,7 +58,7 @@ namespace OData.Client
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Name == other.Name;
+            return Name == other.Name && ValueName == other.ValueName;
         }
 
         /// <inheritdoc />
@@ -68,7 +68,7 @@ namespace OData.Client
         /// Returns a hash code for this instance.
         /// </summary>
         /// <returns>The hash code for this instance.</returns>
-        public override int GetHashCode() => SelectableName.GetHashCode();
+        public override int GetHashCode() => HashCode.Combine(Name, SelectableName);
         
         /// <summary>
         /// Creates a filter that checks whether the <paramref name="property"/> references the
@@ -91,6 +91,6 @@ namespace OData.Client
             property.DoesNotReference(other);
 
         /// <inheritdoc />
-        public override string ToString() => $"{nameof(SelectableName)}: {SelectableName}";
+        public override string ToString() => $"{nameof(Name)}: {Name}, {nameof(ValueName)}: {ValueName}";
     }
 }

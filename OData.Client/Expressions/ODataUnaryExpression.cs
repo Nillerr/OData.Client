@@ -8,6 +8,7 @@ namespace OData.Client.Expressions
     ///     Used for <c>not {operand}</c>.
     /// </para> 
     /// </summary>
+    [Equals]
     public class ODataUnaryExpression : IODataFilterExpression, IODataLogicalOperand, IODataLambdaBody
     {
         /// <summary>

@@ -10,7 +10,7 @@ namespace OData.Client
 
         public ODataFilter(IODataFilterExpression expression) => Expression = expression;
 
-        public bool Equals(ODataFilter<TEntity> other) => Expression == other.Expression;
+        public bool Equals(ODataFilter<TEntity> other) => Equals(Expression, other.Expression);
         public override bool Equals(object? obj) => obj is ODataFilter<TEntity> other && Equals(other);
         public override int GetHashCode() => HashCode.Combine(Expression);
 

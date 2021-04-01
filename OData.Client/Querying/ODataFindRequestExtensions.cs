@@ -17,7 +17,7 @@ namespace OData.Client
         /// <typeparam name="TEntity">The type of entity.</typeparam>
         /// <returns>The query string representation of the request.</returns>
         public static string ToQueryString<TEntity>(
-            this ODataFindRequest<TEntity> request,
+            this IODataFindRequest<TEntity> request,
             IExpressionFormatter expressionFormatter,
             QueryStringFormatting formatting
         )

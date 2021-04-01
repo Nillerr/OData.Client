@@ -6,6 +6,7 @@ namespace OData.Client.Expressions
     /// <remarks>
     /// Logical expression (<c>not</c>, <c>and</c>, <c>or</c>) are represented by <see cref="ODataLogicalExpression"/>.
     /// </remarks>
+    [Equals]
     public class ODataBinaryExpression : IODataLogicalOperand, IODataFilterExpression, IODataLambdaBody
     {
         public ODataBinaryExpression(

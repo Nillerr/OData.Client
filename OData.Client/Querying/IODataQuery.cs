@@ -63,8 +63,6 @@ namespace OData.Client
         /// <returns>This query instance.</returns>
         IODataQuery<TEntity> Expand<TOther>(IRef<TEntity, TOther> property) where TOther : IEntity;
 
-        IODataQuery<TEntity> Expand(IRef<TEntity, IEntity> property);
-
         /// <summary>
         /// Specifies a collection-valued navigation property to expand.
         /// </summary>
@@ -120,5 +118,15 @@ namespace OData.Client
         /// <param name="count">The number of results to return.</param>
         /// <returns>This query instance.</returns>
         IODataQuery<TEntity> Limit(int? count);
+        
+        /// <summary>
+        /// Creates a <see cref="IODataFindRequest{TEntity}"/> object representing the current query.
+        /// </summary>
+        IODataFindRequest<TEntity> ToFindRequest();
+        
+        /// <summary>
+        /// Creates a <see cref="IODataFindRequestHeaders{TEntity}"/> object representing the current query.
+        /// </summary>
+        IODataFindRequestHeaders<TEntity> ToFindNextRequest(int currentCount);
     }
 }

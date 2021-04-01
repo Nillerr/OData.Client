@@ -4,8 +4,8 @@ namespace OData.Client
     /// A combination of a property to sort by, and a direction to sort it in.
     /// </summary>
     /// <typeparam name="TEntity">The type of entity.</typeparam>
-    public readonly struct Sorting<TEntity>
-        where TEntity : IEntity
+    [Equals]
+    public readonly struct Sorting<TEntity> where TEntity : IEntity
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Sorting{TEntity}"/> struct.
@@ -27,5 +27,10 @@ namespace OData.Client
         /// The direction to sort in.
         /// </summary>
         public SortDirection Direction { get; }
+
+        public override string ToString()
+        {
+            return $"{nameof(Property)}: {Property}, {nameof(Direction)}: {Direction:G}";
+        }
     }
 }

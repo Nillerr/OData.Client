@@ -74,13 +74,6 @@ namespace OData.Client
         }
 
         /// <inheritdoc />
-        public IODataQuery<TEntity> Expand(IRef<TEntity, IEntity> property)
-        {
-            // Always throw an exception, tell users to use `Expand(query, property, type)` below.
-            throw new InvalidOperationException();
-        }
-
-        /// <inheritdoc />
         public IODataQuery<TEntity> Expand<TOther>(IRefs<TEntity, TOther> property) where TOther : IEntity
         {
             var expansion = ODataExpansion.Create(property);
@@ -144,12 +137,26 @@ namespace OData.Client
             return this;
         }
 
+        public IODataFindRequest<TEntity> ToFindRequest()
+        {
+            var maxPageSize = MinimumMaxPageSize(0);
+            var request = new ODataFindRequest<TEntity>(_filter, _selection, _expansions, _sorting, maxPageSize);
+            return request;
+        }
+
+        public IODataFindRequestHeaders<TEntity> ToFindNextRequest(int currentCount)
+        {
+            var maxPageSize = MinimumMaxPageSize(currentCount);
+            var request = new ODataFindNextRequest<TEntity>(maxPageSize);
+            return request;
+        }
+
         /// <inheritdoc />
         public async IAsyncEnumerator<IEntity<TEntity>> GetAsyncEnumerator(
             CancellationToken cancellationToken = default
         )
         {
-            var request = CreateFindRequest();
+            var request = ToFindRequest();
 
             var currentCount = 0;
             
@@ -172,23 +179,9 @@ namespace OData.Client
                     }
                 }
 
-                var nextRequest = CreateFindNextRequest(currentCount);
+                var nextRequest = ToFindNextRequest(currentCount);
                 currentResponse = await _oDataClient.FindNextAsync(currentResponse, nextRequest, cancellationToken);
             }
-        }
-
-        private ODataFindRequest<TEntity> CreateFindRequest()
-        {
-            var maxPageSize = MinimumMaxPageSize(0);
-            var request = new ODataFindRequest<TEntity>(_filter, _selection, _expansions, _sorting, maxPageSize);
-            return request;
-        }
-
-        private ODataFindNextRequest<TEntity> CreateFindNextRequest(int currentCount)
-        {
-            var maxPageSize = MinimumMaxPageSize(currentCount);
-            var request = new ODataFindNextRequest<TEntity>(maxPageSize);
-            return request;
         }
 
         private int? MinimumMaxPageSize(int currentCount)
@@ -199,14 +192,13 @@ namespace OData.Client
         /// <inheritdoc />
         public override string ToString()
         {
-            var request = CreateFindRequest();
+            var request = ToFindRequest();
             var queryString = request.ToQueryString(_expressionFormatter, QueryStringFormatting.None);
 
             var expression = (queryString == string.Empty ? "<empty>" : queryString);
             var maxPageSize = _maxPageSize?.ToString() ?? "<empty>";
             
-            return $"Expression: {expression}" +
-                   $"{Environment.NewLine}" +
+            return $"Expression: {expression}{Environment.NewLine}" +
                    $"MaxPageSize: {maxPageSize}";
         }
     }

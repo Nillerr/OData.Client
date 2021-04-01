@@ -4,6 +4,7 @@ namespace OData.Client
     /// A navigation property to expand.
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
+    [Equals]
     public readonly struct ODataExpansion<TEntity> where TEntity : IEntity
     {
         internal ODataExpansion(IExpandableProperty<TEntity> property)
