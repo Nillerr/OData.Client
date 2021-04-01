@@ -68,9 +68,9 @@ namespace OData.Client.Demo
             var incidents = oDataClient.Collection(Incident.EntityType);
 
             var adxPortalComments = oDataClient.Collection(AdxPortalComment.EntityType);
-            await QueryPortalComments(adxPortalComments);
-            // await QueryIncidents(incidents);
-            // await QueryIncidents(incidents);
+            // await QueryPortalComments(adxPortalComments);
+            await QueryIncidents(incidents);
+            await QueryIncidents(incidents);
             // await CreateCaseAsync(incidents);
         }
 
