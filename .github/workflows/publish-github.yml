@@ -1,5 +1,10 @@
 name: publish-github
 
+on:
+  push:
+    branches:
+      - master
+
 jobs:
   publish:
     name: build, pack & publish
@@ -35,5 +40,5 @@ jobs:
         uses: rohith/publish-nuget@v2
         with:
           PROJECT_FILE_PATH: OData.Client/OData.Client.csproj
-          NUGET_SOURCE: "source"
+          NUGET_SOURCE: "github"
           INCLUDE_SYMBOLS: true
