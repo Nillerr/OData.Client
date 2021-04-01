@@ -137,9 +137,9 @@ namespace OData.Client
             where TOther : IEntity;
 
         /// <summary>
-        /// Returns a JSON representation of the selected properties in the entity.
+        /// Returns a string representation of the selected properties in the entity.
         /// </summary>
-        /// <returns>The JSON representation of the selected properties in the entity.</returns>
-        string ToJson(Formatting formatting);
+        /// <returns>The string representation of the selected properties in the entity.</returns>
+        string ToString();
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -100,7 +101,7 @@ namespace OData.Client
             return requestUri;
         }
 
-        private Uri FunctionUri<TResult>(ODataFunctionRequest<TResult> request)
+        private Uri FunctionUri<TResult>(IODataFunctionRequest<TResult> request)
             where TResult : IEntity
         {
             var argumentPairs = request.Arguments.Select(parameter => $"{parameter.Key}={_expressionFormatter.ToString(parameter.Value)}");
@@ -108,10 +109,22 @@ namespace OData.Client
             var functionUri = new Uri(BaseUri, $"{request.FunctionName}({argumentsPart})");
             
             var requestUriBuilder = new UriBuilder(functionUri);
-            requestUriBuilder.Query = request.ToQueryString(QueryStringFormatting.UrlEscaped);
+            requestUriBuilder.Query = ToQueryString(request, QueryStringFormatting.UrlEscaped);
 
             var requestUri = requestUriBuilder.Uri;
             return requestUri;
+        }
+
+        private string ToQueryString<TResult>(IODataFunctionRequest<TResult> request, QueryStringFormatting formatting)
+            where TResult : IEntity
+        {
+            var parts = new List<string>(3);
+
+            parts.AddSelection(request.Selection, formatting);
+            parts.AddExpansions(request.Expansions, formatting);
+
+            var queryString = string.Join("&", parts);
+            return queryString;
         }
 
         /// <inheritdoc />
@@ -448,7 +461,7 @@ namespace OData.Client
 
         /// <inheritdoc />
         public async Task<IEntity<TResult>> InvokeAsync<TResult>(
-            ODataFunctionRequest<TResult> request,
+            IODataFunctionRequest<TResult> request,
             CancellationToken cancellationToken = default
         )
             where TResult : IEntity
@@ -474,7 +487,7 @@ namespace OData.Client
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 var arguments = string.Join(",", request.Arguments.Select(kvp => $"{kvp.Key}={_expressionFormatter.ToString(kvp.Value)}"));
-                _logger.LogDebug("Invocation of function '{Function}' with arguments ({Arguments}) returned: {Result}", request.FunctionName, arguments, entity.ToJson(Formatting.None));
+                _logger.LogDebug("Invocation of function '{Function}' with arguments ({Arguments}) returned: {Result}", request.FunctionName, arguments, entity);
             }
             
             return entity;

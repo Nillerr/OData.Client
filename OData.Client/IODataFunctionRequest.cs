@@ -1,13 +1,16 @@
 using System.Collections.Generic;
-using JetBrains.Annotations;
 
 namespace OData.Client
 {
-    public interface IODataFunctionRequest<out TResult>
+    public interface IODataFunctionRequest<TResult>
         where TResult : IEntity
     {
-        public IEntityType<TResult> EntityType { get; }
+        IEntityType<TResult> EntityType { get; }
         string FunctionName { get; }
-        Dictionary<string, ODataFunctionRequestArgument> Arguments { get; }
+        
+        IReadOnlyDictionary<string, ODataFunctionRequestArgument> Arguments { get; }
+        
+        IReadOnlyCollection<ISelectableProperty<TResult>> Selection { get; }
+        IReadOnlyCollection<ODataExpansion<TResult>> Expansions { get; }
     }
 }

@@ -1,43 +1,40 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace OData.Client
 {
     public sealed class ODataFunctionRequest<TResult> :
-        IODataFunctionRequest<TResult>
+        IODataFunctionRequest<TResult>,
+        IEquatable<ODataFunctionRequest<TResult>>
         where TResult : IEntity
     {
         private readonly List<ISelectableProperty<TResult>> _selection = new();
         private readonly List<ODataExpansion<TResult>> _expansions = new();
-        
+        private readonly Dictionary<string, ODataFunctionRequestArgument> _arguments = new();
+
         public ODataFunctionRequest(IEntityType<TResult> entityType, string functionName)
         {
             EntityType = entityType;
             FunctionName = functionName;
         }
 
-        public object this[string parameterName]
+        public object? this[string parameterName]
         {
-            set => Arguments[parameterName] = new ODataFunctionRequestArgument(value);
+            get => _arguments[parameterName].Value;
+            set => _arguments[parameterName] = new ODataFunctionRequestArgument(value);
         }
 
         public IEntityType<TResult> EntityType { get; }
         public string FunctionName { get; }
 
-        public Dictionary<string, ODataFunctionRequestArgument> Arguments { get; } = new();
-
-        /// <summary>
-        /// The selection to apply.
-        /// </summary>
-        public IEnumerable<ISelectableProperty<TResult>> Selection => _selection;
-
-        /// <summary>
-        /// The expansions to apply.
-        /// </summary>
-        public IEnumerable<ODataExpansion<TResult>> Expansions => _expansions;
+        public IReadOnlyCollection<ISelectableProperty<TResult>> Selection => _selection;
+        public IReadOnlyCollection<ODataExpansion<TResult>> Expansions => _expansions;
+        public IReadOnlyDictionary<string, ODataFunctionRequestArgument> Arguments => _arguments;
 
         public ODataFunctionRequest<TResult> Pass(string parameterName, object? value)
         {
-            Arguments[parameterName] = new ODataFunctionRequestArgument(value);
+            _arguments[parameterName] = new ODataFunctionRequestArgument(value);
             return this;
         }
 
@@ -55,22 +52,52 @@ namespace OData.Client
             _expansions.Add(expansion);
             return this;
         }
-        
-        /// <summary>
-        /// Returns a query string representation of the request using the specified formatting.
-        /// </summary>
-        /// <param name="formatting">The formatting to apply to the query string.</param>
-        /// <returns>The query string representation of the request.</returns>
-        public string ToQueryString(QueryStringFormatting formatting)
+
+        public bool Equals(ODataFunctionRequest<TResult>? other)
         {
-            var parts = new List<string>(3);
-
-            parts.AddSelection(Selection, formatting);
-            parts.AddExpansions(Expansions, formatting);
-
-            var queryString = string.Join("&", parts);
-            return queryString;
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return EntityType.Equals(other.EntityType) &&
+                   FunctionName == other.FunctionName &&
+                   _arguments.Count == other._arguments.Count &&
+                   _arguments
+                       .All(argument => Equals(argument.Value, other._arguments.GetValueOrDefault(argument.Key))) &&
+                   _selection.Count == other._selection.Count && _selection.All(other._selection.Contains) &&
+                   _expansions.Count == other._expansions.Count && _expansions.All(other._expansions.Contains);
         }
+
+        public override bool Equals(object? obj) =>
+            ReferenceEquals(this, obj) || obj is ODataFunctionRequest<TResult> other && Equals(other);
+
+        public override int GetHashCode()
+        {
+            var hashCode = new HashCode();
+            hashCode.Add(FunctionName);
+            hashCode.Add(EntityType);
+
+            foreach (var argument in _arguments)
+            {
+                hashCode.Add(argument);
+            }
+
+            foreach (var selection in _selection)
+            {
+                hashCode.Add(selection);
+            }
+
+            foreach (var expansion in _expansions)
+            {
+                hashCode.Add(expansion);
+            }
+
+            return hashCode.ToHashCode();
+        }
+
+        public static bool operator ==(ODataFunctionRequest<TResult>? left, ODataFunctionRequest<TResult>? right) =>
+            Equals(left, right);
+
+        public static bool operator !=(ODataFunctionRequest<TResult>? left, ODataFunctionRequest<TResult>? right) =>
+            !Equals(left, right);
     }
 
     public static class ODataFunctionRequest

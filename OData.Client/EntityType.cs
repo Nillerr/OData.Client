@@ -8,6 +8,7 @@ namespace OData.Client
     /// }
     /// </code>
     /// </example>
+    [Equals]
     public sealed class EntityType<TEntity> : IEntityType<TEntity>
         where TEntity : IEntity
     {

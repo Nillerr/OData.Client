@@ -78,7 +78,8 @@ namespace OData.Client.Json.Net
         /// <inheritdoc />
         public bool TryGetEntity<TOther>(IOptionalRef<TEntity, TOther> property, IEntityType<TOther> other, out IEntity<TOther> entity) where TOther : IEntity
         {
-            if (_root.TryGetValue(property.SelectableName, out var token))
+            var propertyName = EntityPropertyName(property, other);
+            if (_root.TryGetValue(propertyName, out var token))
             {
                 var otherRoot = token.Value<JObject>();
                 entity = new JObjectEntity<TOther>(other, otherRoot, _serializer);
@@ -96,8 +97,18 @@ namespace OData.Client.Json.Net
             {
                 return entity;
             }
+
+            var propertyName = EntityPropertyName(property, other);
+            throw new JsonSerializationException($"A property '{propertyName}' could not be found.");
+        }
+
+        private string EntityPropertyName<TOther>(IRef<TEntity, TOther> property, IEntityType<TOther> other) where TOther : IEntity
+        {
+            var name = typeof(TOther) == typeof(IEntity)
+                ? $"{property.ExpandableName}_{other.Name}"
+                : property.ExpandableName;
             
-            throw new JsonSerializationException($"A property '{property.SelectableName}' could not be found.");
+            return name;
         }
 
         /// <inheritdoc />
@@ -180,12 +191,12 @@ namespace OData.Client.Json.Net
             throw new JsonSerializationException($"A property '{property.SelectableName}' could not be found.");
         }
 
-        /// <inheritdoc />
-        public string ToJson(Formatting formatting)
+        /// <inheritdoc cref="IEntity" />
+        public override string ToString()
         {
             using var stringWriter = new StringWriter();
             using var jsonTextWriter = new JsonTextWriter(stringWriter);
-            jsonTextWriter.Formatting = (Newtonsoft.Json.Formatting) formatting;
+            jsonTextWriter.Formatting = Formatting.Indented;
             
             _serializer.Serialize(jsonTextWriter, _root);
 

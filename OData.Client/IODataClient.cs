@@ -230,8 +230,16 @@ namespace OData.Client
             where TEntity : IEntity
             where TOther : IEntity;
 
+        /// <summary>
+        /// <b>[EXPERIMENTAL]</b> Invokes the function specified by the <see cref="IODataFunctionRequest{TResult}"/>.
+        /// </summary>
+        /// <param name="request">The function request.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <typeparam name="TResult">The type of result returned by the function.</typeparam>
+        /// <returns>The result of invoking the specified function.</returns>
+        /// <remarks>This is an experimental API and thus the signature is subject to change.</remarks>
         Task<IEntity<TResult>> InvokeAsync<TResult>(
-            ODataFunctionRequest<TResult> request,
+            IODataFunctionRequest<TResult> request,
             CancellationToken cancellationToken = default
         )
             where TResult : IEntity;

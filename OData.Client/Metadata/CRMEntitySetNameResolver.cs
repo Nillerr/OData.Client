@@ -57,7 +57,7 @@ namespace OData.Client
             
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("Fetched entity definition for '{EntityType}': {EntityDefinition}", context.EntityType.Name, entityDefinition.ToJson(Formatting.None));
+                _logger.LogDebug("Fetched entity definition for '{EntityType}': {EntityDefinition}", context.EntityType.Name, entityDefinition);
             }
             
             return entityDefinition;

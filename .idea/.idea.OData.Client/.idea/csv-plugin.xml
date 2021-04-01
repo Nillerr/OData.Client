@@ -3,6 +3,13 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
+        <entry key="/OData.Client.Demo/Program.cs">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/OData.Client/Expressions/Formatting/DefaultValueFormatter.cs">
           <value>
             <Attribute>

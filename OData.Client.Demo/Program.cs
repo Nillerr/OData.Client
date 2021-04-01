@@ -85,7 +85,10 @@ namespace OData.Client.Demo
             foreach (var activity in activities)
             {
                 var activityId = activity.Id(Activity.ActivityId);
-                Console.WriteLine($"{activityId}: {activity.ToJson(Formatting.Indented)}");
+                Console.WriteLine($"{activityId}: {activity}");
+                
+                var incident = activity.Entity(Activity.RegardingObjectId, Incident.EntityType);
+                Console.WriteLine($"Incident: {incident}");
             }
         }
 
@@ -131,7 +134,7 @@ namespace OData.Client.Demo
                 foreach (var incident in page)
                 {
                     var incidentId = incident.Id(Incident.IncidentId);
-                    Console.WriteLine($"{incidentId}: {incident.ToJson(Formatting.Indented)}");
+                    Console.WriteLine($"{incidentId}: {incident}");
                 }
                 
                 Console.WriteLine();
