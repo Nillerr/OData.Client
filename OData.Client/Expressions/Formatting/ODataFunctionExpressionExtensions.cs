@@ -8,10 +8,10 @@ namespace OData.Client.Expressions.Formatting
         public static string ToFilterString(
             this ODataFunctionExpression expression,
             string propertyPrefix,
-            IValueFormatter valueFormatter
+            IExpressionFormatter expressionFormatter
         )
         {
-            var visitor = new FunctionArgumentToStringVisitor(valueFormatter, propertyPrefix);
+            var visitor = new FunctionArgumentToStringVisitor(expressionFormatter, propertyPrefix);
             
             var arguments = expression.Arguments.ToFilterString(visitor);
             var function = expression.Function.Name;

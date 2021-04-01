@@ -5,19 +5,19 @@ namespace OData.Client.Expressions.Formatting
     internal sealed class BinaryRightOperandToStringVisitor : IODataBinaryRightOperandVisitor
     {
         private readonly StringBuilder _stringBuilder = new();
-        private readonly IValueFormatter _valueFormatter;
+        private readonly IExpressionFormatter _expressionFormatter;
         
-        public BinaryRightOperandToStringVisitor(string propertyPrefix, IValueFormatter valueFormatter)
+        public BinaryRightOperandToStringVisitor(string propertyPrefix, IExpressionFormatter expressionFormatter)
         {
             PropertyPrefix = propertyPrefix;
-            _valueFormatter = valueFormatter;
+            _expressionFormatter = expressionFormatter;
         }
 
         private string PropertyPrefix { get; }
 
         public void Visit(ODataConstantExpression expression)
         {
-            var stringValue = _valueFormatter.ToString(expression);
+            var stringValue = _expressionFormatter.ToString(expression);
             _stringBuilder.Append(stringValue);
         }
 

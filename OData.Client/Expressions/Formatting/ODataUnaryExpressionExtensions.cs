@@ -5,10 +5,10 @@ namespace OData.Client.Expressions.Formatting
         public static string ToFilterString(
             this ODataUnaryExpression expression,
             string propertyPrefix,
-            IValueFormatter valueFormatter
+            IExpressionFormatter expressionFormatter
         )
         {
-            var operandVisitor = new FilterExpressionToStringVisitor(propertyPrefix, valueFormatter);
+            var operandVisitor = new FilterExpressionToStringVisitor(propertyPrefix, expressionFormatter);
             expression.Operand.Visit(operandVisitor);
 
             var operand = operandVisitor.ToString();

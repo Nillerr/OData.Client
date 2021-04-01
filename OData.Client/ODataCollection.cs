@@ -10,23 +10,23 @@ namespace OData.Client
     {
         private readonly IEntityType<TEntity> _entityType;
         private readonly IODataClient _oDataClient;
-        private readonly IValueFormatter _valueFormatter;
+        private readonly IExpressionFormatter _expressionFormatter;
 
         public ODataCollection(
             IEntityType<TEntity> entityType,
             IODataClient oDataClient,
-            IValueFormatter valueFormatter
+            IExpressionFormatter expressionFormatter
         )
         {
             _entityType = entityType;
             _oDataClient = oDataClient;
-            _valueFormatter = valueFormatter;
+            _expressionFormatter = expressionFormatter;
         }
 
         /// <inheritdoc />
         public IODataQuery<TEntity> Find()
         {
-            return new ODataQuery<TEntity>(_entityType, _oDataClient, _valueFormatter);
+            return new ODataQuery<TEntity>(_entityType, _oDataClient, _expressionFormatter);
         }
 
         /// <inheritdoc />

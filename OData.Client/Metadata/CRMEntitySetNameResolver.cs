@@ -46,7 +46,7 @@ namespace OData.Client
         )
             where TEntity : IEntity
         {
-            _logger.LogDebug("Fetching entity definition for '{entityType}'...", context.EntityType.Name);
+            _logger.LogDebug("Fetching entity definition for '{EntityType}'...", context.EntityType.Name);
             var entityType = ODataEntityDefinition.EntityType;
             
             var request = ODataFunctionRequest.For(entityType, "EntityDefinitions")
@@ -57,7 +57,7 @@ namespace OData.Client
             
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("Fetched entity definition for '{entityType}': {entityDefinition}", context.EntityType.Name, entityDefinition.ToJson(Formatting.None));
+                _logger.LogDebug("Fetched entity definition for '{EntityType}': {EntityDefinition}", context.EntityType.Name, entityDefinition.ToJson(Formatting.None));
             }
             
             return entityDefinition;

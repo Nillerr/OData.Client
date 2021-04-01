@@ -6,8 +6,6 @@ namespace OData.Client
 {
     public sealed class ODataClientSettings
     {
-        private IEntitySetNameResolver? _entitySetNameResolver;
-
         public ODataClientSettings(
             Uri organizationUri,
             IODataPropertiesFactory propertiesFactory,
@@ -21,39 +19,22 @@ namespace OData.Client
             EntitySerializer = entitySerializer;
             HttpClient = httpClient;
             LoggerFactory = loggerFactory;
+            
+            ValueFormatter = new DefaultValueFormatter();
+            ExpressionFormatter = new DefaultExpressionFormatter(ValueFormatter);
+            
+            var logger = loggerFactory.CreateLogger<CRMEntitySetNameResolver>();
+            EntitySetNameResolver = new CRMEntitySetNameResolver(logger);
         }
 
-        public Uri OrganizationUri { get; set; }
-        public IODataPropertiesFactory PropertiesFactory { get; set; }
-        public IEntitySerializer EntitySerializer { get; set; }
-        public IODataHttpClient HttpClient { get; set; }
-        public ILoggerFactory LoggerFactory { get; set; }
-        
-        public IValueFormatter ValueFormatter { get; set; } = new DefaultValueFormatter();
+        public Uri OrganizationUri { get; }
+        public IODataPropertiesFactory PropertiesFactory { get; }
+        public IEntitySerializer EntitySerializer { get; }
+        public IODataHttpClient HttpClient { get; }
+        public ILoggerFactory LoggerFactory { get; }
 
-        public IEntitySetNameResolver EntitySetNameResolver
-        {
-            get => GetOrCreateDefault(ref _entitySetNameResolver, () =>
-            {
-                var logger = LoggerFactory.CreateLogger<CRMEntitySetNameResolver>();
-                return new CRMEntitySetNameResolver(logger);
-            });
-            set => _entitySetNameResolver = value;
-        }
-
-        private static T GetOrCreateDefault<T>(ref T? property, Func<T> defaultFactory)
-            where T : notnull
-        {
-            var value = property;
-            if (value != null)
-            {
-                return value;
-            }
-
-            var defaultValue = defaultFactory();
-            property = defaultValue;
-
-            return defaultValue;
-        }
+        public IValueFormatter ValueFormatter { get; set; }
+        public IExpressionFormatter ExpressionFormatter { get; set; }
+        public IEntitySetNameResolver EntitySetNameResolver { get; set; }
     }
 }

@@ -21,19 +21,19 @@ namespace OData.Client
         
         private readonly IEntityType<TEntity> _entityType;
         private readonly IODataClient _oDataClient;
-        private readonly IValueFormatter _valueFormatter;
+        private readonly IExpressionFormatter _expressionFormatter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataQuery{TEntity}"/> class.
         /// </summary>
         /// <param name="entityType">The entity type.</param>
         /// <param name="oDataClient">The OData client.</param>
-        /// <param name="valueFormatter">The value formatter.</param>
-        public ODataQuery(IEntityType<TEntity> entityType, IODataClient oDataClient, IValueFormatter valueFormatter)
+        /// <param name="expressionFormatter">The value formatter.</param>
+        public ODataQuery(IEntityType<TEntity> entityType, IODataClient oDataClient, IExpressionFormatter expressionFormatter)
         {
             _entityType = entityType;
             _oDataClient = oDataClient;
-            _valueFormatter = valueFormatter;
+            _expressionFormatter = expressionFormatter;
         }
 
         /// <inheritdoc />
@@ -200,7 +200,7 @@ namespace OData.Client
         public override string ToString()
         {
             var request = CreateFindRequest();
-            var queryString = request.ToQueryString(_valueFormatter, QueryStringFormatting.None);
+            var queryString = request.ToQueryString(_expressionFormatter, QueryStringFormatting.None);
 
             var expression = (queryString == string.Empty ? "<empty>" : queryString);
             var maxPageSize = _maxPageSize?.ToString() ?? "<empty>";

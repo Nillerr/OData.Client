@@ -9,7 +9,7 @@ namespace OData.Client
     {
         public static void AddFilter<TEntity>(
             this List<string> queryStringParts,
-            IValueFormatter valueFormatter,
+            IExpressionFormatter expressionFormatter,
             ODataFilter<TEntity>? filter,
             QueryStringFormatting formatting
         )
@@ -28,7 +28,7 @@ namespace OData.Client
                 return;
             }
 
-            var filterVisitor = new FilterExpressionToStringVisitor(string.Empty, valueFormatter);
+            var filterVisitor = new FilterExpressionToStringVisitor(string.Empty, expressionFormatter);
             filterExpression.Visit(filterVisitor);
 
             var filterString = filterVisitor.ToString();

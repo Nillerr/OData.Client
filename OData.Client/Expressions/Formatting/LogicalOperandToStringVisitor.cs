@@ -5,43 +5,43 @@ namespace OData.Client.Expressions.Formatting
     internal sealed class LogicalOperandToStringVisitor : IODataLogicalOperandVisitor
     {
         private readonly StringBuilder _stringBuilder = new();
-        private readonly IValueFormatter _valueFormatter;
+        private readonly IExpressionFormatter _expressionFormatter;
 
-        public LogicalOperandToStringVisitor(string propertyPrefix, IValueFormatter valueFormatter)
+        public LogicalOperandToStringVisitor(string propertyPrefix, IExpressionFormatter expressionFormatter)
         {
             PropertyPrefix = propertyPrefix;
-            _valueFormatter = valueFormatter;
+            _expressionFormatter = expressionFormatter;
         }
 
         private string PropertyPrefix { get; }
 
         public void Visit(ODataBinaryExpression expression)
         {
-            var filterString = expression.ToFilterString(PropertyPrefix, _valueFormatter);
+            var filterString = expression.ToFilterString(PropertyPrefix, _expressionFormatter);
             _stringBuilder.Append(filterString);
         }
 
         public void Visit(ODataFunctionExpression expression)
         {
-            var filterString = expression.ToFilterString(PropertyPrefix, _valueFormatter);
+            var filterString = expression.ToFilterString(PropertyPrefix, _expressionFormatter);
             _stringBuilder.Append(filterString);
         }
 
         public void Visit(ODataLambdaExpression expression)
         {
-            var filterString = expression.ToFilterString(_valueFormatter);
+            var filterString = expression.ToFilterString(_expressionFormatter);
             _stringBuilder.Append(filterString);
         }
 
         public void Visit(ODataLogicalExpression expression)
         {
-            var filterString = expression.ToFilterString(PropertyPrefix, _valueFormatter);
+            var filterString = expression.ToFilterString(PropertyPrefix, _expressionFormatter);
             _stringBuilder.Append(filterString);
         }
 
         public void Visit(ODataUnaryExpression expression)
         {
-            var filterString = expression.ToFilterString(PropertyPrefix, _valueFormatter);
+            var filterString = expression.ToFilterString(PropertyPrefix, _expressionFormatter);
             _stringBuilder.Append(filterString);
         }
 

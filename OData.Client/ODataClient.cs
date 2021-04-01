@@ -20,7 +20,7 @@ namespace OData.Client
         private readonly IODataPropertiesFactory _propertiesFactory;
         private readonly IEntitySerializer _entitySerializer;
         private readonly IODataHttpClient _oDataHttpClient;
-        private readonly IValueFormatter _valueFormatter;
+        private readonly IExpressionFormatter _expressionFormatter;
         private readonly IEntitySetNameResolver _entitySetNameResolver;
         private readonly ILogger<ODataClient> _logger;
 
@@ -34,7 +34,7 @@ namespace OData.Client
             _propertiesFactory = settings.PropertiesFactory;
             _entitySerializer = settings.EntitySerializer;
             _oDataHttpClient = settings.HttpClient;
-            _valueFormatter = settings.ValueFormatter;
+            _expressionFormatter = settings.ExpressionFormatter;
             _entitySetNameResolver = settings.EntitySetNameResolver;
             _logger = settings.LoggerFactory.CreateLogger<ODataClient>();
         }
@@ -69,7 +69,7 @@ namespace OData.Client
             var collectionUri = await CollectionUriASync(type);
 
             var requestUriBuilder = new UriBuilder(collectionUri);
-            requestUriBuilder.Query = request.ToQueryString(_valueFormatter, QueryStringFormatting.UrlEscaped);
+            requestUriBuilder.Query = request.ToQueryString(_expressionFormatter, QueryStringFormatting.UrlEscaped);
 
             var requestUri = requestUriBuilder.Uri;
             return requestUri;
@@ -103,7 +103,7 @@ namespace OData.Client
         private Uri FunctionUri<TResult>(ODataFunctionRequest<TResult> request)
             where TResult : IEntity
         {
-            var argumentPairs = request.Arguments.Select(parameter => $"{parameter.Key}={_valueFormatter.ToString(parameter.Value)}");
+            var argumentPairs = request.Arguments.Select(parameter => $"{parameter.Key}={_expressionFormatter.ToString(parameter.Value)}");
             var argumentsPart = string.Join(",", argumentPairs);
             var functionUri = new Uri(BaseUri, $"{request.FunctionName}({argumentsPart})");
             
@@ -117,7 +117,7 @@ namespace OData.Client
         /// <inheritdoc />
         public IODataCollection<TEntity> Collection<TEntity>(IEntityType<TEntity> type) where TEntity : IEntity
         {
-            return new ODataCollection<TEntity>(type, this, _valueFormatter);
+            return new ODataCollection<TEntity>(type, this, _expressionFormatter);
         }
 
         /// <inheritdoc />
@@ -130,8 +130,8 @@ namespace OData.Client
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                var queryString = request.ToQueryString(_valueFormatter, QueryStringFormatting.None);
-                _logger.LogDebug("Querying entities of type '{entityType}' using request \"{request}\"...", type.Name, queryString);
+                var queryString = request.ToQueryString(_expressionFormatter, QueryStringFormatting.None);
+                _logger.LogDebug("Querying entities of type '{EntityType}' using request \"{Request}\"...", type.Name, queryString);
             }
             
             async Task<HttpRequestMessage> CreateRequest()
@@ -151,8 +151,8 @@ namespace OData.Client
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 // TODO @nije: Add ToJson() for response
-                var queryString = request.ToQueryString(_valueFormatter, QueryStringFormatting.None);
-                _logger.LogDebug("Query for entities of type '{entityType}' using request \"{request}\" returned {count} results.", type.Name, queryString, response.Value.Count);
+                var queryString = request.ToQueryString(_expressionFormatter, QueryStringFormatting.None);
+                _logger.LogDebug("Query for entities of type '{EntityType}' using request \"{Request}\" returned {Count} results", type.Name, queryString, response.Value.Count);
             }
             
             return response;
@@ -174,7 +174,7 @@ namespace OData.Client
             
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("Querying the next page of entities of type '{entityType}' using request \"{requestUri}\"...", current.EntityType.Name, requestUri);
+                _logger.LogDebug("Querying the next page of entities of type '{EntityType}' using request \"{RequestUri}\"...", current.EntityType.Name, requestUri);
             }
             
             Task<HttpRequestMessage> CreateRequest()
@@ -192,7 +192,7 @@ namespace OData.Client
             
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("Query for the next page of entities of type '{entityType}' using request \"{requestUri}\" returned {count} results.", current.EntityType.Name, requestUri, response.Value.Count);
+                _logger.LogDebug("Query for the next page of entities of type '{EntityType}' using request \"{RequestUri}\" returned {Count} results", current.EntityType.Name, requestUri, response.Value.Count);
             }
             
             return response;
@@ -455,8 +455,8 @@ namespace OData.Client
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                var arguments = string.Join(",", request.Arguments.Select(kvp => $"{kvp.Key}={_valueFormatter.ToString(kvp.Value)}"));
-                _logger.LogDebug("Invoking function '{function}' with arguments ({arguments})...", request.FunctionName, arguments);
+                var arguments = string.Join(",", request.Arguments.Select(kvp => $"{kvp.Key}={_expressionFormatter.ToString(kvp.Value)}"));
+                _logger.LogDebug("Invoking function '{Function}' with arguments ({Arguments})...", request.FunctionName, arguments);
             }
             
             Task<HttpRequestMessage> CreateRequest()
@@ -473,8 +473,8 @@ namespace OData.Client
             
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                var arguments = string.Join(",", request.Arguments.Select(kvp => $"{kvp.Key}={_valueFormatter.ToString(kvp.Value)}"));
-                _logger.LogDebug("Invocation of function '{function}' with arguments ({arguments}) returned: {result}", request.FunctionName, arguments, entity.ToJson(Formatting.None));
+                var arguments = string.Join(",", request.Arguments.Select(kvp => $"{kvp.Key}={_expressionFormatter.ToString(kvp.Value)}"));
+                _logger.LogDebug("Invocation of function '{Function}' with arguments ({Arguments}) returned: {Result}", request.FunctionName, arguments, entity.ToJson(Formatting.None));
             }
             
             return entity;

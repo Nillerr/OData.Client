@@ -5,11 +5,11 @@ namespace OData.Client.Expressions.Formatting
     internal sealed class FunctionArgumentToStringVisitor : IODataFunctionArgumentVisitor
     {
         private readonly StringBuilder _stringBuilder = new();
-        private readonly IValueFormatter _valueFormatter;
+        private readonly IExpressionFormatter _expressionFormatter;
 
-        public FunctionArgumentToStringVisitor(IValueFormatter valueFormatter, string propertyPrefix)
+        public FunctionArgumentToStringVisitor(IExpressionFormatter expressionFormatter, string propertyPrefix)
         {
-            _valueFormatter = valueFormatter;
+            _expressionFormatter = expressionFormatter;
             PropertyPrefix = propertyPrefix;
         }
 
@@ -17,7 +17,7 @@ namespace OData.Client.Expressions.Formatting
 
         public void Visit(ODataConstantExpression expression)
         {
-            var stringValue = _valueFormatter.ToString(expression);
+            var stringValue = _expressionFormatter.ToString(expression);
             _stringBuilder.Append(stringValue);
         }
 

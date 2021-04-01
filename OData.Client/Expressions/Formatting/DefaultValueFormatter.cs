@@ -5,17 +5,7 @@ namespace OData.Client.Expressions.Formatting
 {
     public class DefaultValueFormatter : IValueFormatter
     {
-        public string ToString(ODataConstantExpression expression)
-        {
-            return ToString(expression.Value);
-        }
-
-        public string ToString(ODataFunctionRequestArgument argument)
-        {
-            return ToString(argument.Value);
-        }
-
-        private static string ToString(object? expressionValue)
+        public string Serialize(object? expressionValue)
         {
             const string utcDateTimeFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 

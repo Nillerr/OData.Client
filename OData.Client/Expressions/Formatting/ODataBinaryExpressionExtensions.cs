@@ -5,13 +5,13 @@ namespace OData.Client.Expressions.Formatting
         public static string ToFilterString(
             this ODataBinaryExpression expression,
             string propertyPrefix,
-            IValueFormatter valueFormatter
+            IExpressionFormatter expressionFormatter
         )
         {
             var leftVisitor = new BinaryLeftOperandToStringVisitor(propertyPrefix);
             expression.Left.Visit(leftVisitor);
 
-            var rightVisitor = new BinaryRightOperandToStringVisitor(propertyPrefix, valueFormatter);
+            var rightVisitor = new BinaryRightOperandToStringVisitor(propertyPrefix, expressionFormatter);
             expression.Right.Visit(rightVisitor);
 
             var left = leftVisitor.ToString();
