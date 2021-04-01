@@ -41,4 +41,6 @@ jobs:
 
       # publish to github package
       - name: Publish
-        run: dotnet nuget push ./$project/bin/$config/$project.1.0.0-alpha1.nupkg --source "github"
+        run: |
+          NUPKG=$(ls ./$project/bin/$config | grep "\.nupkg")
+          dotnet nuget push ./$project/bin/$config/$NUPKG --api-key "${{ secrets.GITHUB_TOKEN }}" --source "github"
