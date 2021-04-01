@@ -12,6 +12,6 @@ namespace OData.Client
         /// </summary>
         internal static readonly EntityType<Ref> EntityType = "<<ref>>";
         
-        public static readonly Required<Ref, Uri> Id = "@odata.id";
+        public static readonly Property<Ref, Uri> Id = "@odata.id";
     }
 }

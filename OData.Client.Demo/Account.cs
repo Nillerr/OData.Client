@@ -4,7 +4,7 @@ namespace OData.Client.Demo
     {
         public static readonly EntityType<Account> EntityType = "account";
         
-        public static readonly Required<Account, IEntityId<Account>> AccountId = "accountid";
-        public static readonly Required<Account, bool> IsAdmin = "is_admin";
+        public static readonly Property<Account, IEntityId<Account>> AccountId = "accountid";
+        public static readonly Property<Account, bool> IsAdmin = "is_admin";
     }
 }

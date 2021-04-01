@@ -4,7 +4,7 @@ namespace OData.Client
     {
         public static readonly EntityType<ODataEntityDefinition> EntityType = "Metadata";
 
-        public static readonly Required<ODataEntityDefinition, IEntityId<ODataEntityDefinition>> MetadataId = "MetadataId";
-        public static readonly Required<ODataEntityDefinition, string> EntitySetName = "EntitySetName";
+        public static readonly Property<ODataEntityDefinition, IEntityId<ODataEntityDefinition>> MetadataId = "MetadataId";
+        public static readonly Property<ODataEntityDefinition, string> EntitySetName = "EntitySetName";
     }
 }

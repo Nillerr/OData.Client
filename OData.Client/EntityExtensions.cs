@@ -1,40 +1,32 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace OData.Client
 {
     /// <summary>
-    /// Extensions for working with <see cref="IRequired{TEntity,TValue}"/> and
+    /// Extensions for working with <see cref="IProperty{TEntity,TValue}"/> and
     /// <see cref="IRequiredRef{TEntity,TOther}"/> properties on entities.
     /// </summary>
     public static class EntityExtensions
     {
         /// <summary>
-        /// Tries to get the value with the specified <paramref name="property"/>.
+        /// Gets the value with the specified <paramref name="property"/> converted to the specified type.
         /// </summary>
         /// <param name="source">The entity.</param>
         /// <param name="property">The property.</param>
-        /// <param name="value">The value.</param>
         /// <typeparam name="TEntity">The type of entity.</typeparam>
         /// <typeparam name="TValue">The type to convert the value to.</typeparam>
-        /// <returns><see langword="true"/> if a value was successfully retrieved; otherwise, <see langword="false"/>.</returns>
+        /// <returns>The converted value.</returns>
         /// <exception cref="ODataNullValueException">The value of the property was <see langword="null"/>.</exception>
-        public static bool TryGetValue<TEntity, TValue>(
-            this IEntity<TEntity> source,
-            IRequired<TEntity, TValue> property,
-            [MaybeNullWhen(false)] out TValue value
-        )
+        public static TValue? ValueOrDefault<TEntity, TValue>(this IEntity<TEntity> source, IProperty<TEntity, TValue> property)
             where TEntity : IEntity
-            where TValue : notnull
         {
-            var optional = new Optional<TEntity, TValue>(property.SelectableName);
-            if (source.TryGetValue(optional, out var nullable))
+            if (source.TryGetValue(property, out TValue? value))
             {
-                value = CheckNotNull(nullable, property);
-                return true;
+                return value;
             }
 
-            value = default;
-            return false;
+            return default;
         }
 
         /// <summary>
@@ -46,13 +38,15 @@ namespace OData.Client
         /// <typeparam name="TValue">The type to convert the value to.</typeparam>
         /// <returns>The converted value.</returns>
         /// <exception cref="ODataNullValueException">The value of the property was <see langword="null"/>.</exception>
-        public static TValue Value<TEntity, TValue>(this IEntity<TEntity> source, IRequired<TEntity, TValue> property)
+        public static TValue Value<TEntity, TValue>(this IEntity<TEntity> source, IProperty<TEntity, TValue> property)
             where TEntity : IEntity
-            where TValue : notnull
         {
-            var optional = new Optional<TEntity, TValue>(property.SelectableName);
-            var nullable = source.Value(optional);
-            return CheckNotNull(nullable, property);
+            if (source.TryGetValue(property, out var value))
+            {
+                return value;
+            }
+
+            throw new InvalidOperationException($"The entity does not contain a property named '{property.Name}'.");
         }
 
         /// <summary>
@@ -161,25 +155,6 @@ namespace OData.Client
             var optional = new OptionalRef<TEntity, TOther>(property.SelectableName);
             var nullable = source.Reference(optional, other);
             return CheckNotNull(nullable, property);
-        }
-
-        /// <summary>
-        /// Checks if <paramref name="value"/> is <see langword="null"/>, and if so, throws an exception.
-        /// </summary>
-        /// <param name="value">The value to check.</param>
-        /// <param name="property">The property containing the value.</param>
-        /// <typeparam name="TValue">The type of value.</typeparam>
-        /// <returns>The value.</returns>
-        /// <exception cref="ODataNullValueException"><paramref name="value"/> was <see langword="null"/>.</exception>
-        private static TValue CheckNotNull<TValue>(TValue? value, IProperty property)
-            where TValue : notnull
-        {
-            if (value == null)
-            {
-                throw new ODataNullValueException($"The value in the entity for required property '{property.SelectableName}' was null.", property);
-            }
-
-            return value;
         }
 
         /// <summary>

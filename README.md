@@ -59,15 +59,11 @@ public sealed class Contact : IEntity
     public static readonly EntityType<Contact> EntityType = "contact";
     
     // The id of the entity is declared using the `Required<TEntity, IEntityId<TEntity>>` type.
-    public static readonly Required<Contact, IEntityId<Contact>> ContactId = "contactid";
+    public static readonly Property<Contact, IEntityId<Contact>> ContactId = "contactid";
     
-    // Required (non-nullable) properties are declared using the `Required<TEntity, TValue>` type. The type of `TValue` 
-    // must not use nullable annotations.
-    public static readonly Required<Contact, string> EmailAddress = "emailaddress1";
-    
-    // Optional (nullable) properties are declared using the `Optional<TEntity, TValue>` type. The type of `TValue` 
-    // must not use nullable annotations.
-    public static readonly Optional<Contact, string> GivenName = "givenname";
+    // Properties (fields) are declared using the `Property<TEntity, TValue>` type.
+    public static readonly Property<Contact, string> EmailAddress = "emailaddress1";
+    public static readonly Property<Contact, string?> GivenName = "givenname";
     
     // Required reference to another entity (single-valued navivation properties) are declared using the 
     // `RequiredRef<TEntity, TOther>` type. The type of `TOther` must not use nullable annotations.

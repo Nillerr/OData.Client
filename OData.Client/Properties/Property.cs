@@ -2,18 +2,15 @@ using System;
 
 namespace OData.Client
 {
-    /// <inheritdoc cref="IRequired{TEntity,TValue}" />
-    public sealed class Required<TEntity, TValue> :
-        IRequired<TEntity, TValue>,
-        IEquatable<IProperty<TEntity, TValue>>
+    /// <inheritdoc cref="IProperty{TEntity,TValue}"/>
+    public sealed class Property<TEntity, TValue> : IProperty<TEntity, TValue>, IEquatable<IProperty<TEntity, TValue>>
         where TEntity : IEntity
-        where TValue : notnull
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Required{TEntity,TOther}"/> class.
+        /// Initializes a new instance of the <see cref="Property{TEntity,TValue}"/> class.
         /// </summary>
         /// <param name="name">The property name.</param>
-        public Required(string name) => Name = name;
+        public Property(string name) => Name = name;
 
         /// <inheritdoc />
         public string Name { get; }
@@ -31,12 +28,12 @@ namespace OData.Client
         public Type EntityType => typeof(TEntity);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Required{TEntity,TOther}"/> class using the string as the
+        /// Initializes a new instance of the <see cref="Property{TEntity,TValue}"/> class using the string as the
         /// property name.
         /// </summary>
         /// <param name="name">The property name.</param>
-        /// <returns>The newly created <see cref="Required{TEntity,TOther}"/> instance.</returns>
-        public static implicit operator Required<TEntity, TValue>(string name) => new(name);
+        /// <returns>The newly created <see cref="Property{TEntity,TValue}"/> instance.</returns>
+        public static implicit operator Property<TEntity, TValue>(string name) => new(name);
 
         /// <inheritdoc />
         public bool Equals(IProperty<TEntity, TValue>? other)
@@ -62,7 +59,7 @@ namespace OData.Client
         /// <param name="property">The property.</param>
         /// <param name="other">The value.</param>
         /// <returns>The filter.</returns>
-        public static ODataFilter<TEntity> operator ==(Required<TEntity, TValue> property, IProperty<TEntity, TValue> other) => 
+        public static ODataFilter<TEntity> operator ==(Property<TEntity, TValue> property, IProperty<TEntity, TValue> other) => 
             property.EqualTo(other);
         
         /// <summary>
@@ -72,7 +69,7 @@ namespace OData.Client
         /// <param name="property">The property.</param>
         /// <param name="other">The value.</param>
         /// <returns>The filter.</returns>
-        public static ODataFilter<TEntity> operator !=(Required<TEntity, TValue> property, IProperty<TEntity, TValue> other) => 
+        public static ODataFilter<TEntity> operator !=(Property<TEntity, TValue> property, IProperty<TEntity, TValue> other) => 
             property.NotEqualTo(other);
         
         /// <summary>
@@ -82,7 +79,7 @@ namespace OData.Client
         /// <param name="property">The property.</param>
         /// <param name="other">The value.</param>
         /// <returns>The filter.</returns>
-        public static ODataFilter<TEntity> operator >(Required<TEntity, TValue> property, IProperty<TEntity, TValue> other) => 
+        public static ODataFilter<TEntity> operator >(Property<TEntity, TValue> property, IProperty<TEntity, TValue> other) => 
             property.GreaterThan(other);
         
         /// <summary>
@@ -92,7 +89,7 @@ namespace OData.Client
         /// <param name="property">The property.</param>
         /// <param name="other">The value.</param>
         /// <returns>The filter.</returns>
-        public static ODataFilter<TEntity> operator <(Required<TEntity, TValue> property, IProperty<TEntity, TValue> other) => 
+        public static ODataFilter<TEntity> operator <(Property<TEntity, TValue> property, IProperty<TEntity, TValue> other) => 
             property.LessThan(other);
 
         /// <summary>
@@ -102,7 +99,7 @@ namespace OData.Client
         /// <param name="property">The property.</param>
         /// <param name="other">The value.</param>
         /// <returns>The filter.</returns>
-        public static ODataFilter<TEntity> operator >=(Required<TEntity, TValue> property, IProperty<TEntity, TValue> other) => 
+        public static ODataFilter<TEntity> operator >=(Property<TEntity, TValue> property, IProperty<TEntity, TValue> other) => 
             property.GreaterThanOrEqualTo(other);
         
         /// <summary>
@@ -112,7 +109,7 @@ namespace OData.Client
         /// <param name="property">The property.</param>
         /// <param name="other">The value.</param>
         /// <returns>The filter.</returns>
-        public static ODataFilter<TEntity> operator <=(Required<TEntity, TValue> property, IProperty<TEntity, TValue> other) => 
+        public static ODataFilter<TEntity> operator <=(Property<TEntity, TValue> property, IProperty<TEntity, TValue> other) => 
             property.LessThanOrEqualTo(other);
         
         /// <summary>
@@ -121,7 +118,7 @@ namespace OData.Client
         /// <param name="property">The property.</param>
         /// <param name="value">The value.</param>
         /// <returns>The filter.</returns>
-        public static ODataFilter<TEntity> operator ==(Required<TEntity, TValue> property, TValue value) => 
+        public static ODataFilter<TEntity> operator ==(Property<TEntity, TValue> property, TValue value) => 
             property.EqualTo(value);
         
         /// <summary>
@@ -131,7 +128,7 @@ namespace OData.Client
         /// <param name="property">The property.</param>
         /// <param name="value">The value.</param>
         /// <returns>The filter.</returns>
-        public static ODataFilter<TEntity> operator !=(Required<TEntity, TValue> property, TValue value) => 
+        public static ODataFilter<TEntity> operator !=(Property<TEntity, TValue> property, TValue value) => 
             property.NotEqualTo(value);
         
         /// <summary>
@@ -141,7 +138,7 @@ namespace OData.Client
         /// <param name="property">The property.</param>
         /// <param name="value">The value.</param>
         /// <returns>The filter.</returns>
-        public static ODataFilter<TEntity> operator >(Required<TEntity, TValue> property, TValue value) => 
+        public static ODataFilter<TEntity> operator >(Property<TEntity, TValue> property, TValue value) => 
             property.GreaterThan(value);
         
         /// <summary>
@@ -151,7 +148,7 @@ namespace OData.Client
         /// <param name="property">The property.</param>
         /// <param name="value">The value.</param>
         /// <returns>The filter.</returns>
-        public static ODataFilter<TEntity> operator <(Required<TEntity, TValue> property, TValue value) => 
+        public static ODataFilter<TEntity> operator <(Property<TEntity, TValue> property, TValue value) => 
             property.LessThan(value);
 
         /// <summary>
@@ -161,7 +158,7 @@ namespace OData.Client
         /// <param name="property">The property.</param>
         /// <param name="value">The value.</param>
         /// <returns>The filter.</returns>
-        public static ODataFilter<TEntity> operator >=(Required<TEntity, TValue> property, TValue value) => 
+        public static ODataFilter<TEntity> operator >=(Property<TEntity, TValue> property, TValue value) => 
             property.GreaterThanOrEqualTo(value);
         
         /// <summary>
@@ -171,7 +168,7 @@ namespace OData.Client
         /// <param name="property">The property.</param>
         /// <param name="value">The value.</param>
         /// <returns>The filter.</returns>
-        public static ODataFilter<TEntity> operator <=(Required<TEntity, TValue> property, TValue value) => 
+        public static ODataFilter<TEntity> operator <=(Property<TEntity, TValue> property, TValue value) => 
             property.LessThanOrEqualTo(value);
 
         /// <inheritdoc />

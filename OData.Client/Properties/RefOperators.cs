@@ -49,7 +49,7 @@ namespace OData.Client
             where TEntity : IEntity
             where TOther : IEntity
         {
-            var valueProperty = new Optional<TEntity, Guid>(property.ValueName);
+            var valueProperty = new Property<TEntity, Guid>(property.ValueName);
             var left = new ODataPropertyExpression(valueProperty);
             var right = ODataConstantExpression.Create(valueProperty, other.Id);
             var expression = new ODataBinaryExpression(left, @operator, right);

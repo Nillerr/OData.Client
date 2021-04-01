@@ -10,6 +10,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/OData.Client.Json.Net/JObjectProperties.cs">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/OData.Client/Expressions/Formatting/DefaultValueFormatter.cs">
           <value>
             <Attribute>

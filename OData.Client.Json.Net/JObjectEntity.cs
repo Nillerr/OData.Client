@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using Namotion.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -31,9 +33,9 @@ namespace OData.Client.Json.Net
         }
 
         /// <inheritdoc />
-        public IEntityId<TEntity> Id(IRequired<TEntity, IEntityId<TEntity>> property)
+        public IEntityId<TEntity> Id(IProperty<TEntity, IEntityId<TEntity>> property)
         {
-            var propertyAsGuid = new Required<TEntity, Guid>(property.SelectableName);
+            var propertyAsGuid = new Property<TEntity, Guid>(property.SelectableName);
             var value = this.Value(propertyAsGuid);
             var entityId = _entityType.Id(value);
             return entityId;
@@ -46,7 +48,7 @@ namespace OData.Client.Json.Net
         }
 
         /// <inheritdoc />
-        public bool TryGetValue<TValue>(IOptional<TEntity, TValue> property, out TValue? value) where TValue : notnull
+        public bool TryGetValue<TValue>(IProperty<TEntity, TValue> property, [MaybeNullWhen(false)] out TValue value)
         {
             if (property.ValueType.IsEntityId())
             {
@@ -57,22 +59,19 @@ namespace OData.Client.Json.Net
             {
                 var reader = new JTokenReader(token);
                 value = _serializer.Deserialize<TValue>(reader);
+                
+                if (value is null && typeof(TValue).ToContextualType().Nullability == Nullability.NotNullable)
+                {
+                    throw new ODataNullValueException($"The value in the entity for required property '{property.SelectableName}' was null.", property);
+                }
+                
+#pragma warning disable 8762
                 return true;
+#pragma warning restore 8762
             }
 
-            value = default!;
+            value = default;
             return false;
-        }
-
-        /// <inheritdoc />
-        public TValue? Value<TValue>(IOptional<TEntity, TValue> property) where TValue : notnull
-        {
-            if (TryGetValue(property, out var value))
-            {
-                return value;
-            }
-            
-            throw new JsonSerializationException($"A property '{property.SelectableName}' could not be found.");
         }
 
         /// <inheritdoc />

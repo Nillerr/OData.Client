@@ -117,6 +117,7 @@ namespace OData.Client.Demo
             var dateTime = DateTime.Parse("2020-05-18T01:26:32Z");
 
             string? caseNumber = null;
+            
             var query = incidents
                 .Where(Incident.IncidentId == IncidentId)
                 .Select(Incident.CreatedOn, Incident.Title, Incident.CaseNumber, Incident.PrimaryContact)
@@ -126,7 +127,7 @@ namespace OData.Client.Demo
             Console.WriteLine(query);
 
             var pageNumber = 0;
-            await foreach (var page in query.FastPages(maxPageSize: 10))
+            await foreach (var page in query.Pages(maxPageSize: 10))
             {
                 pageNumber++;
                 Console.WriteLine($"Fetched page #{pageNumber}");

@@ -8,13 +8,14 @@ namespace OData.Client.Demo
 
         public static readonly EntityType<Incident> EntityType = "incident";
 
-        public static readonly Required<Incident, string> ETag = "@odata.etag";
+        public static readonly Property<Incident, string> ETag = "@odata.etag";
         
-        public static readonly Required<Incident, IEntityId<Incident>> IncidentId = "incidentid";
-        public static readonly Required<Incident, DateTime> CreatedOn = "createdon";
-        public static readonly Required<Incident, string> Title = "title";
-        public static readonly Optional<Incident, string> CaseNumber = "c2rur_urcasenumber";
-        public static readonly Required<Incident, double> DoubleValue = "dbler";
+        public static readonly Property<Incident, IEntityId<Incident>> IncidentId = "incidentid";
+        public static readonly Property<Incident, DateTime> CreatedOn = "createdon";
+        public static readonly Property<Incident, string> Title = "title";
+        public static readonly Property<Incident, string> CaseNumber = "c2rur_urcasenumber";
+        public static readonly Property<Incident, double> DoubleValue = "dbler";
+        public static readonly Property<Incident, double?> OptionalDoubleValue = "dbler";
         
         public static readonly OptionalRef<Incident, Contact> PrimaryContact = "primarycontactid";
         

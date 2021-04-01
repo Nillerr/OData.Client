@@ -5,23 +5,12 @@ namespace OData.Client
 {
     public static class OptionalRefOperators
     {
-        public static Required<TEntity, TValue> Where<TEntity, TOther, TValue>(
+        public static Property<TEntity, TValue> Where<TEntity, TOther, TValue>(
             this OptionalRef<TEntity, TOther> property,
-            IRequired<TOther, TValue> other
+            IProperty<TOther, TValue> other
         )
             where TEntity : IEntity
             where TOther : IEntity
-            where TValue : notnull
-        {
-            return $"{property.Name}/{other.Name}";
-        }
-        public static Optional<TEntity, TValue> Where<TEntity, TOther, TValue>(
-            this OptionalRef<TEntity, TOther> property,
-            IOptional<TOther, TValue> other
-        )
-            where TEntity : IEntity
-            where TOther : IEntity
-            where TValue : notnull
         {
             return $"{property.Name}/{other.Name}";
         }
@@ -76,7 +65,7 @@ namespace OData.Client
             where TEntity : IEntity
             where TOther : IEntity
         {
-            var valueProperty = new Optional<TEntity, Guid>(property.ValueName);
+            var valueProperty = new Property<TEntity, Guid>(property.ValueName);
             var left = new ODataPropertyExpression(valueProperty);
             var right = ODataConstantExpression.Null;
             var expression = new ODataBinaryExpression(left, @operator, right);

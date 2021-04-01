@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace OData.Client
 {
@@ -23,7 +24,7 @@ namespace OData.Client
         /// </summary>
         /// <param name="property">The id property.</param>
         /// <returns>The id of the entity.</returns>
-        IEntityId<TEntity> Id(IRequired<TEntity, IEntityId<TEntity>> property);
+        IEntityId<TEntity> Id(IProperty<TEntity, IEntityId<TEntity>> property);
         
         /// <summary>
         /// Checks if the specified <paramref name="property"/> is present.
@@ -39,15 +40,7 @@ namespace OData.Client
         /// <param name="value">The value.</param>
         /// <typeparam name="TValue">The type to convert the value to.</typeparam>
         /// <returns><see langword="true"/> if a value was successfully retrieved; otherwise, <see langword="false"/>.</returns>
-        bool TryGetValue<TValue>(IOptional<TEntity, TValue> property, out TValue? value) where TValue : notnull;
-
-        /// <summary>
-        /// Gets the value with the specified <paramref name="property"/> converted to the specified type.
-        /// </summary>
-        /// <param name="property">The property.</param>
-        /// <typeparam name="TValue">The type to convert the value to.</typeparam>
-        /// <returns>The converted value.</returns>
-        TValue? Value<TValue>(IOptional<TEntity, TValue> property) where TValue : notnull;
+        bool TryGetValue<TValue>(IProperty<TEntity, TValue> property, [MaybeNullWhen(false)] out TValue value);
 
         /// <summary>
         /// Tries to get the entity referenced by the specified single-valued navigation <paramref name="property"/>. 
