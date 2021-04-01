@@ -43,4 +43,4 @@ jobs:
       - name: Publish
         run: |
           NUPKG=$(ls ./$project/bin/$config | grep "\.nupkg")
-          dotnet nuget push ./$project/bin/$config/$NUPKG --api-key "${{ secrets.GITHUB_TOKEN }}" --source "github"
+          dotnet nuget push ./$project/bin/$config/$NUPKG --api-key "${{ secrets.GITHUB_TOKEN }}" --source "https://nuget.pkg.github.com/Nillerr/index.json"
