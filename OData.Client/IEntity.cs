@@ -20,11 +20,10 @@ namespace OData.Client
         where TEntity : IEntity
     {
         /// <summary>
-        /// Returns the id of the entity specified by <paramref name="property"/>.
+        /// Returns the id of the entity.
         /// </summary>
-        /// <param name="property">The id property.</param>
         /// <returns>The id of the entity.</returns>
-        IEntityId<TEntity> Id(IProperty<TEntity, IEntityId<TEntity>> property);
+        IEntityId<TEntity> Id();
         
         /// <summary>
         /// Checks if the specified <paramref name="property"/> is present.

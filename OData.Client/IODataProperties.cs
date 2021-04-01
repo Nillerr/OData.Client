@@ -11,14 +11,22 @@ namespace OData.Client
     public interface IODataProperties<in TEntity> where TEntity : IEntity
     {
         /// <summary>
+        /// Sets the value of <paramref name="property"/> to the specified <paramref name="id"/>.
+        /// </summary>
+        /// <param name="property">The property to set.</param>
+        /// <param name="id">The value to set the property to.</param>
+        /// <typeparam name="TValue">The type of value of the property.</typeparam>
+        /// <returns>This instance, for fluent chaining.</returns>
+        IODataProperties<TEntity> Id(IEntityId<TEntity> id);
+        
+        /// <summary>
         /// Sets the value of <paramref name="property"/> to the specified <paramref name="value"/>.
         /// </summary>
         /// <param name="property">The property to set.</param>
         /// <param name="value">The value to set the property to.</param>
         /// <typeparam name="TValue">The type of value of the property.</typeparam>
         /// <returns>This instance, for fluent chaining.</returns>
-        IODataProperties<TEntity> Set<TValue>(IProperty<TEntity, TValue> property, TValue value)
-            where TValue : notnull;
+        IODataProperties<TEntity> Set<TValue>(IProperty<TEntity, TValue> property, TValue value);
 
         /// <summary>
         /// Binds an <paramref name="id"/> to a single-valued navigation <paramref name="property"/>.

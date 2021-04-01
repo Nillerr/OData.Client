@@ -15,6 +15,9 @@ namespace OData.Client
         /// <inheritdoc />
         public string Name { get; }
 
+        /// <inheritdoc />
+        public string IdPropertyName { get; }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityType{TEntity}"/> class.
         /// </summary>
@@ -23,14 +26,29 @@ namespace OData.Client
         public EntityType(string name)
         {
             Name = name;
+            IdPropertyName = $"{name}id";
+        }
+
+        private EntityType(string name, string idPropertyName)
+        {
+            Name = name;
+            IdPropertyName = idPropertyName;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityType{TEntity}"/> class using the string as the
         /// <see cref="Name"/>.
         /// </summary>
-        /// <param name="name">The pluralized name / endpoint of the entity, e.g. <c>"accounts"</c>, <c>"contacts"</c>.</param>
+        /// <param name="name">The name of the entity, e.g. <c>"account"</c>, <c>"contact"</c>.</param>
         /// <returns>The new instance.</returns>
         public static implicit operator EntityType<TEntity>(string name) => new(name);
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EntityType{TEntity}"/> class as a child of another entity,
+        /// using the specified name.
+        /// </summary>
+        /// <param name="name">The name of the child entity, e.g. <c>"account"</c>, <c>"contact"</c>.</param>
+        /// <returns>The child entity type instance.</returns>
+        public EntityType<TEntity> Child(string name) => new(name, IdPropertyName);
     }
 }

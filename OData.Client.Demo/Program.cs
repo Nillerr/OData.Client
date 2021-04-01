@@ -84,7 +84,7 @@ namespace OData.Client.Demo
 
             foreach (var activity in activities)
             {
-                var activityId = activity.Id(Activity.ActivityId);
+                var activityId = activity.Id();
                 Console.WriteLine($"{activityId}: {activity}");
                 
                 var incident = activity.Entity(Activity.RegardingObjectId, Incident.EntityType);
@@ -134,7 +134,7 @@ namespace OData.Client.Demo
                 
                 foreach (var incident in page)
                 {
-                    var incidentId = incident.Id(Incident.IncidentId);
+                    var incidentId = incident.Id();
                     Console.WriteLine($"{incidentId}: {incident}");
                 }
                 

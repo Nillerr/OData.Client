@@ -33,9 +33,9 @@ namespace OData.Client.Json.Net
         }
 
         /// <inheritdoc />
-        public IEntityId<TEntity> Id(IProperty<TEntity, IEntityId<TEntity>> property)
+        public IEntityId<TEntity> Id()
         {
-            var propertyAsGuid = new Property<TEntity, Guid>(property.SelectableName);
+            var propertyAsGuid = new Property<TEntity, Guid>(_entityType.IdPropertyName);
             var value = this.Value(propertyAsGuid);
             var entityId = _entityType.Id(value);
             return entityId;

@@ -17,23 +17,32 @@ namespace OData.Client.Json.Net
         private readonly IODataClient _oDataClient;
         private readonly JsonSerializer _serializer;
         private readonly IEntitySetNameResolver _entitySetNameResolver;
+        private readonly IEntityType<TEntity> _entityType;
 
         private readonly List<Func<Task>> _asyncBinds = new();
 
         public JObjectProperties(
             IODataClient oDataClient,
             JsonSerializer serializer,
-            IEntitySetNameResolver entitySetNameResolver
-        )
+            IEntitySetNameResolver entitySetNameResolver,
+            IEntityType<TEntity> entityType)
         {
             _oDataClient = oDataClient;
             _serializer = serializer;
             _entitySetNameResolver = entitySetNameResolver;
+            _entityType = entityType;
+        }
+
+        /// <inheritdoc />
+        public IODataProperties<TEntity> Id(IEntityId<TEntity> id)
+        {
+            var token = id.Id.ToString("D", CultureInfo.InvariantCulture);
+            _root[_entityType.IdPropertyName] = token;
+            return this;
         }
 
         /// <inheritdoc />
         public IODataProperties<TEntity> Set<TValue>(IProperty<TEntity, TValue> property, TValue value)
-            where TValue : notnull
         {
             var token = Token(value);
             _root[property.SelectableName] = token;

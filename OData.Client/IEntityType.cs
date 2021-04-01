@@ -10,8 +10,13 @@ namespace OData.Client
         where TEntity : IEntity
     {
         /// <summary>
-        /// The pluralized name / endpoint of the entity, e.g. <c>"accounts"</c>, <c>"contacts"</c>.
+        /// The name of the entity, e.g. <c>"account"</c>, <c>"contact"</c>.
         /// </summary>
         string Name { get; }
+        
+        /// <summary>
+        /// The name of the id property.
+        /// </summary>
+        string IdPropertyName { get; }
     }
 }

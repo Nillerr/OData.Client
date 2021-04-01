@@ -46,7 +46,7 @@ namespace OData.Client.Json.Net
         public IODataProperties<TEntity> Create<TEntity>(ODataPropertiesFactoryContext<TEntity> context)
             where TEntity : IEntity
         {
-            return new JObjectProperties<TEntity>(context.ODataClient, _serializer, context.EntitySetNameResolver);
+            return new JObjectProperties<TEntity>(context.ODataClient, _serializer, context.EntitySetNameResolver, context.EntityType);
         }
     }
 }
