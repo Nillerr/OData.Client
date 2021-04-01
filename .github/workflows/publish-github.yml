@@ -14,6 +14,8 @@ jobs:
       config: "Release"
 
     steps:
+      - uses: actions/checkout@v2
+
       # Set up .NET 5
       - name: Setup dotnet
         uses: actions/setup-dotnet@v1
