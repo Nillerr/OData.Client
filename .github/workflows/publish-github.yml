@@ -6,8 +6,35 @@ on:
       - master
 
 jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    env:
+      config: "Release"
+
+    steps:
+      # Set up .NET 5
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+
+      # restore dependencies
+      - name: Install dependencies
+        run: dotnet restore
+
+      # build project
+      - name: Build
+        run: dotnet build --configuration $config --no-restore
+
+      # run tests with built project
+      - name: Test
+        run: dotnet test --no-restore --no-build --configuration $config
+
   publish-odata-client:
     name: Publish OData.Client
+    needs: build
     runs-on: ubuntu-latest
 
     env:
@@ -23,18 +50,6 @@ jobs:
         with:
           dotnet-version: 5.0.x
 
-      # restore dependencies
-      - name: Install dependencies
-        run: dotnet restore
-
-      # build project
-      - name: Build
-        run: dotnet build --configuration $config --no-restore
-
-      # run tests with built project
-      - name: Test
-        run: dotnet test --no-restore --no-build --configuration $config
-
       # pack nuget package
       - name: Pack
         run: dotnet pack $project/$project.csproj --configuration $config --include-symbols --include-source
@@ -47,6 +62,7 @@ jobs:
 
   publish-odata-client-authentication-microsoft:
     name: Publish OData.Client.Authentication.Microsoft
+    needs: build
     runs-on: ubuntu-latest
 
     env:
@@ -62,18 +78,6 @@ jobs:
         with:
           dotnet-version: 5.0.x
 
-      # restore dependencies
-      - name: Install dependencies
-        run: dotnet restore
-
-      # build project
-      - name: Build
-        run: dotnet build --configuration $config --no-restore
-
-      # run tests with built project
-      - name: Test
-        run: dotnet test --no-restore --no-build --configuration $config
-
       # pack nuget package
       - name: Pack
         run: dotnet pack $project/$project.csproj --configuration $config --include-symbols --include-source
@@ -86,6 +90,7 @@ jobs:
 
   publish-odata-client-json-net:
     name: Publish OData.Client.Json.Net
+    needs: build
     runs-on: ubuntu-latest
 
     env:
@@ -100,18 +105,6 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 5.0.x
-
-      # restore dependencies
-      - name: Install dependencies
-        run: dotnet restore
-
-      # build project
-      - name: Build
-        run: dotnet build --configuration $config --no-restore
-
-      # run tests with built project
-      - name: Test
-        run: dotnet test --no-restore --no-build --configuration $config
 
       # pack nuget package
       - name: Pack
