@@ -12,6 +12,7 @@ jobs:
 
     env:
       config: "Release"
+      project: "OData.Client"
 
     steps:
       - uses: actions/checkout@v2
@@ -34,11 +35,10 @@ jobs:
       - name: Test
         run: dotnet test --no-restore --no-build --configuration $config
 
-      # Publish (https://github.com/marketplace/actions/publish-nuget)
-      - name: publish on version change
-        id: publish_nuget
-        uses: rohith/publish-nuget@v2
-        with:
-          PROJECT_FILE_PATH: OData.Client/OData.Client.csproj
-          NUGET_SOURCE: "github"
-          INCLUDE_SYMBOLS: true
+      # pack nuget package
+      - name: Pack
+        run: dotnet pack $project/$project.csproj --configuration $config --include-symbols --include-source
+
+      # publish to github package
+      - name: Publish
+        run: dotnet nuget push ./$project/bin/$config/$project.1.0.0-alpha1.nupkg --source "github"
