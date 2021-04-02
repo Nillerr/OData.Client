@@ -30,22 +30,25 @@ namespace OData.Client
         }
 
         /// <inheritdoc />
-        public async Task<IEntity<TEntity>?> RetrieveAsync(IEntityId<TEntity> id)
+        public async Task<IEntity<TEntity>?> RetrieveAsync(
+            IEntityId<TEntity> id,
+            CancellationToken cancellationToken = default)
         {
-            var entity = await _oDataClient.RetrieveAsync(id, new ODataRetrieveRequest<TEntity>());
+            var entity = await _oDataClient.RetrieveAsync(id, new ODataRetrieveRequest<TEntity>(), cancellationToken);
             return entity;
         }
 
         /// <inheritdoc />
         public async Task<IEntity<TEntity>?> RetrieveAsync(
             IEntityId<TEntity> id,
-            Action<IODataSelection<TEntity>> selection
+            Action<IODataSelection<TEntity>> selection,
+            CancellationToken cancellationToken = default
         )
         {
             var request = new ODataRetrieveRequest<TEntity>();
             selection(request);
 
-            var entity = await _oDataClient.RetrieveAsync(id, request);
+            var entity = await _oDataClient.RetrieveAsync(id, request, cancellationToken);
             return entity;
         }
 

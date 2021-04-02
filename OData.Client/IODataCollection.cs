@@ -23,8 +23,9 @@ namespace OData.Client
         /// Retrieves the entity specified by <paramref name="id"/>.
         /// </summary>
         /// <param name="id">The id of the entity to retrieve.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The entity with the specified id if it exists; otherwise <see langword="null"/>.</returns>
-        Task<IEntity<TEntity>?> RetrieveAsync(IEntityId<TEntity> id);
+        Task<IEntity<TEntity>?> RetrieveAsync(IEntityId<TEntity> id, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Retrieves the selection specified by <paramref name="selection"/> from the entity specified by
@@ -32,8 +33,12 @@ namespace OData.Client
         /// </summary>
         /// <param name="id">The id of the entity to retrieve.</param>
         /// <param name="selection">The selection of properties to retrieve.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The entity with the specified id if it exists; otherwise <see langword="null"/>.</returns>
-        Task<IEntity<TEntity>?> RetrieveAsync(IEntityId<TEntity> id, Action<IODataSelection<TEntity>> selection);
+        Task<IEntity<TEntity>?> RetrieveAsync(
+            IEntityId<TEntity> id,
+            Action<IODataSelection<TEntity>> selection,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Creates a new entity with the specified properties.
