@@ -33,6 +33,14 @@ namespace OData.Client.Json.Net
         }
 
         /// <inheritdoc />
+        public Guid Guid()
+        {
+            var propertyAsGuid = new Property<TEntity, Guid>(_entityType.IdPropertyName);
+            var value = this.Value(propertyAsGuid);
+            return value;
+        }
+
+        /// <inheritdoc />
         public IEntityId<TEntity> Id()
         {
             var propertyAsGuid = new Property<TEntity, Guid>(_entityType.IdPropertyName);
@@ -75,7 +83,7 @@ namespace OData.Client.Json.Net
         }
 
         /// <inheritdoc />
-        public bool TryGetEntity<TOther>(IOptionalRef<TEntity, TOther> property, IEntityType<TOther> other, out IEntity<TOther> entity) where TOther : IEntity
+        public bool TryGetEntity<TOther>(IOptionalRef<TEntity, TOther> property, IEntityType<TOther> other, out IEntity<TOther>? entity) where TOther : IEntity
         {
             var propertyName = EntityPropertyName(property, other);
             if (_root.TryGetValue(propertyName, out var token))
@@ -90,7 +98,7 @@ namespace OData.Client.Json.Net
         }
 
         /// <inheritdoc />
-        public IEntity<TOther> Entity<TOther>(IOptionalRef<TEntity, TOther> property, IEntityType<TOther> other) where TOther : IEntity
+        public IEntity<TOther>? Entity<TOther>(IOptionalRef<TEntity, TOther> property, IEntityType<TOther> other) where TOther : IEntity
         {
             if (TryGetEntity(property, other, out var entity))
             {

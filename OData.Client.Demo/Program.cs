@@ -68,9 +68,9 @@ namespace OData.Client.Demo
             var incidents = oDataClient.Collection(Incident.EntityType);
 
             var adxPortalComments = oDataClient.Collection(AdxPortalComment.EntityType);
-            // await QueryPortalComments(adxPortalComments);
-            await QueryIncidents(incidents);
-            await QueryIncidents(incidents);
+            await QueryPortalComments(adxPortalComments);
+            // await QueryIncidents(incidents);
+            // await QueryIncidents(incidents);
             // await CreateCaseAsync(incidents);
         }
 
@@ -80,6 +80,7 @@ namespace OData.Client.Demo
                 .Where(Activity.RegardingObjectId == IncidentId & Activity.ActivityTypeCode == AdxPortalComment.EntityType.Name)
                 .Select(Activity.ActivityId, Activity.ActivityTypeCode, Activity.RegardingObjectId)
                 .Expand(Activity.RegardingObjectId, Incident.EntityType)
+                .Limit(1)
                 .ToListAsync();
 
             foreach (var activity in activities)
@@ -87,8 +88,9 @@ namespace OData.Client.Demo
                 var activityId = activity.Id();
                 Console.WriteLine($"{activityId}: {activity}");
                 
-                var incident = activity.Entity(Activity.RegardingObjectId, Incident.EntityType);
-                Console.WriteLine($"Incident: {incident}");
+                var incident = activity.Entity(Activity.RegardingObjectId, Incident.EntityType)!;
+                var incidentId = incident.Id();
+                Console.WriteLine($"{incidentId}: {incident}");
             }
         }
 

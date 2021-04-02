@@ -15,7 +15,7 @@ namespace OData.Client
         /// <returns>The selection builder.</returns>
         public static IODataSelection<TEntity> Select<TEntity>(
             this IODataSelection<TEntity> selection,
-            params IProperty<TEntity>[] properties
+            params ISelectableProperty<TEntity>[] properties
         )
             where TEntity : IEntity
         {
@@ -31,7 +31,7 @@ namespace OData.Client
         /// <returns>The selection builder.</returns>
         public static IODataSelection<TEntity> Expand<TEntity>(
             this IODataSelection<TEntity> selection,
-            params IRefProperty<TEntity>[] properties
+            params IExpandableProperty<TEntity>[] properties
         )
             where TEntity : IEntity
         {

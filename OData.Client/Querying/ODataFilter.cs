@@ -6,6 +6,8 @@ namespace OData.Client
     public readonly struct ODataFilter<TEntity> : IEquatable<ODataFilter<TEntity>>
         where TEntity : IEntity
     {
+        public static ODataFilter<TEntity> Empty => default;
+        
         public IODataFilterExpression? Expression { get; }
 
         public ODataFilter(IODataFilterExpression expression) => Expression = expression;

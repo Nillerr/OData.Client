@@ -68,6 +68,15 @@ namespace OData.Client
         /// <inheritdoc />
         public IODataQuery<TEntity> Expand<TOther>(IRef<TEntity, TOther> property) where TOther : IEntity
         {
+            if (typeof(TOther) == typeof(IEntity))
+            {
+                throw new InvalidOperationException(
+                    "Cannot expand an unspecified reference property. When expanding an unspecified reference " +
+                    $"property of type {nameof(IEntity)}, the type to expand must be specified. Use the " +
+                    "Expand(this IODataQuery<TEntity>, IRef<TEntity, IEntity>, IEntityType<TOther>) " +
+                    "extension method to specify the type to expand.");
+            }
+            
             var expansion = ODataExpansion.Create(property);
             _expansions.Add(expansion);
             return this;
@@ -137,6 +146,7 @@ namespace OData.Client
             return this;
         }
 
+        /// <inheritdoc />
         public IODataFindRequest<TEntity> ToFindRequest()
         {
             var maxPageSize = MinimumMaxPageSize(0);
@@ -144,6 +154,7 @@ namespace OData.Client
             return request;
         }
 
+        /// <inheritdoc />
         public IODataFindRequestHeaders<TEntity> ToFindNextRequest(int currentCount)
         {
             var maxPageSize = MinimumMaxPageSize(currentCount);

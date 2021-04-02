@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -19,6 +20,12 @@ namespace OData.Client
     public interface IEntity<TEntity>
         where TEntity : IEntity
     {
+        /// <summary>
+        /// Returns the id of the entity.
+        /// </summary>
+        /// <returns>The id of the entity.</returns>
+        Guid Guid();
+        
         /// <summary>
         /// Returns the id of the entity.
         /// </summary>
